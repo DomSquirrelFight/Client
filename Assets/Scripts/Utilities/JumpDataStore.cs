@@ -13,6 +13,4 @@ public class JumpDataStore : MonoBehaviour {
     {
          m_acJump = new AnimationCurve(new Keyframe(0, 0), new Keyframe (1, 1));
     }
-
-
 }
