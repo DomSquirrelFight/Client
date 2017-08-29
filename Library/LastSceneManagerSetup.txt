@@ -1,4 +1,0 @@
-sceneSetups:
-- path: Assets/Scenes/Map_TestFight/Map_Test_Fight.unity
-  isLoaded: 1
-  isActive: 1
