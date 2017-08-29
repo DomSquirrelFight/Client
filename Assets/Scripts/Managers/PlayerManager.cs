@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 
-public class PlayerManager : MonoBehaviour {
+public class PlayerManager : MonoBehaviour
+{
 
-    ePlayerState m_ePlayerState = ePlayerState.PlayerState_Idle;
-
+    #region 通用变量和接口
+    ePlayerState m_ePlayerState = ePlayerState.PlayerState_Idle;//角色状态
     BaseActor Owner;
     CameraController cc;
     public void OnStart(BaseActor owner)
@@ -14,11 +15,84 @@ public class PlayerManager : MonoBehaviour {
         Owner = owner;
         cc = Owner.CameraContrl;
     }
+    void Update()
+    {
 
+        if (!Owner) return;
+
+        JumpBehaviour();//角色跳跃
+
+        PlayerMove();//角色移动
+
+        PickUpBox();//捡起箱子
+
+    }
+    #endregion
+
+    #region 角色move
     float m_fHorizontal = 0f;
     float m_fVertical = 0f;
     Vector3 m_vCurForward = Vector3.zero;
+    void PlayerMove()
+    {
+        m_fHorizontal = Input.GetAxis("Horizontal");//获取Z轴方向移动指令
+        m_fVertical = Input.GetAxis("Vertical");//获取Y轴方向移动指令
+        switch (cc.CamMoveDir)
+        {
+            case eCamMoveDir.CamMove_Left:
+            case eCamMoveDir.CamMove_Right:
+                {
 
+                    if (0f == m_fHorizontal)
+                    {
+                        Owner.AM.SetFloat(NameToHashScript.SpeedId, 0f);
+                        if (m_ePlayerState < ePlayerState.PlayerState_SmallJump)
+                            m_ePlayerState = ePlayerState.PlayerState_Idle;
+                    }
+                    else
+                    {
+
+                        if (m_ePlayerState == ePlayerState.PlayerState_Idle)
+                            m_ePlayerState = ePlayerState.PlayerState_Run;
+
+                        Owner.AM.SetFloat(NameToHashScript.SpeedId, 1f);
+                        m_vCurForward = new Vector3(m_fHorizontal, 0f, 0f);
+                        Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, 60 * Time.deltaTime);
+
+                        if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
+                        {
+                            //block left
+                            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.LeftPoint.x + Owner.ActorSize && m_fHorizontal < 0f)
+                            {
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            //block right
+                            if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.RightPoint.x - Owner.ActorSize && m_fHorizontal > 0f)
+                            {
+                                return;
+                            }
+                        }
+                        Owner.ActorTrans.Translate(new Vector3(0f, 0f, 3 * Time.deltaTime));
+                    }
+
+                    break;
+                }
+            case eCamMoveDir.CamMove_Up:
+            case eCamMoveDir.CamMove_Down:
+                {
+                    //Block Left and Block right
+
+                    //不处理相机中点
+                    break;
+                }
+        }
+    }
+    #endregion
+
+    #region 小跳跃
     bool CanSmallJump()
     {
         if (m_ePlayerState < ePlayerState.PlayerState_SmallJump && m_fOrigHeight == 0f && m_fStartJumpTime == 0f && false == m_bIsDescend)
@@ -26,7 +100,6 @@ public class PlayerManager : MonoBehaviour {
 
         return false;
     }
-
     //判断是否在下落状态
     bool m_bIsDescend = false;
 
@@ -37,8 +110,8 @@ public class PlayerManager : MonoBehaviour {
             return m_bIsDescend;
         }
     }
-    float m_fStartJumpTime = 0f;
-    float m_fOrigHeight = 0f;
+    float m_fStartJumpTime = 0f;//开始计时变量
+    float m_fOrigHeight = 0f;//角色原始高度
     void BeginSmallJump()
     {
         //设置当前状态
@@ -64,7 +137,7 @@ public class PlayerManager : MonoBehaviour {
         m_ePlayerState = ePlayerState.PlayerState_Idle;
     }
 
-    float curPercent = 0f;
+    float curPercent = 0f;//曲线进度
 
     void OnTriggerEnter(Collider other)
     {
@@ -107,76 +180,14 @@ public class PlayerManager : MonoBehaviour {
         }
 
     }
+    #endregion
 
+    #region 捡起箱子
     void PickUpBox()
     {
 
     }
-
-	// Update is called once per frame
-	void Update () {
-
-        if (!Owner) return;
-
-        JumpBehaviour();
-
-        m_fHorizontal = Input.GetAxis("Horizontal");//获取Z轴方向移动指令
-        m_fVertical = Input.GetAxis("Vertical");//获取Y轴方向移动指令
-        switch (cc.CamMoveDir)
-        {
-            case eCamMoveDir.CamMove_Left:
-            case eCamMoveDir.CamMove_Right:
-                {
-                    
-                    if (0f == m_fHorizontal) { 
-                        Owner.AM.SetFloat(NameToHashScript.SpeedId, 0f);
-                        if(m_ePlayerState < ePlayerState.PlayerState_SmallJump)
-                        m_ePlayerState = ePlayerState.PlayerState_Idle;
-                    }                       
-                    else
-                    {
-
-                        if (m_ePlayerState == ePlayerState.PlayerState_Idle)
-                            m_ePlayerState = ePlayerState.PlayerState_Run;
-
-                        Owner.AM.SetFloat(NameToHashScript.SpeedId, 1f);
-                        m_vCurForward = new Vector3(m_fHorizontal, 0f, 0f);
-                        Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, 60 * Time.deltaTime);
-
-                        if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
-                        {
-                            //block left
-                            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.LeftPoint.x + Owner.ActorSize && m_fHorizontal < 0f)
-                            {
-                                return;
-                            }
-                        }
-                        else
-                        {
-                            //block right
-                            if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.RightPoint.x - Owner.ActorSize && m_fHorizontal > 0f)
-                            {
-                                return;
-                            }
-                        }       
-                        Owner.ActorTrans.Translate(new Vector3(0f, 0f, 3 * Time.deltaTime));
-                    }
-                    
-                    break;
-                }
-            case eCamMoveDir.CamMove_Up:
-            case eCamMoveDir.CamMove_Down:
-                {
-                    //Block Left and Block right
-
-                    //不处理相机中点
-                    break;
-                }
-        }
-
-        PickUpBox();//捡起箱子
-
-    }
+    #endregion
 
     //void TouchHandler()
     //{
