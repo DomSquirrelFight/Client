@@ -18,10 +18,107 @@ public class PlayerManager : MonoBehaviour {
     float m_fHorizontal = 0f;
     float m_fVertical = 0f;
     Vector3 m_vCurForward = Vector3.zero;
+
+    bool CanSmallJump()
+    {
+        if (m_ePlayerState < ePlayerState.PlayerState_SmallJump && m_fOrigHeight == 0f && m_fStartJumpTime == 0f && false == m_bIsDescend)
+            return true;
+
+        return false;
+    }
+
+    //判断是否在下落状态
+    bool m_bIsDescend = false;
+
+    bool IsDescend
+    {
+        get
+        {
+            return m_bIsDescend;
+        }
+    }
+    float m_fStartJumpTime = 0f;
+    float m_fOrigHeight = 0f;
+    void BeginSmallJump()
+    {
+        //设置当前状态
+        m_ePlayerState = ePlayerState.PlayerState_SmallJump;
+        //保存原始高度
+        m_fOrigHeight = Owner.ActorTrans.position.y;
+        //保存曲线开始时间
+        m_fStartJumpTime = Time.time;
+        //判定是否开始下降
+        m_bIsDescend = false;
+    }
+
+    void ResetJump()
+    {
+        m_bIsDescend = false;
+        m_fStartJumpTime = 0f;
+        Owner.ActorTrans.transform.position = new Vector3(
+                        Owner.ActorTrans.transform.position.x,
+                        m_fOrigHeight,
+                        Owner.ActorTrans.transform.position.z
+                        );
+        m_fOrigHeight = 0f;
+        m_ePlayerState = ePlayerState.PlayerState_Idle;
+    }
+
+    float curPercent = 0f;
+
+    void OnTriggerEnter(Collider other)
+    {
+        //如果碰到的是地面
+        if (other.gameObject.layer == LayerMask.NameToLayer("Ground")/*碰到的是地面*/ && m_ePlayerState >= ePlayerState.PlayerState_SmallJump/*当前在跳跃状态*/ && IsDescend/*当前正在下降*/)
+        {
+            ResetJump();
+        }
+    }
+
+    void JumpBehaviour()
+    {
+        if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
+        {
+            if (CanSmallJump())
+            {
+                BeginSmallJump();
+            }
+        }
+
+        switch (m_ePlayerState) {
+            case ePlayerState.PlayerState_SmallJump:
+                {
+                    curPercent = (Time.time - m_fStartJumpTime) / Owner.SmallJumpDataStore.m_fDuration;
+                    Owner.ActorTrans.transform.position = new Vector3(
+                        Owner.ActorTrans.transform.position.x,
+                        m_fOrigHeight + Owner.SmallJumpDataStore.m_acJump.Evaluate(curPercent) * Owner.SmallJumpDataStore.m_fHeight,
+                        Owner.ActorTrans.transform.position.z
+                        );
+
+                    if (curPercent > 0.5f)
+                        m_bIsDescend = true;
+     
+                    break;
+                }
+            case ePlayerState.PlayerState_BigJump:
+                {
+                    break;
+                }
+        }
+
+    }
+
+    void PickUpBox()
+    {
+
+    }
+
 	// Update is called once per frame
 	void Update () {
 
         if (!Owner) return;
+
+        JumpBehaviour();
 
         m_fHorizontal = Input.GetAxis("Horizontal");//获取Z轴方向移动指令
         m_fVertical = Input.GetAxis("Vertical");//获取Y轴方向移动指令
@@ -31,11 +128,17 @@ public class PlayerManager : MonoBehaviour {
             case eCamMoveDir.CamMove_Right:
                 {
                     
-                    if (0f == m_fHorizontal) {
+                    if (0f == m_fHorizontal) { 
                         Owner.AM.SetFloat(NameToHashScript.SpeedId, 0f);
+                        if(m_ePlayerState < ePlayerState.PlayerState_SmallJump)
+                        m_ePlayerState = ePlayerState.PlayerState_Idle;
                     }                       
                     else
                     {
+
+                        if (m_ePlayerState == ePlayerState.PlayerState_Idle)
+                            m_ePlayerState = ePlayerState.PlayerState_Run;
+
                         Owner.AM.SetFloat(NameToHashScript.SpeedId, 1f);
                         m_vCurForward = new Vector3(m_fHorizontal, 0f, 0f);
                         Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, 60 * Time.deltaTime);
@@ -55,9 +158,7 @@ public class PlayerManager : MonoBehaviour {
                             {
                                 return;
                             }
-                        }
-                
-
+                        }       
                         Owner.ActorTrans.Translate(new Vector3(0f, 0f, 3 * Time.deltaTime));
                     }
                     
@@ -73,41 +174,7 @@ public class PlayerManager : MonoBehaviour {
                 }
         }
 
-        #region old version
-        //if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
-        //{
-        //    TouchHandler ();
-        //}
-        //else
-        //{
-        //    MouseHandler();
-        //}
-
-        //switch (m_ePlayerState)
-        //{
-        //    case ePlayerState.PlayerState_Idle:
-        //        {
-        //            Owner.AM.SetFloat(NameToHashScript.SpeedId, 0f);
-        //            break;
-        //        }
-        //    case ePlayerState.PlayerState_Run:
-        //        {
-        //            Owner.AM.SetFloat(NameToHashScript.SpeedId, 1f);
-                   
-        //            m_vCurForward = new Vector3(m_fHorizontal, 0f, 0f);
-        //            Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, 60*Time.deltaTime);
-        //            if (Owner.AM.IsInTransition(0))
-        //                return;
-
-        //            //根据当前的朝向，确定角色的运动边界.
-    
-
-        //            //移动角色
-        //            Owner.ActorTrans.Translate(new Vector3(0f, 0f, 5 * Time.deltaTime));
-        //            break;
-        //        }
-        //}
-        #endregion
+        PickUpBox();//捡起箱子
 
     }
 

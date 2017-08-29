@@ -2,9 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
+
+[RequireComponent(typeof(BoxCollider)), RequireComponent(typeof(Rigidbody))]
 public class CameraWallEvent : MonoBehaviour {
 
-    //public eCameEventType m_eCamEventType = eCameEventType.CamEvent_ChangeDir;
+    void Reset()
+    {
+        BoxCollider bc = gameObject.GetComponent<BoxCollider>();
+        bc.isTrigger = true;
+        Rigidbody rb = GetComponent<Rigidbody>();
+        rb.isKinematic = true;
+    }
+
     public eCamMoveDir m_eCamMoveDir = eCamMoveDir.CamMove_Right;
 
     void OnTriggerEnter(Collider other)
@@ -22,7 +31,6 @@ public class CameraWallEvent : MonoBehaviour {
             }
             //设置新的运动方向
             cc.CamMoveDir = m_eCamMoveDir;
-            //cc.CalculateCamera();
             switch (m_eCamMoveDir)
             {
                 case eCamMoveDir.CamMove_Left:
@@ -37,15 +45,6 @@ public class CameraWallEvent : MonoBehaviour {
                     }
             }
         }
-
-        //switch (m_eCamEventType)
-        //{
-        //    case eCameEventType.CamEvent_ChangeDir:
-        //        {
-                  
-
-        //            break;
-        //        }
-        //}     
     }
+
 }

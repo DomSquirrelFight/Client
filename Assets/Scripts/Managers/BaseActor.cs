@@ -34,7 +34,7 @@ public class BaseActor : MonoBehaviour
     /// 创建角色，并将角色实例返回
     /// </summary>
     /// <returns></returns>
-    static public BaseActor CreatePlayer(string name/*角色名称*/, eRoleID roldid/*角色ID*/, Vector3 pos = default(Vector3)/*模型出生位置*/, Quaternion rot = default(Quaternion)/*模型出生朝向*/)
+    static public BaseActor CreatePlayer(string name/*角色名称*/, eRoleID roldid/*角色ID*/, Vector3 pos = default(Vector3)/*模型出生位置*/, Quaternion rot = default(Quaternion)/*模型出生朝向*/, bool bCanJump = true)
     {
 
         #region 创建外层对象
@@ -49,6 +49,16 @@ public class BaseActor : MonoBehaviour
 
         CreateActor(roldid, ba, pos, rot);//加载模型
 
+        //获取跳跃数据
+        if (bCanJump)
+        {
+            //获取小跳数据
+            UnityEngine.Object _obj = Resources.Load("Prefabs/Maps/FightTest/SmallJumpDataStore");
+            GameObject obj = Instantiate(_obj) as GameObject;
+            ba.m_cSmallJumpDataStore = obj.GetComponent<JumpDataStore>();
+            ba.m_cSmallJumpDataStore.transform.parent = ba.transform;//设置小跳的父类
+        }
+     
         if (
             null != ba.PlayerMgr/*读取角色管理器*/ ||
             null != ba.CameraContrl/*相机实例对象*/ ||
@@ -156,5 +166,17 @@ public class BaseActor : MonoBehaviour
         }
     }
     #endregion
+
+    #region 小跳类
+    private JumpDataStore m_cSmallJumpDataStore;
+    public JumpDataStore SmallJumpDataStore
+    {
+        get
+        {
+            return m_cSmallJumpDataStore;
+        }
+    }
+    #endregion
+
 
 }
