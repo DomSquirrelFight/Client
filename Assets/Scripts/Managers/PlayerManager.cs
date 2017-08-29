@@ -1,0 +1,134 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using AttTypeDefine;
+
+public class PlayerManager : MonoBehaviour {
+
+    ePlayerState m_ePlayerState = ePlayerState.PlayerState_Idle;
+
+    BaseActor Owner;
+    CameraController cc;
+    public void OnStart(BaseActor owner)
+    {
+        Owner = owner;
+        cc = Owner.CameraContrl;
+    }
+
+    float m_fHorizontal = 0f;
+    float m_fVertical = 0f;
+    Vector3 m_vCurForward = Vector3.zero;
+	// Update is called once per frame
+	void Update () {
+
+        if (!Owner) return;
+
+        m_fHorizontal = Input.GetAxis("Horizontal");//获取Z轴方向移动指令
+        m_fVertical = Input.GetAxis("Vertical");//获取Y轴方向移动指令
+        switch (cc.CamMoveDir)
+        {
+            case eCamMoveDir.CamMove_Left:
+            case eCamMoveDir.CamMove_Right:
+                {
+                    
+                    if (0f == m_fHorizontal) {
+                        Owner.AM.SetFloat(NameToHashScript.SpeedId, 0f);
+                    }                       
+                    else
+                    {
+                        Owner.AM.SetFloat(NameToHashScript.SpeedId, 1f);
+                        m_vCurForward = new Vector3(m_fHorizontal, 0f, 0f);
+                        Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, 60 * Time.deltaTime);
+
+                        if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
+                        {
+                            //block left
+                            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.LeftPoint.x + Owner.ActorSize && m_fHorizontal < 0f)
+                            {
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            //block right
+                            if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.RightPoint.x - Owner.ActorSize && m_fHorizontal > 0f)
+                            {
+                                return;
+                            }
+                        }
+                
+
+                        Owner.ActorTrans.Translate(new Vector3(0f, 0f, 3 * Time.deltaTime));
+                    }
+                    
+                    break;
+                }
+            case eCamMoveDir.CamMove_Up:
+            case eCamMoveDir.CamMove_Down:
+                {
+                    //Block Left and Block right
+
+                    //不处理相机中点
+                    break;
+                }
+        }
+
+        #region old version
+        //if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+        //{
+        //    TouchHandler ();
+        //}
+        //else
+        //{
+        //    MouseHandler();
+        //}
+
+        //switch (m_ePlayerState)
+        //{
+        //    case ePlayerState.PlayerState_Idle:
+        //        {
+        //            Owner.AM.SetFloat(NameToHashScript.SpeedId, 0f);
+        //            break;
+        //        }
+        //    case ePlayerState.PlayerState_Run:
+        //        {
+        //            Owner.AM.SetFloat(NameToHashScript.SpeedId, 1f);
+                   
+        //            m_vCurForward = new Vector3(m_fHorizontal, 0f, 0f);
+        //            Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, 60*Time.deltaTime);
+        //            if (Owner.AM.IsInTransition(0))
+        //                return;
+
+        //            //根据当前的朝向，确定角色的运动边界.
+    
+
+        //            //移动角色
+        //            Owner.ActorTrans.Translate(new Vector3(0f, 0f, 5 * Time.deltaTime));
+        //            break;
+        //        }
+        //}
+        #endregion
+
+    }
+
+    //void TouchHandler()
+    //{
+
+    //}
+
+    //void MouseHandler()
+    //{
+
+    //    m_fHorizontal = Input.GetAxis("Horizontal");//获取Z轴方向移动指令
+    //    if (m_ePlayerState <= ePlayerState.PlayerState_Run && 0f != m_fHorizontal)//如果当前非跳跃状态&&出发了移动指令 -> 切换状态到移动
+    //    {
+    //        m_ePlayerState = ePlayerState.PlayerState_Run;
+    //    }
+    //    else if (m_ePlayerState <= ePlayerState.PlayerState_Run && 0f == m_fHorizontal)//如果当前是非跳跃状态&&没有发出移动指令 -> 切换状态到待机
+    //    {
+    //        m_ePlayerState = ePlayerState.PlayerState_Idle;
+    //    }
+        
+    //}
+
+}
