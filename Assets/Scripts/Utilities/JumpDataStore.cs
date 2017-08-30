@@ -4,30 +4,68 @@ using UnityEngine;
 
 public class JumpDataStore : MonoBehaviour {
 
-
     public AnimationCurve m_acSmallJump;//小跳跃曲线对象
+    public AnimationCurve m_acBigJump;//大条曲线
 
-    [SerializeField]//跳跃持续时间
-    private float duration;
-    public float m_fDuration//持续时间
+    #region 小跳跃持续时间
+    [SerializeField]
+    private float smallduration;
+
+    public float m_fSmallDuration//持续时间
     {
         get
         {
-            return duration;
+            return smallduration;
         }
     }
+    #endregion
 
-    [SerializeField]//跳跃高度
-    private float JumpHeight;
-    public float m_fHeight//跳跃高度
+    #region 小跳跃高度
+    [SerializeField]
+    private float SmallJumpHeight;
+    public float m_fSmallHeight//小跳跃高度
     {
         get
         {
-            return JumpHeight;
+            return SmallJumpHeight;
         }
     }
+    #endregion
 
-    [Range(0f, 0.45f)][SerializeField]//切换到大条的百分比
+    #region 大跳跃持续时间
+    [SerializeField]
+    private float bigduration;
+
+    public float m_fBigDuration
+    {
+        get
+        {
+            return bigduration;
+        }
+    }
+    #endregion
+
+    #region 大跳跃高度
+    [SerializeField]
+    private float BigJumpHeight;
+    public float m_fBigJumpHeight
+    {
+        get
+        {
+            return BigJumpHeight;
+        }
+    }
+    #endregion
+
+    #region 当前的跳跃时长,跳跃高度
+    [HideInInspector]
+    public float m_CurDuration;
+    [HideInInspector]
+    public float m_CurJumpHeight;
+    #endregion
+
+    #region 切换到大条的百分比
+    [Range(0f, 0.45f)][SerializeField]
     private float BigJumpPercent;
     public float m_fChangeBigJumpPercent
     {
@@ -36,9 +74,8 @@ public class JumpDataStore : MonoBehaviour {
             return BigJumpPercent;
         }
     }
+    #endregion
 
-    public AnimationCurve m_acBigJump;//大条曲线
-    
     void Reset()
     {
         m_acSmallJump = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
