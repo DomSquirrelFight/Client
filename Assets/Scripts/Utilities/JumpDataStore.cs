@@ -65,7 +65,6 @@ public class JumpDataStore : MonoBehaviour {
     #endregion
 
     #region 切换到大条的百分比
-    [Range(0f, 0.45f)][SerializeField]
     private float BigJumpPercent;
     public float m_fChangeBigJumpPercent
     {
@@ -73,22 +72,28 @@ public class JumpDataStore : MonoBehaviour {
         {
             return BigJumpPercent;
         }
+        set
+        {
+            if (value != BigJumpPercent)
+                BigJumpPercent = value;
+        }
     }
     #endregion
 
     void Reset()
     {
         m_acSmallJump = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
+        m_acBigJump = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
     }
 
     void Awake()
     {
-        m_acBigJump = new AnimationCurve(
-             new Keyframe(m_fChangeBigJumpPercent, m_acSmallJump.Evaluate(m_fChangeBigJumpPercent)),
-             new Keyframe(0.5f, 1f),
-             new Keyframe(1, 0)
+        //m_acBigJump = new AnimationCurve(
+        //     new Keyframe(m_fChangeBigJumpPercent, m_acSmallJump.Evaluate(m_fChangeBigJumpPercent)),
+        //     new Keyframe(0.5f, 1f),
+        //     new Keyframe(1, 0)
 
-         );
+        // );
     }
 
 }
