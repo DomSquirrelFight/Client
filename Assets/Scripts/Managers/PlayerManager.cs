@@ -36,7 +36,7 @@ public class PlayerManager : MonoBehaviour
     void PlayerMove()
     {
         m_fHorizontal = Input.GetAxis("Horizontal");//获取Z轴方向移动指令
-        m_fVertical = Input.GetAxis("Vertical");//获取Y轴方向移动指令
+        //m_fVertical = Input.GetAxis("Vertical");//获取Y轴方向移动指令
         switch (cc.CamMoveDir)
         {
             case eCamMoveDir.CamMove_Left:
@@ -92,37 +92,44 @@ public class PlayerManager : MonoBehaviour
     }
     #endregion
 
-    #region 小跳跃
-    bool CanSmallJump()
-    {
-        if (m_ePlayerState < ePlayerState.PlayerState_SmallJump && m_fOrigHeight == 0f && m_fStartJumpTime == 0f && false == m_bIsDescend)
-            return true;
-
-        return false;
-    }
-    //判断是否在下落状态
-    bool m_bIsDescend = false;
-
-    bool IsDescend
-    {
-        get
-        {
-            return m_bIsDescend;
-        }
-    }
+    #region 跳跃
+    bool m_bIsDescend = false;    //判断是否在下落状态
     float m_fStartJumpTime = 0f;//开始计时变量
     float m_fOrigHeight = 0f;//角色原始高度
-    void BeginSmallJump()
+    float curPercent = 0f;//曲线进度
+    JumpDataStore curjumpdata;
+    JumpDataStore m_CurJumpData
+    {//跳跃数据
+        get
+        {
+            return curjumpdata;
+        }
+        set
+        {
+            if (value != curjumpdata)
+            {
+                JumpDataStore newjumpdata = value;
+                curjumpdata = newjumpdata;
+                //if(m_ePlayerState == ePlayerState.PlayerState_BigJump)
+                //    curjumpdata.
+            }
+        }
+    }
+    void BeginJump()
     {
-        //设置当前状态
-        m_ePlayerState = ePlayerState.PlayerState_SmallJump;
         //保存原始高度
         m_fOrigHeight = Owner.ActorTrans.position.y;
         //保存曲线开始时间
         m_fStartJumpTime = Time.time;
         //判定是否开始下降
         m_bIsDescend = false;
-    }
+        //开启运动学刚体
+        Owner.RB.isKinematic = true;
+        //获取跳跃数据
+        m_CurJumpData = Owner.SmallJumpDataStore;
+        
+
+    }//初始化跳跃数据
 
     void ResetJump()
     {
@@ -135,51 +142,93 @@ public class PlayerManager : MonoBehaviour
                         );
         m_fOrigHeight = 0f;
         m_ePlayerState = ePlayerState.PlayerState_Idle;
-    }
+        Owner.RB.isKinematic = false;
+    }//复位跳跃数据
 
-    float curPercent = 0f;//曲线进度
-
-    void OnTriggerEnter(Collider other)
+    bool CanJump()
     {
-        //如果碰到的是地面
-        if (other.gameObject.layer == LayerMask.NameToLayer("Ground")/*碰到的是地面*/ && m_ePlayerState >= ePlayerState.PlayerState_SmallJump/*当前在跳跃状态*/ && IsDescend/*当前正在下降*/)
+        if (m_ePlayerState < ePlayerState.PlayerState_SmallJump && m_fOrigHeight == 0f && m_fStartJumpTime == 0f && false == m_bIsDescend)
+            return true;
+
+        return false;
+    }//判断是否可以跳跃
+
+    bool CheckJumpOver()
+    {
+        if (m_ePlayerState >= ePlayerState.PlayerState_SmallJump/*当前在跳跃状态*/ && m_bIsDescend/*当前正在下降*/)
         {
-            ResetJump();
+            if (Owner.ActorTrans.position.y - m_fOrigHeight < 0.05f)
+                return true;
         }
-    }
+        return false;
+    }//判断是否跳跃结束
+
+    bool IsTriggerJump()
+    {
+        if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K)) {
+            m_ePlayerState = ePlayerState.PlayerState_SmallJump;
+            return true;
+        } 
+        else if (Input.GetKeyDown(KeyCode.I)) {
+            m_ePlayerState = ePlayerState.PlayerState_BigJump;
+            return true;
+        }
+        else if (Input.GetKey(KeyCode.I))
+        {
+            //判定是否重置了跳跃高度
+            
+
+            //当前高度作为起点,
+
+            //读取大跳跃高度和时间，重新设置跳跃参数
+
+            //
+        }
+        return false;
+    }//判断是否触发了跳跃
 
     void JumpBehaviour()
     {
-        if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
+
+        if (CheckJumpOver())//检查是否跳跃结束
+            ResetJump();//如果结束，复位跳跃
+        else if (CanJump())//检测是否可以开始跳跃
         {
-            if (CanSmallJump())
+            if (IsTriggerJump())//检测是否触发跳跃
             {
-                BeginSmallJump();
+                BeginJump();//初始化跳跃数据
             }
         }
+        
+        if (m_ePlayerState >= ePlayerState.PlayerState_SmallJump)//判定当前状态
+        {
 
-        switch (m_ePlayerState) {
-            case ePlayerState.PlayerState_SmallJump:
-                {
-                    curPercent = (Time.time - m_fStartJumpTime) / Owner.SmallJumpDataStore.m_fDuration;
-                    Owner.ActorTrans.transform.position = new Vector3(
-                        Owner.ActorTrans.transform.position.x,
-                        m_fOrigHeight + Owner.SmallJumpDataStore.m_acJump.Evaluate(curPercent) * Owner.SmallJumpDataStore.m_fHeight,
-                        Owner.ActorTrans.transform.position.z
-                        );
+            curPercent = (Time.time - m_fStartJumpTime) / m_CurJumpData.m_fDuration;//获取曲线进度
+            //计算当前角色高度
+            Owner.ActorTrans.transform.position = new Vector3(
+            Owner.ActorTrans.transform.position.x,
+            m_fOrigHeight + m_CurJumpData.m_acSmallJump.Evaluate(curPercent) * m_CurJumpData.m_fHeight,
+            Owner.ActorTrans.transform.position.z
+            );
 
-                    if (curPercent > 0.5f)
-                        m_bIsDescend = true;
-     
-                    break;
-                }
-            case ePlayerState.PlayerState_BigJump:
-                {
-                    break;
-                }
+            if (curPercent > 0.5f)//判断是否在下落状态
+                m_bIsDescend = true;
         }
 
+    }//跳跃行为接口
+
+    void OnCollisionEnter(Collision other)
+    {
+
+
+
+        ////如果碰到的是地面
+        //if (other.gameObject.layer == LayerMask.NameToLayer("Ground")/*碰到的是地面*/ && m_ePlayerState >= ePlayerState.PlayerState_SmallJump/*当前在跳跃状态*/ && IsDescend/*当前正在下降*/)
+        //{
+        //    ResetJump();
+        //}
     }
+
     #endregion
 
     #region 捡起箱子
@@ -188,25 +237,28 @@ public class PlayerManager : MonoBehaviour
 
     }
     #endregion
-
-    //void TouchHandler()
-    //{
-
-    //}
-
-    //void MouseHandler()
-    //{
-
-    //    m_fHorizontal = Input.GetAxis("Horizontal");//获取Z轴方向移动指令
-    //    if (m_ePlayerState <= ePlayerState.PlayerState_Run && 0f != m_fHorizontal)//如果当前非跳跃状态&&出发了移动指令 -> 切换状态到移动
-    //    {
-    //        m_ePlayerState = ePlayerState.PlayerState_Run;
-    //    }
-    //    else if (m_ePlayerState <= ePlayerState.PlayerState_Run && 0f == m_fHorizontal)//如果当前是非跳跃状态&&没有发出移动指令 -> 切换状态到待机
-    //    {
-    //        m_ePlayerState = ePlayerState.PlayerState_Idle;
-    //    }
-        
-    //}
-
 }
+
+
+
+
+
+//void TouchHandler()
+//{
+
+//}
+
+//void MouseHandler()
+//{
+
+//    m_fHorizontal = Input.GetAxis("Horizontal");//获取Z轴方向移动指令
+//    if (m_ePlayerState <= ePlayerState.PlayerState_Run && 0f != m_fHorizontal)//如果当前非跳跃状态&&出发了移动指令 -> 切换状态到移动
+//    {
+//        m_ePlayerState = ePlayerState.PlayerState_Run;
+//    }
+//    else if (m_ePlayerState <= ePlayerState.PlayerState_Run && 0f == m_fHorizontal)//如果当前是非跳跃状态&&没有发出移动指令 -> 切换状态到待机
+//    {
+//        m_ePlayerState = ePlayerState.PlayerState_Idle;
+//    }
+
+//}
