@@ -160,9 +160,10 @@ public class BaseActor : MonoBehaviour
     {
         get
         {
-            if (0f == actorsize)
-                actorsize = Actor.GetComponent<SphereCollider>().radius;
-            return actorsize;
+            //todo erric
+            //if (0f == actorsize)
+            //    actorsize = Actor.GetComponent<BoxCollider>().size.x;
+            return 0.7f;
         }
     }
     #endregion

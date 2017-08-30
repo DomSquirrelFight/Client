@@ -24,21 +24,22 @@ public class JumpDataStoreEditor : Editor {
         if (BigJumpPercent != JumpData.m_fChangeBigJumpPercent)
         {
             Undo.RecordObject(JumpData, "Revert Change Big Jump Percent");
-            
-
-            //清空曲线数据
-            while (JumpData.m_acBigJump.length > 0)
-            {
-                JumpData.m_acBigJump.RemoveKey(0);
-            }
-
-            //添加起点，中点和终点
-            JumpData.m_acBigJump.AddKey(new Keyframe(BigJumpPercent, JumpData.m_acSmallJump.Evaluate(BigJumpPercent)));
-            JumpData.m_acBigJump.AddKey(new Keyframe(0.5f, 1f));
-            JumpData.m_acBigJump.AddKey(new Keyframe(1f, 0f));
-
 
             JumpData.m_fChangeBigJumpPercent = BigJumpPercent;
+
+            ////清空曲线数据
+            //while (JumpData.m_acBigJump.length > 0)
+            //{
+            //    JumpData.m_acBigJump.RemoveKey(0);
+            //}
+
+            ////添加起点，中点和终点
+            //JumpData.m_acBigJump.AddKey(new Keyframe(0, JumpData.m_acSmallJump.Evaluate(BigJumpPercent)));
+            //JumpData.m_acBigJump.AddKey(new Keyframe(0.5f, 1f));
+            //JumpData.m_acBigJump.AddKey(new Keyframe(1f, 0f));
+
+
+          
             EditorUtility.SetDirty(JumpData);
         }
 

@@ -5,7 +5,7 @@ using UnityEngine;
 public class JumpDataStore : MonoBehaviour {
 
     public AnimationCurve m_acSmallJump;//小跳跃曲线对象
-    public AnimationCurve m_acBigJump;//大条曲线
+    //public AnimationCurve m_acBigJump;//大条曲线
 
     #region 小跳跃持续时间
     [SerializeField]
@@ -62,28 +62,31 @@ public class JumpDataStore : MonoBehaviour {
     public float m_CurDuration;
     [HideInInspector]
     public float m_CurJumpHeight;
+    [HideInInspector]
+    public AnimationCurve m_CurCurve;
     #endregion
 
     #region 切换到大条的百分比
-    private float BigJumpPercent;
-    public float m_fChangeBigJumpPercent
-    {
-        get
-        {
-            return BigJumpPercent;
-        }
-        set
-        {
-            if (value != BigJumpPercent)
-                BigJumpPercent = value;
-        }
-    }
+    [HideInInspector]
+    public float m_fChangeBigJumpPercent;
+    //public float m_fChangeBigJumpPercent
+    //{
+    //    get
+    //    {
+    //        return BigJumpPercent;
+    //    }
+    //    set
+    //    {
+    //        if (value != BigJumpPercent)
+    //            BigJumpPercent = value;
+    //    }
+    //}
     #endregion
 
     void Reset()
     {
         m_acSmallJump = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
-        m_acBigJump = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
+        //m_acBigJump = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1));
     }
 
     void Awake()
