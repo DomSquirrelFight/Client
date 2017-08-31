@@ -161,11 +161,25 @@ public class BaseActor : MonoBehaviour
         get
         {
             //todo erric
-            //if (0f == actorsize)
-            //    actorsize = Actor.GetComponent<BoxCollider>().size.x;
-            return 0.7f;
+            if (0f == actorsize)
+                //actorsize = Actor.GetComponent<CapsuleCollider>().radius;
+                actorsize = Actor.GetComponent<BoxCollider>().size.z * 0.5f;
+            return actorsize;
         }
     }
+
+    float actorheight = 0f;
+    public float ActorHeight
+    {
+        get
+        {
+            if (0f == actorheight)
+                //actorheight = Actor.GetComponent<CapsuleCollider>().height;
+                actorheight = Actor.GetComponent<BoxCollider>().size.y * 0.5f;
+            return actorheight;
+        }
+    }
+
     #endregion
 
     #region 小跳类

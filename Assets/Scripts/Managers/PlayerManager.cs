@@ -26,8 +26,7 @@ public class PlayerManager : MonoBehaviour
 
         if (!Owner) return;
 
-        if (HitGround())
-            return;
+        HitGround();
 
         JumpBehaviour();//角色跳跃
 
@@ -44,16 +43,25 @@ public class PlayerManager : MonoBehaviour
     bool RayCastBlock(eCamMoveDir side)
     {
 
-        dir = Vector3.right;
-        if (side == eCamMoveDir.CamMove_Left)
-            dir = Vector3.left;
-        if (Physics.Raycast(Owner.ActorTrans.transform.position + Vector3.up * 0.1f, m_fHorizontal * dir, out hitInfo, dist, mask))
+        float distance = Owner.ActorSize + 0.5f;
+        if (Physics.Raycast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorSize, m_fHorizontal * Vector3.right, out hitInfo, distance, mask))
         {
             //绘制射线
-            Debug.DrawLine(Owner.ActorTrans.transform.position + Vector3.up * 0.1f, hitInfo.point, Color.blue);
+            Debug.DrawLine(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorSize, hitInfo.point, Color.blue);
 
-            if (Mathf.Abs(Owner.ActorTrans.transform.position.x - hitInfo.point.x) < 0.5f)
-                return true;
+
+            if (m_fHorizontal < 0f)
+            {
+                if ((Owner.ActorTrans.transform.position.x - hitInfo.point.x) > 0f && (Owner.ActorTrans.transform.position.x - hitInfo.point.x) < Owner.ActorSize + 0.1f)
+                    return true;
+            }
+            else if (m_fHorizontal > 0f)
+            {
+                if ((hitInfo.point.x - Owner.ActorTrans.transform.position.x) > 0f && (hitInfo.point.x - Owner.ActorTrans.transform.position.x) < Owner.ActorSize + 0.1f)
+                    return true;
+            }
+
+         
         }
 
         return false;
@@ -108,24 +116,6 @@ public class PlayerManager : MonoBehaviour
                             return;
                    
                         Owner.ActorTrans.Translate(new Vector3(0f, 0f, 3 * Time.deltaTime));
-
-//                        if (m_ePlayerState < ePlayerState.PlayerState_SmallJump)
-//                        {
-//                            if (Physics.Raycast(Owner.ActorTrans.transform.position, Vector3.down, out hitInfo, dist, mask))
-//                            {
-//                                //绘制射线
-//#if UNITY_EDITOR
-//                                Debug.DrawLine(Owner.ActorTrans.transform.position, hitInfo.point, Color.red);
-//#endif
-//                                if (Mathf.Abs(Owner.ActorTrans.transform.position.y - hitInfo.point.y) > 0.4f)
-//                                {
-//                                    bDescent = true;
-//                                    m_ePlayerState = ePlayerState.PlayerState_SmallJump;
-//                                }
-                              
-//                            }
-//                        }
-
                    }
 
                     break;
@@ -147,7 +137,7 @@ public class PlayerManager : MonoBehaviour
 
     bool CanJump()//判定是否可以跳跃
     {
-        if (m_ePlayerState < ePlayerState.PlayerState_SmallJump)
+        if (m_ePlayerState < ePlayerState.PlayerState_SmallJump && m_fIsGrounded)
             return true;
 
         return false;
@@ -161,25 +151,22 @@ public class PlayerManager : MonoBehaviour
     }
 
     float JumpHeight = 3f;
-    float JumpDuration = 0.5f;
     float JumpAcceleration = 10f;
     float OrigHeight = 0f;
     float CurHeight = 0f;
-    bool bDescent = false;
+    bool m_fIsGrounded = false;
     float CurAcceleration = 0f;
     void DoBeforeJump()
     {
         m_ePlayerState = ePlayerState.PlayerState_SmallJump;
         OrigHeight = Owner.ActorTrans.position.y;
         CurHeight = OrigHeight;
-        bDescent = false;
         CurAcceleration = JumpAcceleration;
         Owner.RB.isKinematic = true;
     }
 
     void DoBeforeLeaveJump(float y)
     {
-        bDescent = false;
         m_ePlayerState = ePlayerState.PlayerState_Idle;
         Owner.ActorTrans.position = new Vector3(
                Owner.ActorTrans.position.x,
@@ -190,27 +177,31 @@ public class PlayerManager : MonoBehaviour
 
     bool HitGround()
     {
-        if (
-            (m_ePlayerState >= ePlayerState.PlayerState_SmallJump/*当前在跳跃状态*/ && bDescent/*当前正在下降*/)
-            )
-        {
-            if (Physics.Raycast(Owner.ActorTrans.transform.position, Vector3.down, out hitInfo, dist, mask))
-            {
-                //绘制射线
-#if UNITY_EDITOR
-                Debug.DrawLine(Owner.ActorTrans.transform.position, hitInfo.point, Color.red);
-#endif
-                //Debug.Log(Mathf.Abs(Owner.ActorTrans.transform.position.y - hitInfo.point.y));
-                
-                if (Mathf.Abs(Owner.ActorTrans.transform.position.y - hitInfo.point.y) < 0.2f)
-                {
-                    DoBeforeLeaveJump(hitInfo.point.y);
-                    //Debug.Log("HitGround");
-                    return true;
-                }
-            }
-        }
 
+        float distance = Owner.ActorHeight + 1f;
+        Ray ray1 = new Ray(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight, Vector3.down);//从自身的中心点开始向下发射.
+
+        Vector3 pos = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight - Vector3.right * Owner.ActorSize;
+        if(Owner.ActorTrans.transform.forward.x < 0)
+            pos = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Vector3.right * Owner.ActorSize;
+        Ray ray2 = new Ray(pos, Vector3.down);//从自身的中心点开始向下发射.
+
+        if (Physics.Raycast(ray1, out hitInfo, distance, mask) || Physics.Raycast(ray2, out hitInfo, distance, mask))
+        {
+            distance = Owner.ActorTrans.transform.position.y + Owner.ActorHeight - hitInfo.point.y;
+            Debug.DrawLine(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight, hitInfo.point, Color.green);
+        }
+        double dis = (double)distance;
+        dis = System.Math.Round(dis, 2);
+
+        if (dis < Owner.ActorHeight && dis > 0f)
+        {
+            m_ePlayerState = ePlayerState.PlayerState_Idle;
+            Owner.RB.isKinematic = false;
+            m_fIsGrounded = true;
+            return true;
+        }
+        m_fIsGrounded = false;
         return false;
     }
 
@@ -231,7 +222,6 @@ public class PlayerManager : MonoBehaviour
         {
             if (CurHeight - OrigHeight >= JumpHeight)//判断是否跳到了最大高度
             {
-                bDescent = true;
                 Owner.RB.isKinematic = false;
             }
             else
