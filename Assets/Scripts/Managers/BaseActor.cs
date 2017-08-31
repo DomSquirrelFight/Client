@@ -62,11 +62,13 @@ public class BaseActor : MonoBehaviour
         if (
             null != ba.PlayerMgr/*读取角色管理器*/ ||
             null != ba.CameraContrl/*相机实例对象*/ ||
-            null != ba.RB/*加载刚体*/
+            null != ba.RB/*加载刚体*/ ||
+            null != ba.PlayerInputMgr
             ) {
             ba.PlayerMgr.OnStart(ba);//启动角色管理器
             ba.CameraContrl.OnStart(ba);//启动相机
-            //ba.RB.isKinematic = true;
+            ba.PlayerInputMgr.OnStart(ba);//启动角色输入管理器
+            ba.RB.isKinematic = true;
         }
 
         return ba;
@@ -196,6 +198,20 @@ public class BaseActor : MonoBehaviour
     #region 玩家状态
 
     #endregion
+
+    #region 角色控制管理器
+    private PlayerInputManager playerinputmgr;
+    public PlayerInputManager PlayerInputMgr
+    {
+        get
+        {
+            if(null == playerinputmgr)
+                playerinputmgr = Actor.GetOrAddComponent<PlayerInputManager>();
+            return playerinputmgr;
+        }
+    }
+    #endregion
+
 
 
 }
