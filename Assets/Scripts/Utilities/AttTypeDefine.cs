@@ -9,6 +9,16 @@ namespace AttTypeDefine  {
         eBehav_JumpDown,//往下跳
     }
 
+    public enum ePlayerNormalBeha
+    {
+        eNormalBehav_Null,
+        eNormalBehav_SmallJump,
+        eNormalBehav_BigJump,
+        //eNormalBehav_Move,
+        //eNormalBehav_Idle,
+    }
+
+
     public enum eRoleID
     {
         Role_NULL = -1,

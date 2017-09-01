@@ -24,7 +24,9 @@ public class PlayerInputManager : MonoBehaviour {
     }
 
     //检测是否触发小跳跃
-    void InputSmallJump() { }
+    void InputSmallJump() {
+        PlayerMgr.CalJumpInput();
+    }
 
     //检测是否触发大跳跃
     void InputBigJump() { }

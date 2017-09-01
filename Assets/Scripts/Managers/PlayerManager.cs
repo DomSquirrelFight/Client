@@ -222,10 +222,12 @@ public class PlayerManager : MonoBehaviour
 
     #region 变量
     ePlayerBehaviour m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;//角色行为
+    ePlayerNormalBeha m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Null;
     bool m_bGounded = false;
     BaseActor Owner;
     CameraController cc;
     int mask;
+    JumpDataStore m_curJumpData;
     #endregion
 
     #region 启动接口
@@ -234,6 +236,7 @@ public class PlayerManager : MonoBehaviour
         mask = 1 << LayerMask.NameToLayer("Ground");
         Owner = owner;
         cc = Owner.CameraContrl;
+        m_curJumpData = Owner.SmallJumpDataStore;
     }
     #endregion
 
@@ -249,7 +252,64 @@ public class PlayerManager : MonoBehaviour
 
     #region 处理角色运动
 
-    void CheckHitGound() { }
+    Ray ray1, ray2, ray3;
+    Vector3 pos, pos1;
+    bool HitGround()
+    {
+        TmpDis = Owner.ActorHeight + 1f;
+        ray1 = new Ray(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight, Vector3.down);//从自身的中心点开始向下发射.
+
+        pos = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight - Vector3.right * Owner.ActorSize;
+        if (Owner.ActorTrans.transform.forward.x < 0)
+            pos = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Vector3.right * Owner.ActorSize;
+
+        pos1 = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Vector3.right * Owner.ActorSize;
+        if (Owner.ActorTrans.transform.forward.x < 0)
+            pos1 = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight - Vector3.right * Owner.ActorSize;
+
+        ray2 = new Ray(pos, Vector3.down);//从自身的中心点尾部开始向下发射.
+        ray3 = new Ray(pos1, Vector3.down);//从自身的中心点头部开始向下发射.
+        if (Physics.Raycast(ray1, out hitInfo, TmpDis, mask) || Physics.Raycast(ray2, out hitInfo, TmpDis, mask) || Physics.Raycast(ray3, out hitInfo, TmpDis, mask))
+        {
+            TmpDis = Owner.ActorTrans.transform.position.y + Owner.ActorHeight - hitInfo.point.y;
+            Debug.DrawLine(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight, hitInfo.point, Color.green);
+
+            //if (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null && m_bIsDescent)
+            //{
+            //    int a = 0;
+            //}
+
+
+            if (TmpDis < Owner.ActorHeight + 0.1f && TmpDis > 0f)
+            {
+                if (
+                    (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null && m_bIsDescent) ||
+                    m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null
+                    )
+                {
+                    m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Null;
+                    m_bGounded = true;
+                    m_bIsDescent = false;
+                    Owner.ActorTrans.position = new Vector3(
+                        Owner.ActorTrans.position.x,
+                        hitInfo.point.y,
+                        Owner.ActorTrans.position.z
+                        );
+                    return true;
+                }
+            }
+        }
+        //double dis = (double)distance;
+        //dis = System.Math.Round(dis, 2);
+
+        m_bGounded = false;
+        return false;
+    }
+
+    void FixedUpdate()
+    {
+        HitGround();//检测是否落地
+    }
 
     //横向运动，遇到障碍物，进行阻挡
     float TmpDis;
@@ -282,9 +342,6 @@ public class PlayerManager : MonoBehaviour
 
     public void PlayerMove()
     {
-
-        CheckHitGound();//检测是否落地
-
         switch (m_ePlayerBeha) {
             case ePlayerBehaviour.eBehav_Normal:
                 {
@@ -300,7 +357,6 @@ public class PlayerManager : MonoBehaviour
                     break;
                 }
         }
-
     }
 
     #region Player_NormalBehaviour
@@ -318,7 +374,7 @@ public class PlayerManager : MonoBehaviour
         }
 
         //执行小跳跃
-
+        JumpBehaviour();
 
     }
 
@@ -343,6 +399,25 @@ public class PlayerManager : MonoBehaviour
             Owner.ActorTrans.Translate(new Vector3(0f, 0f, GlobalHelper.SMoveSpeed * Time.deltaTime));
         }
 
+        #region 如果未落地 && 不是跳跃模式 -> 开始自由下落模式
+        if (!m_bGounded && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
+        {
+             //开始自由下落
+
+            //记录当前高度
+            m_curHeight = Owner.ActorTrans.transform.position.y;
+
+            //记录当前速度
+            
+            /*
+             * 
+             * 
+             * 
+             * */
+
+        }
+        #endregion
+        
     }
 
     /// <summary>
@@ -366,7 +441,68 @@ public class PlayerManager : MonoBehaviour
         return false; 
     }
     #endregion
-    
+
+    #region Player Jump
+    public bool CalJumpInput()
+    {
+        if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
+        {
+            if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
+            {
+               
+                DoBeforeJump();
+                return true;
+            }
+              
+        }
+        return false;
+    }
+    //readonly float fSmallJumpHeight = 1.875f;//跳跃高度
+    //readonly float fSmallJumpInitSpeed = 7.5f;//初始速度
+    //readonly float fSmallJumpAccel = -15f;//加速度
+    float fOrigHeight = 0f;
+    float m_curHeight = 0f;
+    bool m_bIsDescent = false;
+    float m_fCurSpeed = 0f;
+    float m_fStartTime = 0f;
+    float m_fDuration = 0;
+    void DoBeforeJump()
+    {
+        m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_SmallJump;
+        fOrigHeight = m_curHeight = Owner.ActorTrans.transform.position.y;
+        m_bIsDescent = false;
+        m_fCurSpeed = m_curJumpData.m_fJumpInitSpeed;
+        m_fStartTime = Time.time;
+    }
+
+    public void JumpBehaviour()
+    {
+        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_SmallJump)
+        {
+            //m_curHeight >= fOrigHeight + fSmallJumpHeight
+            if (m_fCurSpeed <=0f && m_bIsDescent == false)
+            {
+                m_bIsDescent = true;
+            }
+
+            Owner.ActorTrans.transform.position = new Vector3(
+                Owner.ActorTrans.transform.position.x,
+                m_curHeight,
+                Owner.ActorTrans.transform.position.z
+                );
+            m_fDuration = Time.time - m_fStartTime;
+
+            m_fCurSpeed = m_curJumpData.m_fJumpInitSpeed + (m_curJumpData.m_fJumpAccel * m_fDuration);
+            //m_curHeight += m_fCurSpeed * Time.deltaTime * 10;
+            m_curHeight = fOrigHeight + (m_curJumpData.m_fJumpInitSpeed * m_fDuration + 0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
+            //Debug.Log(m_fCurSpeed + " " +  m_curHeight + "   " + m_fDuration);
+            //m_fCurSpeed = fSmallJumpInitSpeed + fSmallJumpAccel * m_fDuration;
+            //m_curHeight += m_fCurSpeed * Time.deltaTime ;
+
+        }
+    }
+    #endregion
+
     #endregion
 
     #endregion
