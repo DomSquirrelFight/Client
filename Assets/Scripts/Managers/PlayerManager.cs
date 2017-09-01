@@ -45,6 +45,8 @@ public class PlayerManager : MonoBehaviour
     RaycastHit hitInfo;                                                                                                                                                       //射线检测数据
 
     Vector3 m_vCurForward;                                                                                                                                             //保存当前角色朝向
+
+
     #endregion
 
     #region 外部接口
@@ -98,6 +100,10 @@ public class PlayerManager : MonoBehaviour
         m_vInputMove.x = Input.GetAxis("Horizontal");
         m_vInputMove.y = Input.GetAxis("Vertical");
         m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;
+        if (Input.GetKeyUp(KeyCode.A))
+        {
+            int a = 0;
+        }
     }
 
     public bool CalJumpInput()                                              //获取跳跃输入
@@ -119,10 +125,11 @@ public class PlayerManager : MonoBehaviour
     #region 判定角色是否落地 HitGround
     Ray ray1, ray2, ray3;
     Vector3 pos, pos1;
+ 
     bool HitGround()
     {
         //设定射线长度 <角色身高>
-        TmpDis = Owner.ActorHeight*1.5f;
+        TmpDis = Owner.ActorHeight*2f;
 
         //从自身的中心点开始向下发射.
         ray1 = new Ray(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight, Vector3.down);
@@ -142,9 +149,12 @@ public class PlayerManager : MonoBehaviour
         ray3 = new Ray(pos1, Vector3.down);
 
         //从角色发射三条向下的射线
-        if (Physics.Raycast(ray1, out hitInfo, TmpDis, mask) || Physics.Raycast(ray2, out hitInfo, TmpDis, mask) || Physics.Raycast(ray3, out hitInfo, TmpDis, mask))
+       // if (Physics.Raycast(ray1, out hitInfo, TmpDis, mask) || Physics.Raycast(ray2, out hitInfo, TmpDis, mask) || Physics.Raycast(ray3, out hitInfo, TmpDis, mask))
+        // public static bool BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float maxDistance, int layerMask);
+        //public static bool BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, out RaycastHit hitInfo, Quaternion orientation, float maxDistance, int layerMask);
+        if (Physics.BoxCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center, Owner.BC.size * 0.5f, Vector3.down, out hitInfo, Quaternion.Euler(Vector3.down), TmpDis, mask))
+       // if (Physics.BoxCast(new Vector3(0, 8, 0), Owner.BC.size*20, Vector3.down, out hitInfo, Quaternion.identity, TmpDis*30, mask))
         {
-
             //获取当前角色的位置和触发点的位置
             TmpDis = Owner.ActorTrans.transform.position.y - hitInfo.point.y;
 
@@ -157,7 +167,7 @@ public class PlayerManager : MonoBehaviour
             }
 #endif
 
-            if (TmpDis < Owner.ActorHeight * 0.5f && TmpDis > (0 - Owner.ActorHeight * 0.5f))
+            if (TmpDis < Owner.ActorHeight  && TmpDis > (0 - Owner.ActorHeight))
             {
                 if (
                     (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null && m_bIsDescent) ||
@@ -171,6 +181,7 @@ public class PlayerManager : MonoBehaviour
                         Owner.ActorTrans.position.x,
                         hitInfo.point.y,
                         Owner.ActorTrans.position.z
+                       
                         );
                     return true;
                 }
@@ -193,9 +204,11 @@ public class PlayerManager : MonoBehaviour
 
     bool RayCastBlock(eCamMoveDir side)
     {
-
-        TmpDis = Owner.ActorSize + 0.2f;
-        if (Physics.Raycast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorSize, m_vInputMove.x * Vector3.right, out hitInfo, TmpDis, mask))
+        // if (Physics.Raycast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorSize, m_vInputMove.x * Vector3.right, out hitInfo, TmpDis, mask))
+        TmpDis = Owner.ActorSize*2;
+        //if (Physics.BoxCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center, Owner.BC.size * 0.5f, m_vInputMove.x * Vector3.right, out hitInfo, Quaternion.Euler(m_vInputMove.x * Vector3.right), TmpDis, mask))
+        //l SphereCast(Vector3 origin, float radius, Vector3 direction, out RaycastHit hitInfo, float maxDistance, int layerMask);
+        if (Physics.SphereCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center,0.5f, m_vInputMove.x * Vector3.right, out hitInfo, TmpDis, mask))
         {
             //绘制射线
 #if UNITY_EDITOR
@@ -204,7 +217,7 @@ public class PlayerManager : MonoBehaviour
 
             if (m_vInputMove.x < 0f)//朝左运动
             {
-                if ((Owner.ActorTrans.transform.position.x - hitInfo.point.x) > 0f && (Owner.ActorTrans.transform.position.x - hitInfo.point.x) < Owner.ActorSize + 0.1f)
+                if ((Owner.ActorTrans.transform.position.x - hitInfo.point.x) > 0f && (Owner.ActorTrans.transform.position.x - GlobalHelper.SMoveSpeed * Time.deltaTime - hitInfo.point.x) < Owner.ActorSize + 0.1f)
                     return true;
             }
             else if (m_vInputMove.x > 0f)//朝右运动

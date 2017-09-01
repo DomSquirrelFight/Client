@@ -156,7 +156,18 @@ public class BaseActor : MonoBehaviour
     }
     #endregion
 
-    #region 角色大小
+    #region 角色大小, 碰撞器
+    private BoxCollider bc;
+    public BoxCollider BC
+    {
+        get {
+            if (null == bc)
+            {
+                bc = Actor.GetOrAddComponent<BoxCollider>();
+            }
+            return bc;
+        }
+    }
     float actorsize = 0f;
     public float ActorSize
     {

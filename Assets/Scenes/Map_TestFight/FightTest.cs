@@ -15,7 +15,8 @@ public class FightTest : MonoBehaviour {
 
         //加载主角
         m_Player = BaseActor.CreatePlayer("LocalMajor", m_eRoleId, m_sp.transform.position, m_sp.transform.rotation);
-        
+
+        int a = 0;
 
 		
 	}
