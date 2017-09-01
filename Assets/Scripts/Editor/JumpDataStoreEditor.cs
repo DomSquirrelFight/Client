@@ -60,7 +60,15 @@ public class JumpDataStoreEditor : Editor {
         EditorGUILayout.EndHorizontal();
         #endregion
 
+        #region 提示框
 
+        EditorGUILayout.BeginHorizontal();
+
+        EditorGUILayout.HelpBox("只有当跳跃加速度或者上升跳跃时间有改动，跳跃初速度和跳跃高度才会重新计算", MessageType.Warning, true);
+
+        EditorGUILayout.EndHorizontal();
+
+        #endregion
     }
 
     void CalculateInitSpeed()
@@ -72,8 +80,6 @@ public class JumpDataStoreEditor : Editor {
     {
         JumpData.m_fJumpHeight = JumpData.m_fJumpInitSpeed * JumpData.m_fJumpDuration + 0.5f * JumpData.m_fJumpAccel * JumpData.m_fJumpDuration * JumpData.m_fJumpDuration;
     }
-
-
 }
 
 

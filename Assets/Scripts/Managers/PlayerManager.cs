@@ -223,7 +223,26 @@ public class PlayerManager : MonoBehaviour
     #region 变量
     ePlayerBehaviour m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;//角色行为
     ePlayerNormalBeha m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Null;
-    bool m_bGounded = false;
+    bool bGrounded = false;
+    bool m_bGounded
+    {
+        get
+        {
+            return bGrounded;
+        }
+        set
+        {
+            if (value != bGrounded)
+            {
+
+                if (bGrounded == true && value == false && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
+                {
+                    DoBeforeFreeFall();//为自由下落做准备
+                }
+                bGrounded = value;
+            }
+        }
+    }
     BaseActor Owner;
     CameraController cc;
     int mask;
@@ -389,6 +408,12 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
+    void DoBeforeFreeFall()
+    {
+        m_fStartTime = Time.time;
+        m_curHeight = fOrigHeight = Owner.ActorTrans.transform.position.y;
+    }
+
     void TranslatePlayer()
     {
         if(m_vInputMove.x == 0f)
@@ -402,18 +427,14 @@ public class PlayerManager : MonoBehaviour
         #region 如果未落地 && 不是跳跃模式 -> 开始自由下落模式
         if (!m_bGounded && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
         {
-             //开始自由下落
-
-            //记录当前高度
-            m_curHeight = Owner.ActorTrans.transform.position.y;
-
-            //记录当前速度
-            
-            /*
-             * 
-             * 
-             * 
-             * */
+            Owner.ActorTrans.transform.position = new Vector3(
+             Owner.ActorTrans.transform.position.x,
+             m_curHeight,
+             Owner.ActorTrans.transform.position.z
+             );
+            m_fDuration = Time.time - m_fStartTime;
+            m_fCurSpeed = (m_curJumpData.m_fJumpAccel * m_fDuration);
+            m_curHeight = fOrigHeight + (0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
 
         }
         #endregion
@@ -457,9 +478,6 @@ public class PlayerManager : MonoBehaviour
         }
         return false;
     }
-    //readonly float fSmallJumpHeight = 1.875f;//跳跃高度
-    //readonly float fSmallJumpInitSpeed = 7.5f;//初始速度
-    //readonly float fSmallJumpAccel = -15f;//加速度
     float fOrigHeight = 0f;
     float m_curHeight = 0f;
     bool m_bIsDescent = false;
@@ -479,7 +497,6 @@ public class PlayerManager : MonoBehaviour
     {
         if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_SmallJump)
         {
-            //m_curHeight >= fOrigHeight + fSmallJumpHeight
             if (m_fCurSpeed <=0f && m_bIsDescent == false)
             {
                 m_bIsDescent = true;
@@ -493,12 +510,7 @@ public class PlayerManager : MonoBehaviour
             m_fDuration = Time.time - m_fStartTime;
 
             m_fCurSpeed = m_curJumpData.m_fJumpInitSpeed + (m_curJumpData.m_fJumpAccel * m_fDuration);
-            //m_curHeight += m_fCurSpeed * Time.deltaTime * 10;
             m_curHeight = fOrigHeight + (m_curJumpData.m_fJumpInitSpeed * m_fDuration + 0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
-            //Debug.Log(m_fCurSpeed + " " +  m_curHeight + "   " + m_fDuration);
-            //m_fCurSpeed = fSmallJumpInitSpeed + fSmallJumpAccel * m_fDuration;
-            //m_curHeight += m_fCurSpeed * Time.deltaTime ;
-
         }
     }
     #endregion
