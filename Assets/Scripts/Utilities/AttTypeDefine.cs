@@ -11,7 +11,7 @@ namespace AttTypeDefine  {
 
     public enum ePlayerNormalBeha
     {
-        eNormalBehav_Null,
+        eNormalBehav_Grounded,
         eNormalBehav_SmallJump,
         eNormalBehav_BigJump,
         //eNormalBehav_Move,

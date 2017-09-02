@@ -8,7 +8,7 @@ public class PlayerManager : MonoBehaviour
     #region 变量
     ePlayerBehaviour m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;                                                                        //角色行为
     
-    ePlayerNormalBeha m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Null;                                             //角色普通行为
+    ePlayerNormalBeha m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;                                             //角色普通行为
     
     bool bGrounded = true;                                                                                                                                             //判定角色是否落地
     bool m_bGounded
@@ -21,7 +21,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (value != bGrounded)
             {
-                //if (bGrounded == true && value == false && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
+                //if (bGrounded == true && value == false && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded)
                 //{
                 //    DoBeforeFreeFall();//为自由下落做准备
                 //}
@@ -119,8 +119,8 @@ public class PlayerManager : MonoBehaviour
 
     public bool CalJumpInput()                                              //获取跳跃输入
     {
-        if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
-        //if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
+        if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded)
+        //if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded)
         {
             if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
             {
@@ -136,13 +136,13 @@ public class PlayerManager : MonoBehaviour
     #region 检测碰撞
     void OnCollisionEnter(Collision other)
     {
-        if ((other.gameObject.layer == BrickMaskGlossy || other.gameObject.layer == MaskGlossy) && m_bIsDescent == true && m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null)
+        if ((other.gameObject.layer == BrickMaskGlossy || other.gameObject.layer == MaskGlossy) && m_bIsDescent == true && m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Grounded)
         {
             m_bGounded = true;
-            m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Null;
+            m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
             m_bIsDescent = false;
         }
-        else if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null && other.gameObject.layer == BrickMaskGlossy && m_vInputMove.x != 0f)
+        else if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && other.gameObject.layer == BrickMaskGlossy && m_vInputMove.x != 0f)
         {
             m_bIsBlocked = true;
         }
@@ -251,7 +251,6 @@ public class PlayerManager : MonoBehaviour
     void DoBeforeJump()
     {
 
-        Owner.RB.velocity = new Vector3(0f, 0f, 0f);
         Owner.RB.isKinematic = true;
         m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_SmallJump;
         fOrigHeight = m_curHeight = Owner.ActorTrans.transform.position.y;
@@ -548,7 +547,7 @@ public class PlayerManager : MonoBehaviour
 ////#if UNITY_EDITOR
 ////            Debug.DrawLine(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight, hitInfo.point, Color.green);
 
-////            if (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null && m_bIsDescent)
+////            if (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Grounded && m_bIsDescent)
 ////            {
 ////                int a = 0;
 ////            }
@@ -557,11 +556,11 @@ public class PlayerManager : MonoBehaviour
 ////            if (TmpDis < Owner.ActorHeight  && TmpDis > (0 - Owner.ActorHeight))
 ////            {
 ////                if (
-////                    (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null && m_bIsDescent) ||
-////                    m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null
+////                    (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Grounded && m_bIsDescent) ||
+////                    m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded
 ////                    )
 ////                {
-////                    m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Null;
+////                    m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
 ////                    m_bGounded = true;
 ////                    m_bIsDescent = false;
 ////                    Owner.ActorTrans.position = new Vector3(
@@ -593,7 +592,7 @@ public class PlayerManager : MonoBehaviour
     //    m_curHeight = fOrigHeight = Owner.ActorTrans.transform.position.y;
     //}
 //#region 如果未落地 && 不是跳跃模式 -> 开始自由下落模式
-//if (!m_bGounded && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
+//if (!m_bGounded && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded)
 //{
 //    Owner.ActorTrans.transform.position = new Vector3(
 //     Owner.ActorTrans.transform.position.x,
