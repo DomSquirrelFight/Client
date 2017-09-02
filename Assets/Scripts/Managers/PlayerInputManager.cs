@@ -12,7 +12,7 @@ public class PlayerInputManager : MonoBehaviour {
         PlayerMgr = Owner.PlayerMgr;
     }
 	
-	void Update () {
+	void FixedUpdate () {
         PlayerMgr.PlayerMove();        
 	}
 

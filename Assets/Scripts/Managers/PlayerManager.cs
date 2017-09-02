@@ -5,7 +5,6 @@ using AttTypeDefine;
 
 public class PlayerManager : MonoBehaviour
 {
-    
     #region 变量
     ePlayerBehaviour m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;                                                                        //角色行为
     
@@ -22,11 +21,10 @@ public class PlayerManager : MonoBehaviour
         {
             if (value != bGrounded)
             {
-
-                if (bGrounded == true && value == false && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
-                {
-                    DoBeforeFreeFall();//为自由下落做准备
-                }
+                //if (bGrounded == true && value == false && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
+                //{
+                //    DoBeforeFreeFall();//为自由下落做准备
+                //}
                 bGrounded = value;
             }
         }
@@ -38,7 +36,11 @@ public class PlayerManager : MonoBehaviour
 
     int mask;                                                                                                                                                                     //Ground Layer<用在射线>
 
+    int BrickMask;                                                                                                                                                             //Brick Layer <用在射线>
+
     int MaskGlossy;                                                                                                                                                          //层级平移位数<对比碰撞双方的层级>
+
+    int BrickMaskGlossy;                                                                                                                                                 //层级平移位数<对比碰撞双方的层级>
 
     JumpDataStore m_curJumpData;                                                                                                                                 //跳跃数据
 
@@ -48,7 +50,7 @@ public class PlayerManager : MonoBehaviour
 
     Vector3 m_vCurForward;                                                                                                                                             //保存当前角色朝向
 
-
+    bool m_bIsBlocked = false;                                                                                                                                         //判定横向是否被盒子阻挡了
     #endregion
 
     #region 外部接口
@@ -56,6 +58,8 @@ public class PlayerManager : MonoBehaviour
     {
         MaskGlossy = LayerMask.NameToLayer("Ground");
         mask = 1 << MaskGlossy;
+        BrickMaskGlossy = LayerMask.NameToLayer("Brick");
+        BrickMask = 1 << BrickMaskGlossy;
         Owner = owner;
         cc = Owner.CameraContrl;
         m_curJumpData = Owner.SmallJumpDataStore;
@@ -67,16 +71,18 @@ public class PlayerManager : MonoBehaviour
         {
             case ePlayerBehaviour.eBehav_Normal:
                 {
-                    ////执行旋转操作
-                    //RotatePlayer();
-                    //if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
-                    //{
-                    //    if (!RayCastBlock(cc.CamMoveDir))//横向阻挡
-                    //    {
-                    //        //执行move操作
-                    //        TranslatePlayer();
-                    //    }
-                    //}
+                    //执行旋转操作
+                    RotatePlayer();
+                    //播放位移动画
+                    PlayMoveAnim();
+                    if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
+                    {
+                        if (!RayCastBlock(cc.CamMoveDir))//横向阻挡
+                        {
+                            //执行move操作
+                            TranslatePlayer();
+                        }
+                    }
 
                     //执行小跳跃
                     JumpBehaviour();
@@ -92,7 +98,6 @@ public class PlayerManager : MonoBehaviour
                 }
         }
     }
-
     #endregion
 
     #region 检测输入
@@ -103,6 +108,13 @@ public class PlayerManager : MonoBehaviour
         m_vInputMove.x = Input.GetAxis("Horizontal");
         m_vInputMove.y = Input.GetAxis("Vertical");
         m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;
+        m_bIsBlocked = false;
+#if UNITY_EDITOR
+        if (0f != m_vInputMove.x)
+        {
+            int a = 0;
+        }
+#endif
     }
 
     public bool CalJumpInput()                                              //获取跳跃输入
@@ -121,112 +133,63 @@ public class PlayerManager : MonoBehaviour
     }
     #endregion
 
-    #region 判定角色是否落地 HitGround
-    Ray ray1, ray2, ray3;
-    Vector3 pos, pos1;
- 
-    bool HitGround()
+    #region 检测碰撞
+    void OnCollisionEnter(Collision other)
     {
-        //设定射线长度 <角色身高>
-        TmpDis = Owner.ActorHeight*2f;
-
-        //从自身的中心点开始向下发射.
-        ray1 = new Ray(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight, Vector3.down);
-
-        pos = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight - Vector3.right * Owner.ActorSize;
-        if (Owner.ActorTrans.transform.forward.x < 0)
-            pos = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Vector3.right * Owner.ActorSize;
-
-        pos1 = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Vector3.right * Owner.ActorSize;
-        if (Owner.ActorTrans.transform.forward.x < 0)
-            pos1 = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight - Vector3.right * Owner.ActorSize;
-
-        //从自身的中心点尾部开始向下发射.
-        ray2 = new Ray(pos, Vector3.down);
-
-        //从自身的中心点头部开始向下发射.
-        ray3 = new Ray(pos1, Vector3.down);
-
-        //从角色发射三条向下的射线
-       // if (Physics.Raycast(ray1, out hitInfo, TmpDis, mask) || Physics.Raycast(ray2, out hitInfo, TmpDis, mask) || Physics.Raycast(ray3, out hitInfo, TmpDis, mask))
-        // public static bool BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float maxDistance, int layerMask);
-        //public static bool BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, out RaycastHit hitInfo, Quaternion orientation, float maxDistance, int layerMask);
-        if (Physics.BoxCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center, Owner.BC.size * 0.4f, Vector3.down, out hitInfo, Quaternion.Euler(Vector3.down), TmpDis, mask))
-       // if (Physics.BoxCast(new Vector3(0, 8, 0), Owner.BC.size*20, Vector3.down, out hitInfo, Quaternion.identity, TmpDis*30, mask))
+        if ((other.gameObject.layer == BrickMaskGlossy || other.gameObject.layer == MaskGlossy) && m_bIsDescent == true && m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null)
         {
-            //获取当前角色的位置和触发点的位置
-            TmpDis = Owner.ActorTrans.transform.position.y - hitInfo.point.y;
-
-#if UNITY_EDITOR
-            Debug.DrawLine(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight, hitInfo.point, Color.green);
-
-            if (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null && m_bIsDescent)
-            {
-                int a = 0;
-            }
-#endif
-
-            if (TmpDis < Owner.ActorHeight  && TmpDis > (0 - Owner.ActorHeight))
-            {
-                if (
-                    (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null && m_bIsDescent) ||
-                    m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null
-                    )
-                {
-                    m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Null;
-                    m_bGounded = true;
-                    m_bIsDescent = false;
-                    Owner.ActorTrans.position = new Vector3(
-                        Owner.ActorTrans.position.x,
-                        hitInfo.point.y,
-                        Owner.ActorTrans.position.z
-                       
-                        );
-                    return true;
-                }
-            }
+            m_bGounded = true;
+            m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Null;
+            m_bIsDescent = false;
         }
-
-        m_bGounded = false;
-        
-        return false;
-    
-    }
-
-    void FixedUpdate()
-    {
-        //HitGround();//检测是否落地
+        else if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null && other.gameObject.layer == BrickMaskGlossy && m_vInputMove.x != 0f)
+        {
+            m_bIsBlocked = true;
+        }
     }
     #endregion
 
     #region Player Translate
-
     bool RayCastBlock(eCamMoveDir side)
     {
-        // if (Physics.Raycast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorSize, m_vInputMove.x * Vector3.right, out hitInfo, TmpDis, mask))
-        TmpDis = Owner.ActorSize*1.1f;
-        //if (Physics.BoxCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center, Owner.BC.size * 0.5f, m_vInputMove.x * Vector3.right, out hitInfo, Quaternion.Euler(m_vInputMove.x * Vector3.right), TmpDis, mask))
-        //l SphereCast(Vector3 origin, float radius, Vector3 direction, out RaycastHit hitInfo, float maxDistance, int layerMask);
-        if (Physics.SphereCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center,0.6f, m_vInputMove.x * Vector3.right, out hitInfo, TmpDis, mask))
-        {
-            //绘制射线
-#if UNITY_EDITOR
-            Debug.DrawLine(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorSize, hitInfo.point, Color.blue);
-#endif
+        if (m_bIsBlocked)
             return true;
-            //if (m_vInputMove.x < 0f)//朝左运动
-            //{
-            //    if ((Owner.ActorTrans.transform.position.x - hitInfo.point.x) > 0f && (Owner.ActorTrans.transform.position.x - GlobalHelper.SMoveSpeed * Time.deltaTime - hitInfo.point.x) < Owner.ActorSize + 0.1f)
-            //        return true;
-            //}
-            //else if (m_vInputMove.x > 0f)//朝右运动
-            //{
-            //    if ((hitInfo.point.x - Owner.ActorTrans.transform.position.x) > 0f && (hitInfo.point.x - Owner.ActorTrans.transform.position.x) < Owner.ActorSize + 0.1f)
-            //        return true;
-            //}
-        }
-
         return false;
+//        TmpDis = Owner.ActorSize;
+//        if (m_vInputMove.x < 0)
+//            m_fDir = -1f;
+//        else
+//            m_fDir = 1f;
+
+//        if (Physics.BoxCast(Owner.ActorTrans.transform.position + Owner.BC.center,
+//         Owner.BC.size * 0.5f, m_fDir * Vector3.right, out hitInfo, Quaternion.Euler(m_fDir * Vector3.right), TmpDis, BrickMask))
+//        //l SphereCast(Vector3 origin, float radius, Vector3 direction, out RaycastHit hitInfo, float maxDistance, int layerMask);
+//        //if (Physics.SphereCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center +
+//        //    m_vInputMove.x * Vector3.right * GlobalHelper.SMoveSpeed * Time.deltaTime,
+//        //    Owner.ActorSize, m_vInputMove.x * Vector3.right, out hitInfo, TmpDis, mask))
+//        {
+//            //绘制射线
+//#if UNITY_EDITOR
+//            m_bIsRayCastTranslateBlocked = true;
+
+//            Debug.DrawLine(Owner.ActorTrans.transform.position + Owner.BC.center, hitInfo.point, Color.blue);
+            
+//#endif
+//            return true;
+//            //if (m_vInputMove.x < 0f)//朝左运动
+//            //{
+//            //    if ((Owner.ActorTrans.transform.position.x - hitInfo.point.x) > 0f && (Owner.ActorTrans.transform.position.x - GlobalHelper.SMoveSpeed * Time.deltaTime - hitInfo.point.x) < Owner.ActorSize + 0.1f)
+//            //        return true;
+//            //}
+//            //else if (m_vInputMove.x > 0f)//朝右运动
+//            //{
+//            //    if ((hitInfo.point.x - Owner.ActorTrans.transform.position.x) > 0f && (hitInfo.point.x - Owner.ActorTrans.transform.position.x) < Owner.ActorSize + 0.1f)
+//            //        return true;
+//            //}
+//        }
+//#if UNITY_EDITOR
+//        m_bIsRayCastTranslateBlocked = false;
+//#endif
     }
 
     void RotatePlayer()
@@ -238,37 +201,10 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    void DoBeforeFreeFall()
-    {
-        m_fStartTime = Time.time;
-        m_curHeight = fOrigHeight = Owner.ActorTrans.transform.position.y;
-    }
-
     void TranslatePlayer()
     {
-        if(m_vInputMove.x == 0f)
-            Owner.AM.SetFloat(NameToHashScript.SpeedId, 0f);
-        else
-        {
-            Owner.AM.SetFloat(NameToHashScript.SpeedId, 1f);
-            Owner.ActorTrans.Translate(new Vector3(0f, 0f, GlobalHelper.SMoveSpeed * Time.deltaTime));
-        }
-
-        #region 如果未落地 && 不是跳跃模式 -> 开始自由下落模式
-        if (!m_bGounded && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
-        {
-            Owner.ActorTrans.transform.position = new Vector3(
-             Owner.ActorTrans.transform.position.x,
-             m_curHeight,
-             Owner.ActorTrans.transform.position.z
-             );
-            m_fDuration = Time.time - m_fStartTime;
-            m_fCurSpeed = (m_curJumpData.m_fJumpAccel * m_fDuration);
-            m_curHeight = fOrigHeight + (0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
-
-        }
-        #endregion
-        
+        if(m_vInputMove.x != 0f)
+               Owner.ActorTrans.Translate(new Vector3(0f, 0f, GlobalHelper.SMoveSpeed * Time.deltaTime));
     }
 
     bool CheckMoveBoundaryBlock() 
@@ -288,10 +224,19 @@ public class PlayerManager : MonoBehaviour
     
         return false; 
     }
+
+    void PlayMoveAnim()
+    {
+        if(0f == m_vInputMove.x)
+            Owner.AM.SetFloat(NameToHashScript.SpeedId, 0f);
+        else
+        {
+            Owner.AM.SetFloat(NameToHashScript.SpeedId, 1f);
+        }
+    }
     #endregion
 
     #region Player Jump
-
     float fOrigHeight = 0f;                                                                                                         //开始跳跃或者下降前的高度
 
     float m_curHeight = 0f;                                                                                                       //保存角色当前高度
@@ -341,19 +286,7 @@ public class PlayerManager : MonoBehaviour
             m_curHeight = fOrigHeight + (m_curJumpData.m_fJumpInitSpeed * m_fDuration + 0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
         }
     }
-
-    void OnCollisionEnter(Collision other)
-    {
-        if (other.gameObject.layer == LayerMask.NameToLayer("Ground") && m_bIsDescent == true && m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null)
-        {
-            m_bGounded = true;
-            m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Null;
-            m_bIsDescent = false;
-        }
-    }
-
     #endregion
-
 }
 
 
@@ -571,8 +504,116 @@ public class PlayerManager : MonoBehaviour
 
 //    }
 //    #endregion
-
 /// <summary>
 /// 判定是否超出朝向边界
 /// </summary>
 /// <returns>如果游戏必须向右行进，那么当角色运行到相机视野的左边界的时候，那么就不能再继续行走了</returns>
+/// 
+//    #region 判定角色是否落地 HitGround
+//    Ray ray1, ray2, ray3;
+//    Vector3 pos, pos1;
+
+////    bool HitGround()
+////    {
+////        //设定射线长度 <角色身高>
+////        TmpDis = Owner.ActorHeight*2f;
+
+////        //从自身的中心点开始向下发射.
+////        ray1 = new Ray(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight, Vector3.down);
+
+////        pos = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight - Vector3.right * Owner.ActorSize;
+////        if (Owner.ActorTrans.transform.forward.x < 0)
+////            pos = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Vector3.right * Owner.ActorSize;
+
+////        pos1 = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Vector3.right * Owner.ActorSize;
+////        if (Owner.ActorTrans.transform.forward.x < 0)
+////            pos1 = Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight - Vector3.right * Owner.ActorSize;
+
+////        //从自身的中心点尾部开始向下发射.
+////        ray2 = new Ray(pos, Vector3.down);
+
+////        //从自身的中心点头部开始向下发射.
+////        ray3 = new Ray(pos1, Vector3.down);
+
+////        //从角色发射三条向下的射线
+////       // if (Physics.Raycast(ray1, out hitInfo, TmpDis, mask) || Physics.Raycast(ray2, out hitInfo, TmpDis, mask) || Physics.Raycast(ray3, out hitInfo, TmpDis, mask))
+////        // public static bool BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float maxDistance, int layerMask);
+////        //public static bool BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, out RaycastHit hitInfo, Quaternion orientation, float maxDistance, int layerMask);
+////        if (Physics.BoxCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center, Owner.BC.size * 0.4f, Vector3.down, out hitInfo, Quaternion.Euler(Vector3.down), TmpDis, mask))
+////       // if (Physics.BoxCast(new Vector3(0, 8, 0), Owner.BC.size*20, Vector3.down, out hitInfo, Quaternion.identity, TmpDis*30, mask))
+////        {
+////            //获取当前角色的位置和触发点的位置
+////            TmpDis = Owner.ActorTrans.transform.position.y - hitInfo.point.y;
+
+////#if UNITY_EDITOR
+////            Debug.DrawLine(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight, hitInfo.point, Color.green);
+
+////            if (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null && m_bIsDescent)
+////            {
+////                int a = 0;
+////            }
+////#endif
+
+////            if (TmpDis < Owner.ActorHeight  && TmpDis > (0 - Owner.ActorHeight))
+////            {
+////                if (
+////                    (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null && m_bIsDescent) ||
+////                    m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null
+////                    )
+////                {
+////                    m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Null;
+////                    m_bGounded = true;
+////                    m_bIsDescent = false;
+////                    Owner.ActorTrans.position = new Vector3(
+////                        Owner.ActorTrans.position.x,
+////                        hitInfo.point.y,
+////                        Owner.ActorTrans.position.z
+
+////                        );
+////                    return true;
+////                }
+////            }
+////        }
+
+////        m_bGounded = false;
+
+////        return false;
+
+////    }
+
+////    void FixedUpdate()
+////    {
+////        //HitGround();//检测是否落地
+////    }
+//    #endregion
+    ////<Deprecated>
+    //void DoBeforeFreeFall()
+    //{
+    //    m_fStartTime = Time.time;
+    //    m_curHeight = fOrigHeight = Owner.ActorTrans.transform.position.y;
+    //}
+//#region 如果未落地 && 不是跳跃模式 -> 开始自由下落模式
+//if (!m_bGounded && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
+//{
+//    Owner.ActorTrans.transform.position = new Vector3(
+//     Owner.ActorTrans.transform.position.x,
+//     m_curHeight,
+//     Owner.ActorTrans.transform.position.z
+//     );
+//    m_fDuration = Time.time - m_fStartTime;
+//    m_fCurSpeed = (m_curJumpData.m_fJumpAccel * m_fDuration);
+//    m_curHeight = fOrigHeight + (0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
+
+//}
+//#endregion
+//#if UNITY_EDITOR
+//    bool m_bIsRayCastTranslateBlocked = false;
+//    void OnDrawGizmos()
+//    {
+//        if (m_bIsRayCastTranslateBlocked)
+//        {
+//            Gizmos.color = Color.blue;
+//            Gizmos.DrawCube(Owner.ActorTrans.transform.position + Owner.BC.center, Owner.BC.size * 0.5f);
+//        }
+//    }
+// #endif
