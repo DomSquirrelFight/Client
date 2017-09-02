@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using AttTypeDefined;
+using AttTypeDefine;
 
 public class UIScene_Selecte : UIScene {
     //移动
