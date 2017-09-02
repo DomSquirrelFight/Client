@@ -68,7 +68,7 @@ public class BaseActor : MonoBehaviour
             ba.PlayerMgr.OnStart(ba);//启动角色管理器
             ba.CameraContrl.OnStart(ba);//启动相机
             ba.PlayerInputMgr.OnStart(ba);//启动角色输入管理器
-            ba.RB.isKinematic = true;
+            //ba.RB.isKinematic = true;
         }
 
         return ba;

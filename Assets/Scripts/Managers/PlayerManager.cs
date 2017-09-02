@@ -5,13 +5,13 @@ using AttTypeDefine;
 
 public class PlayerManager : MonoBehaviour
 {
-
+    
     #region 变量
     ePlayerBehaviour m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;                                                                        //角色行为
     
     ePlayerNormalBeha m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Null;                                             //角色普通行为
     
-    bool bGrounded = false;                                                                                                                                             //判定角色是否落地
+    bool bGrounded = true;                                                                                                                                             //判定角色是否落地
     bool m_bGounded
     {
         get
@@ -36,7 +36,9 @@ public class PlayerManager : MonoBehaviour
 
     CameraController cc;                                                                                                                                                   //相机实例对象                                                   
 
-    int mask;                                                                                                                                                                     //Ground Layer
+    int mask;                                                                                                                                                                     //Ground Layer<用在射线>
+
+    int MaskGlossy;                                                                                                                                                          //层级平移位数<对比碰撞双方的层级>
 
     JumpDataStore m_curJumpData;                                                                                                                                 //跳跃数据
 
@@ -52,7 +54,8 @@ public class PlayerManager : MonoBehaviour
     #region 外部接口
     public void OnStart(BaseActor owner)
     {
-        mask = 1 << LayerMask.NameToLayer("Ground");
+        MaskGlossy = LayerMask.NameToLayer("Ground");
+        mask = 1 << MaskGlossy;
         Owner = owner;
         cc = Owner.CameraContrl;
         m_curJumpData = Owner.SmallJumpDataStore;
@@ -64,16 +67,16 @@ public class PlayerManager : MonoBehaviour
         {
             case ePlayerBehaviour.eBehav_Normal:
                 {
-                    //执行旋转操作
-                    RotatePlayer();
-                    if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
-                    {
-                        if (!RayCastBlock(cc.CamMoveDir))//横向阻挡
-                        {
-                            //执行move操作
-                            TranslatePlayer();
-                        }
-                    }
+                    ////执行旋转操作
+                    //RotatePlayer();
+                    //if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
+                    //{
+                    //    if (!RayCastBlock(cc.CamMoveDir))//横向阻挡
+                    //    {
+                    //        //执行move操作
+                    //        TranslatePlayer();
+                    //    }
+                    //}
 
                     //执行小跳跃
                     JumpBehaviour();
@@ -100,19 +103,15 @@ public class PlayerManager : MonoBehaviour
         m_vInputMove.x = Input.GetAxis("Horizontal");
         m_vInputMove.y = Input.GetAxis("Vertical");
         m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            int a = 0;
-        }
     }
 
     public bool CalJumpInput()                                              //获取跳跃输入
     {
         if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
+        //if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Null)
         {
             if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
             {
-
                 DoBeforeJump();
                 return true;
             }
@@ -152,7 +151,7 @@ public class PlayerManager : MonoBehaviour
        // if (Physics.Raycast(ray1, out hitInfo, TmpDis, mask) || Physics.Raycast(ray2, out hitInfo, TmpDis, mask) || Physics.Raycast(ray3, out hitInfo, TmpDis, mask))
         // public static bool BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, Quaternion orientation, float maxDistance, int layerMask);
         //public static bool BoxCast(Vector3 center, Vector3 halfExtents, Vector3 direction, out RaycastHit hitInfo, Quaternion orientation, float maxDistance, int layerMask);
-        if (Physics.BoxCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center, Owner.BC.size * 0.5f, Vector3.down, out hitInfo, Quaternion.Euler(Vector3.down), TmpDis, mask))
+        if (Physics.BoxCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center, Owner.BC.size * 0.4f, Vector3.down, out hitInfo, Quaternion.Euler(Vector3.down), TmpDis, mask))
        // if (Physics.BoxCast(new Vector3(0, 8, 0), Owner.BC.size*20, Vector3.down, out hitInfo, Quaternion.identity, TmpDis*30, mask))
         {
             //获取当前角色的位置和触发点的位置
@@ -196,7 +195,7 @@ public class PlayerManager : MonoBehaviour
 
     void FixedUpdate()
     {
-        HitGround();//检测是否落地
+        //HitGround();//检测是否落地
     }
     #endregion
 
@@ -205,26 +204,26 @@ public class PlayerManager : MonoBehaviour
     bool RayCastBlock(eCamMoveDir side)
     {
         // if (Physics.Raycast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorSize, m_vInputMove.x * Vector3.right, out hitInfo, TmpDis, mask))
-        TmpDis = Owner.ActorSize*2;
+        TmpDis = Owner.ActorSize*1.1f;
         //if (Physics.BoxCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center, Owner.BC.size * 0.5f, m_vInputMove.x * Vector3.right, out hitInfo, Quaternion.Euler(m_vInputMove.x * Vector3.right), TmpDis, mask))
         //l SphereCast(Vector3 origin, float radius, Vector3 direction, out RaycastHit hitInfo, float maxDistance, int layerMask);
-        if (Physics.SphereCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center,0.5f, m_vInputMove.x * Vector3.right, out hitInfo, TmpDis, mask))
+        if (Physics.SphereCast(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorHeight + Owner.BC.center,0.6f, m_vInputMove.x * Vector3.right, out hitInfo, TmpDis, mask))
         {
             //绘制射线
 #if UNITY_EDITOR
             Debug.DrawLine(Owner.ActorTrans.transform.position + Vector3.up * Owner.ActorSize, hitInfo.point, Color.blue);
 #endif
-
-            if (m_vInputMove.x < 0f)//朝左运动
-            {
-                if ((Owner.ActorTrans.transform.position.x - hitInfo.point.x) > 0f && (Owner.ActorTrans.transform.position.x - GlobalHelper.SMoveSpeed * Time.deltaTime - hitInfo.point.x) < Owner.ActorSize + 0.1f)
-                    return true;
-            }
-            else if (m_vInputMove.x > 0f)//朝右运动
-            {
-                if ((hitInfo.point.x - Owner.ActorTrans.transform.position.x) > 0f && (hitInfo.point.x - Owner.ActorTrans.transform.position.x) < Owner.ActorSize + 0.1f)
-                    return true;
-            }
+            return true;
+            //if (m_vInputMove.x < 0f)//朝左运动
+            //{
+            //    if ((Owner.ActorTrans.transform.position.x - hitInfo.point.x) > 0f && (Owner.ActorTrans.transform.position.x - GlobalHelper.SMoveSpeed * Time.deltaTime - hitInfo.point.x) < Owner.ActorSize + 0.1f)
+            //        return true;
+            //}
+            //else if (m_vInputMove.x > 0f)//朝右运动
+            //{
+            //    if ((hitInfo.point.x - Owner.ActorTrans.transform.position.x) > 0f && (hitInfo.point.x - Owner.ActorTrans.transform.position.x) < Owner.ActorSize + 0.1f)
+            //        return true;
+            //}
         }
 
         return false;
@@ -306,6 +305,9 @@ public class PlayerManager : MonoBehaviour
     float m_fDuration = 0;                                                                                                        //保存跳跃的时长
     void DoBeforeJump()
     {
+
+        Owner.RB.velocity = new Vector3(0f, 0f, 0f);
+        Owner.RB.isKinematic = true;
         m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_SmallJump;
         fOrigHeight = m_curHeight = Owner.ActorTrans.transform.position.y;
         m_bIsDescent = false;
@@ -320,8 +322,14 @@ public class PlayerManager : MonoBehaviour
             if (m_fCurSpeed <=0f && m_bIsDescent == false)
             {
                 m_bIsDescent = true;
+                Owner.RB.isKinematic = false;
+                return;
             }
+            //如果在下降，则直接返回
+            if (m_bIsDescent)
+                return;
 
+            
             Owner.ActorTrans.transform.position = new Vector3(
                 Owner.ActorTrans.transform.position.x,
                 m_curHeight,
@@ -333,6 +341,17 @@ public class PlayerManager : MonoBehaviour
             m_curHeight = fOrigHeight + (m_curJumpData.m_fJumpInitSpeed * m_fDuration + 0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
         }
     }
+
+    void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.layer == LayerMask.NameToLayer("Ground") && m_bIsDescent == true && m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Null)
+        {
+            m_bGounded = true;
+            m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Null;
+            m_bIsDescent = false;
+        }
+    }
+
     #endregion
 
 }
