@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using AttTypeDefined;
+using AttTypeDefine;
 using System;
 
 public class UIScene_Loading : UIScene {

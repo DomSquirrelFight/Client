@@ -1,7 +1,24 @@
 ﻿using UnityEngine;
-namespace AttTypeDefine  {
+namespace AttTypeDefine
+{
 
+    #region UI
 
+    public enum LoadingState
+    {
+        e_LoadLevel,
+        e_ProcessBar,
+        e_LoadSelect,
+        e_Null,
+    }
+    public enum SceneType
+    {
+        SelecteLoading,
+        FightLoading,
+    }
+    #endregion
+
+    #region Character Behaviour
     public enum ePlayerBehaviour
     {
         eBehav_Normal,//平移，待机，小跳跃，大跳跃，仍箱子，捡箱子
@@ -61,6 +78,6 @@ namespace AttTypeDefine  {
         CamMove_Up,
         CamMove_Down,
     }
-
+#endregion
     
 }
