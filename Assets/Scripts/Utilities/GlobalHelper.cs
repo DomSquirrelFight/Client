@@ -2,7 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
-public class GlobalHelper  {
+public class GlobalHelper
+{
+
+    #region 常量表
+    public static float SMoveSpeed = 3f;
+    public static float SRotSpeed = 60f;
+    #endregion
 
 
     public static Vector2 GetCamArea(Vector3 middle)

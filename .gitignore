@@ -1,5 +1,6 @@
-
-.vs/Client/v14/.suo
-
 /Library
-Client.sln
+/Temp
+/Client.v12.suo
+/Client.CSharp.csproj
+/Client.CSharp.Editor.csproj
+/Client.sln

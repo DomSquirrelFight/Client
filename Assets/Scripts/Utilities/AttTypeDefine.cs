@@ -2,6 +2,23 @@
 namespace AttTypeDefine  {
 
 
+    public enum ePlayerBehaviour
+    {
+        eBehav_Normal,//平移，待机，小跳跃，大跳跃，仍箱子，捡箱子
+        eBehav_Hide,//隐藏
+        eBehav_JumpDown,//往下跳
+    }
+
+    public enum ePlayerNormalBeha
+    {
+        eNormalBehav_Grounded,
+        eNormalBehav_SmallJump,
+        eNormalBehav_BigJump,
+        //eNormalBehav_Move,
+        //eNormalBehav_Idle,
+    }
+
+
     public enum eRoleID
     {
         Role_NULL = -1,

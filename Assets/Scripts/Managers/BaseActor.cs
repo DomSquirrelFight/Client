@@ -62,10 +62,12 @@ public class BaseActor : MonoBehaviour
         if (
             null != ba.PlayerMgr/*读取角色管理器*/ ||
             null != ba.CameraContrl/*相机实例对象*/ ||
-            null != ba.RB/*加载刚体*/
+            null != ba.RB/*加载刚体*/ ||
+            null != ba.PlayerInputMgr
             ) {
             ba.PlayerMgr.OnStart(ba);//启动角色管理器
             ba.CameraContrl.OnStart(ba);//启动相机
+            ba.PlayerInputMgr.OnStart(ba);//启动角色输入管理器
             //ba.RB.isKinematic = true;
         }
 
@@ -154,17 +156,43 @@ public class BaseActor : MonoBehaviour
     }
     #endregion
 
-    #region 角色大小
+    #region 角色大小, 碰撞器
+    private BoxCollider bc;
+    public BoxCollider BC
+    {
+        get {
+            if (null == bc)
+            {
+                bc = Actor.GetOrAddComponent<BoxCollider>();
+            }
+            return bc;
+        }
+    }
     float actorsize = 0f;
     public float ActorSize
     {
         get
         {
+            //todo erric
             if (0f == actorsize)
-                actorsize = Actor.GetComponent<SphereCollider>().radius;
+                //actorsize = Actor.GetComponent<CapsuleCollider>().radius;
+                actorsize = Actor.GetComponent<BoxCollider>().size.z * 0.5f;
             return actorsize;
         }
     }
+
+    float actorheight = 0f;
+    public float ActorHeight
+    {
+        get
+        {
+            if (0f == actorheight)
+                //actorheight = Actor.GetComponent<CapsuleCollider>().height;
+                actorheight = Actor.GetComponent<BoxCollider>().size.y * 0.5f;
+            return actorheight;
+        }
+    }
+
     #endregion
 
     #region 小跳类
@@ -181,6 +209,20 @@ public class BaseActor : MonoBehaviour
     #region 玩家状态
 
     #endregion
+
+    #region 角色控制管理器
+    private PlayerInputManager playerinputmgr;
+    public PlayerInputManager PlayerInputMgr
+    {
+        get
+        {
+            if(null == playerinputmgr)
+                playerinputmgr = Actor.GetOrAddComponent<PlayerInputManager>();
+            return playerinputmgr;
+        }
+    }
+    #endregion
+
 
 
 }
