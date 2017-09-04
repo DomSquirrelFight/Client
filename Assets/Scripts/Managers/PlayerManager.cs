@@ -213,14 +213,15 @@ public class PlayerManager : MonoBehaviour
         if (m_vInputMove.x == 0f)
             return false;
 
-        if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
-        {
-            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.LeftPoint.x + Owner.ActorSize && m_vInputMove.x < 0f) return true;//block left
-        }
-        else if(cc.CamMoveDir == eCamMoveDir.CamMove_Left)
-        {
-            if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.RightPoint.x - Owner.ActorSize && m_vInputMove.x > 0f) return true; //block right
-        }
+        //todo_erric
+        //if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
+        //{
+        //    if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.LeftPoint.x + Owner.ActorSize && m_vInputMove.x < 0f) return true;//block left
+        //}
+        //else if(cc.CamMoveDir == eCamMoveDir.CamMove_Left)
+        //{
+        //    if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.RightPoint.x - Owner.ActorSize && m_vInputMove.x > 0f) return true; //block right
+        //}
     
         return false; 
     }

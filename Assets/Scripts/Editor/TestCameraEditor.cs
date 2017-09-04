@@ -56,7 +56,6 @@ public class TestCameraEditor : Editor {
 
             //计算目标对应的相机上下左右边界坐标, 并完成平面绘制
             Handles.color = Handles.zAxisColor;
-
             for (int i = 0; i < tc.m_dTargetCornerPoints.Count; i++)
             {
                 Handles.SphereHandleCap(
@@ -67,6 +66,17 @@ public class TestCameraEditor : Editor {
                                                            EventType.Repaint
                );
             }
+
+            //绘制相机朝向和目标屏幕的焦点坐标
+            Handles.color = Handles.yAxisColor;
+            Handles.SphereHandleCap(
+                                                           0,
+                                                           tc.m_vMiddlePoint,
+                                                           Quaternion.identity,
+                                                           0.5f,
+                                                           EventType.Repaint
+               );
+
 
         }
 

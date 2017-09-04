@@ -30,19 +30,20 @@ public class CameraWallEvent : MonoBehaviour {
 
             //设置新的运动方向
             cc.CamMoveDir = m_eCamMoveDir;
-            switch (m_eCamMoveDir)
-            {
-                case eCamMoveDir.CamMove_Left:
-                    {
-                        cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Right, cc.ZLineLength);
-                        break;
-                    }
-                case eCamMoveDir.CamMove_Right:
-                    {
-                        cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Left, cc.ZLineLength);
-                        break;
-                    }
-            }
+            //todo_erric
+            //switch (m_eCamMoveDir)
+            //{
+            //    case eCamMoveDir.CamMove_Left:
+            //        {
+            //            cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Right, cc.ZLineLength);
+            //            break;
+            //        }
+            //    case eCamMoveDir.CamMove_Right:
+            //        {
+            //            cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Left, cc.ZLineLength);
+            //            break;
+            //        }
+            //}
 
             if (BIsTriggerOnce)
                 Destroy(gameObject);
