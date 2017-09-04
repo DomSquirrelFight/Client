@@ -39,7 +39,11 @@ public class TestCameraEditor : Editor {
                                                            1f,
                                                            EventType.Repaint
                );
+                Handles.DrawLine(tc.transform.position, tc.m_vPoints[i]);
             }
+
+           
+
 
 
             //绘制四个交点组成的平面

@@ -32,6 +32,7 @@ namespace DT.Assets.CameraController
         float height, width;
         #endregion
 
+
         void Awake()
         {
             m_fHalfFOVRad = Camera.main.fieldOfView * 0.5f * Mathf.Deg2Rad;
@@ -52,28 +53,65 @@ namespace DT.Assets.CameraController
 
         }
 
+
         public void RefreshCamTargetBorderPoint()                                                                                                                                        //刷新相机到目标平面四个交点坐标, 目标自身边界顶点
         {
+#if UNITY_EDITOR
             CalCamFourDir();
 
             for (eCamFourCorner type = eCamFourCorner.CamCorner_UpperLeft; type < eCamFourCorner.CamCorner_Size; type++)
             {
                 m_vPoints[(int)type] = CalBordPoint(type);
             }
-
+#endif
+            //calculate middle point 
             CalMiddleAtTargetPlane();
 
+            //calculate target's border coordinates.
             CalTargetFourCorner();
-        }                                                                                                                                                
-
-        void CalculateCornerDir(eCamFourCorner type, Vector3 pos)
-        {
-            if (!m_dCamDir.ContainsKey(type))
-                m_dCamDir.Add(type, pos);
-            else
-                m_dCamDir[type] = pos;
         }
 
+        void CalTargetFourCorner()                                                                                                                                                                  //计算目标4个corner坐标 
+        {
+            Vector3 tmp;
+            //Target Left
+            tmp = transform.position - transform.right * width;
+            //tmp += transform.up * height;
+            tmp += transform.forward * m_fCamDis;
+            tmp = (tmp - transform.position).normalized;
+            tmp = GetTargetCornerPoint(tmp);
+            //tmp = new Vector3(tmp.x, m_tTarget.position.y, tmp.z);
+            CalculateTargetCorner(eTargetFourCorner.TargetCorner_Left, tmp);
+
+            //Target Right, 
+            tmp = transform.position + transform.right * width;
+            //tmp += transform.up * height;
+            tmp += transform.forward * m_fCamDis;
+            tmp = (tmp - transform.position).normalized;
+            tmp = GetTargetCornerPoint(tmp);
+            // tmp = new Vector3(tmp.x, m_tTarget.position.y, tmp.z);
+            CalculateTargetCorner(eTargetFourCorner.TargetCorner_Right, tmp);
+
+            //Target Up
+            //tmp = transform.position + transform.right * width;
+            tmp = transform.position;
+            tmp += transform.up * height;
+            tmp += transform.forward * m_fCamDis;
+            tmp = (tmp - transform.position).normalized;
+            tmp = GetTargetCornerPoint(tmp);
+            //tmp = new Vector3(m_tTarget.position.x, tmp.y, tmp.z);
+            CalculateTargetCorner(eTargetFourCorner.TargetCorner_Up, tmp);
+
+            //Target Down
+            tmp = transform.position;
+            tmp -= transform.up * height;
+            tmp += transform.forward * m_fCamDis;
+            tmp = (tmp - transform.position).normalized;
+            tmp = GetTargetCornerPoint(tmp);
+            //tmp = new Vector3(m_tTarget.position.x, tmp.y, tmp.z);
+            CalculateTargetCorner(eTargetFourCorner.TargetCorner_Down, tmp);
+        }
+   
         void CalculateTargetCorner(eTargetFourCorner type, Vector3 pos)
         {
             if (!m_dTargetCornerPoints.ContainsKey(type))
@@ -91,6 +129,7 @@ namespace DT.Assets.CameraController
 
              return corner;
         }
+
 
         void CalCamFourDir()                                                                                                                                                                            //确定相机的四个视野的方向向量.                                                                                                                               
         {
@@ -125,47 +164,6 @@ namespace DT.Assets.CameraController
             CalculateCornerDir(eCamFourCorner.CamCorner_DownRight, tmp);
         }
 
-        void CalTargetFourCorner()                                                                                                                                                                  //计算目标4个corner坐标 
-        {
-            Vector3 tmp;
-            //Target Left
-            tmp = transform.position - transform.right * width;
-            //tmp += transform.up * height;
-            tmp += transform.forward * m_fCamDis;
-            tmp = (tmp - transform.position).normalized;
-            tmp = GetTargetCornerPoint(tmp);
-            //tmp = new Vector3(tmp.x, m_tTarget.position.y, tmp.z);
-            CalculateTargetCorner(eTargetFourCorner.TargetCorner_Left, tmp);
-
-            //Target Right, 
-            tmp = transform.position + transform.right * width;
-            //tmp += transform.up * height;
-            tmp += transform.forward * m_fCamDis;
-            tmp = (tmp - transform.position).normalized;
-            tmp = GetTargetCornerPoint(tmp);
-           // tmp = new Vector3(tmp.x, m_tTarget.position.y, tmp.z);
-            CalculateTargetCorner(eTargetFourCorner.TargetCorner_Right, tmp);
-
-            //Target Up
-            //tmp = transform.position + transform.right * width;
-            tmp = transform.position;
-            tmp += transform.up * height;
-            tmp += transform.forward * m_fCamDis;
-            tmp = (tmp - transform.position).normalized;
-            tmp = GetTargetCornerPoint(tmp);
-            //tmp = new Vector3(m_tTarget.position.x, tmp.y, tmp.z);
-            CalculateTargetCorner(eTargetFourCorner.TargetCorner_Up, tmp);
-
-            //Target Down
-            tmp = transform.position;
-            tmp -= transform.up * height;
-            tmp += transform.forward * m_fCamDis;
-            tmp = (tmp - transform.position).normalized;
-            tmp = GetTargetCornerPoint(tmp);
-            //tmp = new Vector3(m_tTarget.position.x, tmp.y, tmp.z);
-            CalculateTargetCorner(eTargetFourCorner.TargetCorner_Down, tmp);
-        }
-
         Vector3 CalBordPoint(eCamFourCorner type)                                                                                                                                        //计算相机指定距离视野边界顶点坐标
         {
 
@@ -194,6 +192,14 @@ namespace DT.Assets.CameraController
             return corner;
         }
 
+        void CalculateCornerDir(eCamFourCorner type, Vector3 pos)
+        {
+            if (!m_dCamDir.ContainsKey(type))
+                m_dCamDir.Add(type, pos);
+            else
+                m_dCamDir[type] = pos;
+        }
+
         Vector3 CalMiddleAtTargetPlane()                                                                                                                                                        //计算相机朝向和目标平面的交点坐标.
         {
 
@@ -204,17 +210,17 @@ namespace DT.Assets.CameraController
             return m_vMiddlePoint;
         }
 
-        private Vector3[] GetValues(Dictionary<eCamFourCorner, Vector3> tmp)
-        {
-            Vector3[] values = Enumerable.Select(from i in tmp select i,
-                   value => GetValue(value)).ToArray();
-            return values;
-        }
+        //private Vector3[] GetValues(Dictionary<eCamFourCorner, Vector3> tmp)
+        //{
+        //    Vector3[] values = Enumerable.Select(from i in tmp select i,
+        //           value => GetValue(value)).ToArray();
+        //    return values;
+        //}
 
-        private Vector3 GetValue(KeyValuePair<eCamFourCorner, Vector3> i)
-        {
-            return i.Value;
-        } 
+        //private Vector3 GetValue(KeyValuePair<eCamFourCorner, Vector3> i)
+        //{
+        //    return i.Value;
+        //} 
 
     }
 }
