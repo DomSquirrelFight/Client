@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DT.Assets.CameraController.AttTypeDefine;
-
+using System.Linq;
 namespace DT.Assets.CameraController
 {
     public class TestCamera : MonoBehaviour
@@ -10,14 +10,15 @@ namespace DT.Assets.CameraController
         #region 变量
         public Vector3 TargetPlaneNormal;
 
-        sCamTargetPlane m_sTargetPlaneInfos;                                                                                                                                                     //计算保存目标平面的法向量
-
         [HideInInspector]
         public Transform m_tTarget;                                                                                                                                                                                //目标对象
 
         public Vector3[] m_vPoints = new Vector3[4];                                                                                                                                           //相机和目标平面的四个交点坐标
         [HideInInspector]
         public Dictionary<eCamFourCorner, Vector3> m_dCamDir = new Dictionary<eCamFourCorner, Vector3>();                                                      //相机视野四个角的方向向量
+
+        [HideInInspector]
+        public Dictionary<eTargetFourCorner, Vector3> m_dTargetCornerPoints = new Dictionary<eTargetFourCorner, Vector3>();                                   //目标视野边界顶点坐标                             
                                                                                                                                            
         float m_fCamDis = 0.5f;                                                                                                                                                                             //设定距离相机的距离<帮助确定四个方向的向量>
 
@@ -38,16 +39,35 @@ namespace DT.Assets.CameraController
         {
             m_tTarget = _target;                                                                                                                                                                                //确定目标
 
-            m_sTargetPlaneInfos.vPlanePoint = m_tTarget.position;                                                                                                                           //确定目标位置
-            m_sTargetPlaneInfos.vPlaneNormal = TargetPlaneNormal;                                                                                                                      //确定目标平面法向量
+            RefreshCamTargetBorderPoint();
 
+        }
+
+        public void RefreshCamTargetBorderPoint()                                                                                                                                        //刷新相机到目标平面四个交点坐标, 目标自身边界顶点
+        {
             CalCamFourDir();
 
-            for (eCamFourCorner type = eCamFourCorner.CamCorner_UpperLeft; type < eCamFourCorner.CamCorner_Size ; type++)
+            for (eCamFourCorner type = eCamFourCorner.CamCorner_UpperLeft; type < eCamFourCorner.CamCorner_Size; type++)
             {
                 m_vPoints[(int)type] = CalBordPoint(type);
             }
-        }
+
+            //Target Left
+            Vector3 tmp = new Vector3(m_vPoints[0].x, m_tTarget.position.y, m_tTarget.position.z);
+            CalculateTargetCorner(eTargetFourCorner.TargetCorner_Left, tmp);
+
+            //Target Right, 
+            tmp = new Vector3(m_vPoints[1].x, m_tTarget.position.y, m_tTarget.position.z);
+            CalculateTargetCorner(eTargetFourCorner.TargetCorner_Right, tmp);
+            
+            //Target Up
+            tmp = new Vector3(m_tTarget.position.x,m_vPoints[1].y, m_tTarget.position.z);
+            CalculateTargetCorner(eTargetFourCorner.TargetCorner_Up, tmp);
+
+            //Target Down
+            tmp = new Vector3(m_tTarget.position.x, m_vPoints[2].y, m_tTarget.position.z);
+            CalculateTargetCorner(eTargetFourCorner.TargetCorner_Down, tmp);
+        }                                                                                                                                                
 
         void CalculateCornerDir(eCamFourCorner type, Vector3 pos)
         {
@@ -56,6 +76,15 @@ namespace DT.Assets.CameraController
             else
                 m_dCamDir[type] = pos;
         }
+
+        void CalculateTargetCorner(eTargetFourCorner type, Vector3 pos)
+        {
+            if (!m_dTargetCornerPoints.ContainsKey(type))
+                m_dTargetCornerPoints.Add(type, pos);
+            else
+                m_dTargetCornerPoints[type] = pos;
+        }
+
         void CalCamFourDir()                                                                                                                                                                            //确定相机的四个视野的方向向量.                                                                                                                               
         {
 
@@ -93,8 +122,12 @@ namespace DT.Assets.CameraController
             CalculateCornerDir(eCamFourCorner.CamCorner_DownRight, tmp);
         }
 
+        void CalTargetFourCorner()                                                                                                                                                                  //计算目标4个corner坐标 
+        {
 
-        Vector3 CalBordPoint(eCamFourCorner type)                                                                                                                                                                                 //计算相机指定距离视野边界顶点坐标
+        }
+
+        Vector3 CalBordPoint(eCamFourCorner type)                                                                                                                                        //计算相机指定距离视野边界顶点坐标
         {
 
             float t = 0f;
@@ -121,6 +154,19 @@ namespace DT.Assets.CameraController
 
             return corner;
         }
+
+
+        private Vector3[] GetValues(Dictionary<eCamFourCorner, Vector3> tmp)
+        {
+            Vector3[] values = Enumerable.Select(from i in tmp select i,
+                   value => GetValue(value)).ToArray();
+            return values;
+        }
+
+        private Vector3 GetValue(KeyValuePair<eCamFourCorner, Vector3> i)
+        {
+            return i.Value;
+        } 
 
     }
 }
