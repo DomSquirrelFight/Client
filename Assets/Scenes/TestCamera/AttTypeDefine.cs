@@ -23,6 +23,7 @@ namespace DT.Assets.CameraController.AttTypeDefine {
         CamCorner_UpperRight,
         CamCorner_DownLeft,
         CamCorner_DownRight,
+        CamCorner_Size,
     }
 
 

@@ -16,10 +16,9 @@ namespace DT.Assets.CameraController
         public Transform m_tTarget;                                                                                                                                                                                //目标对象
 
         public Vector3[] m_vPoints = new Vector3[4];                                                                                                                                           //相机和目标平面的四个交点坐标
-
-        Dictionary<eCamFourCorner, Vector3> m_dCamDir = new Dictionary<eCamFourCorner, Vector3>();
-        Vector3[] m_vCamDir = new Vector3[4];                                                                                                                                                    //相机视野四个角的方向向量
-
+        [HideInInspector]
+        public Dictionary<eCamFourCorner, Vector3> m_dCamDir = new Dictionary<eCamFourCorner, Vector3>();                                                      //相机视野四个角的方向向量
+                                                                                                                                           
         float m_fCamDis = 0.5f;                                                                                                                                                                             //设定距离相机的距离<帮助确定四个方向的向量>
 
         float m_fHalfFOVRad;                                                                                                                                                                                //相机角度一半的弧度值
@@ -44,7 +43,10 @@ namespace DT.Assets.CameraController
 
             CalCamFourDir();
 
-            m_vPoints[0] = CalBordPoint(eCamFourCorner.CamCorner_UpperLeft);
+            for (eCamFourCorner type = eCamFourCorner.CamCorner_UpperLeft; type < eCamFourCorner.CamCorner_Size ; type++)
+            {
+                m_vPoints[(int)type] = CalBordPoint(type);
+            }
         }
 
         void CalculateCornerDir(eCamFourCorner type, Vector3 pos)
@@ -54,7 +56,7 @@ namespace DT.Assets.CameraController
             else
                 m_dCamDir[type] = pos;
         }
-        Vector3[] CalCamFourDir()                                                                                                                                                                            //确定相机的四个视野的方向向量.                                                                                                                               
+        void CalCamFourDir()                                                                                                                                                                            //确定相机的四个视野的方向向量.                                                                                                                               
         {
 
             float height = m_fCamDis * Mathf.Tan(m_fHalfFOVRad);
@@ -89,8 +91,6 @@ namespace DT.Assets.CameraController
             tmp += transform.forward * m_fCamDis;
             tmp = (tmp - transform.position).normalized;
             CalculateCornerDir(eCamFourCorner.CamCorner_DownRight, tmp);
-
-            return m_vCamDir;
         }
 
 
