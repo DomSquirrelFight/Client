@@ -27,6 +27,7 @@ public class CameraControllerEditor : Editor {
 
             Handles.color = Color.white;
 
+            //计算， 绘制相机围绕Y轴旋转的中点坐标，左边框坐标和右边框坐标
             #region 绘制一个三角形
 
             //绘制一条直线，从相机，垂直向上一条先发射
@@ -60,23 +61,9 @@ public class CameraControllerEditor : Editor {
 
             #endregion
 
-            #region 绘制相机到主角线段的线段
-            #region 经过测试，结果错误
-            ////2.1.2 获取相机的旋转角度
-            //float fDegreeCamToMajor = cc.transform.rotation.y;
-            ////2.1.3 获取相机射线长度
-            //float fZLineLength = fZCamToMajor / Mathf.Cos(fDegreeCamToMajor);
-            #endregion
-            
+            #region 绘制相机左边框和有边框线段
             Handles.color = Color.red;
             Vector3 vCamMiddlePoint = cc.GetCameraMajorMiddlePoint();
-            Handles.DrawLine(
-                    camMajorHeight,
-                    vCamMiddlePoint
-                );
-            #endregion
-
-            #region 绘制相机左边框和有边框线段
             Vector3 vLeft = cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Left, cc.ZLineLength);
             Vector3 vRight = cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Right, cc.ZLineLength);
 
@@ -87,7 +74,34 @@ public class CameraControllerEditor : Editor {
             Handles.color = Color.white;
             Handles.DrawLine(vLeft, vRight);
             #endregion
-            
+
+
+            //计算， 绘制相机围绕X轴旋转的中点坐标，上边框坐标和下边框坐标
+            #region 绘制一个三角形，从相机到主角的YZ平面.
+            //note : 如果相机没有围绕X轴旋转，即Ѳ == 0f,那么0点和3点将是重合的
+
+            Handles.color = Color.green;   
+           
+            Handles.DrawLine(cc.transform.position, vCamMiddlePoint);
+
+            Handles.color = Color.white;
+            Vector3 vThirdPoint = new Vector3(vCamMiddlePoint.x, cc.transform.position.y, cc.Owner.ActorTrans.position.z);                                       //相机在主角YZ平面的交点<ThirdPoint>
+            Handles.DrawLine(cc.transform.position, vThirdPoint);
+
+
+            if (vThirdPoint.y != vCamMiddlePoint.y)
+            {
+                Handles.DrawLine(vCamMiddlePoint, vThirdPoint);
+            }
+            #endregion
+
+            #region 绘制1点和2点
+
+            #endregion
+
+            #region //Handles.DrawSolidRectangleWithOutline 绘制一个半透明的平面， 需要四个点，1点， 2点。
+
+            #endregion
         }
     }
 

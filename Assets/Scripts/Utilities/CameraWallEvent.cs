@@ -3,19 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 
-[RequireComponent(typeof(BoxCollider)), RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(BoxCollider))]
 public class CameraWallEvent : MonoBehaviour {
 
     void Reset()
     {
         BoxCollider bc = gameObject.GetComponent<BoxCollider>();
         bc.isTrigger = true;
-        Rigidbody rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true;
     }
 
     public eCamMoveDir m_eCamMoveDir = eCamMoveDir.CamMove_Right;
-
+    public bool BIsTriggerOnce = false;
     void OnTriggerEnter(Collider other)
     {
 
@@ -29,6 +27,7 @@ public class CameraWallEvent : MonoBehaviour {
                 Debug.LogError("Fail to find CameraController");
                 return;
             }
+
             //设置新的运动方向
             cc.CamMoveDir = m_eCamMoveDir;
             switch (m_eCamMoveDir)
@@ -44,6 +43,10 @@ public class CameraWallEvent : MonoBehaviour {
                         break;
                     }
             }
+
+            if (BIsTriggerOnce)
+                Destroy(gameObject);
+
         }
     }
 
