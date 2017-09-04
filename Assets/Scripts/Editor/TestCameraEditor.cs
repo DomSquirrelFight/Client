@@ -18,5 +18,24 @@ public class TestCameraEditor : Editor {
         base.OnInspectorGUI();
     }
 
-    
+    void OnSceneGUI()
+    {
+        
+        //先计算相机和目标平面的四个交点坐标
+
+        //显示四个交点坐标
+
+        if (tc.m_tTarget)
+        {
+            if(Handles.Button(tc.m_vPoints[0], Quaternion.identity, 0.5f, 1f, Handles.DotHandleCap))
+            {
+
+            }
+        }
+
+
+
+    }
+
+
 }

@@ -17,5 +17,14 @@ namespace DT.Assets.CameraController.AttTypeDefine {
 
     }
 
+    public enum eCamFourCorner
+    {
+        CamCorner_UpperLeft,
+        CamCorner_UpperRight,
+        CamCorner_DownLeft,
+        CamCorner_DownRight,
+    }
+
+
 }
 
