@@ -17,13 +17,60 @@ public class TestCameraEditor : Editor {
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-    }
 
+        if (tc.m_tTarget)
+        {
+            //------------------------------------------------------------Begin : TargetPlaneNormal<目标平面法向量>-----------------------------------------------------------//
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("目标平面法向量");
+            EditorGUILayout.LabelField("x: " + tc.TargetPlaneNormal.x.ToString() + ";           " + "y: " + tc.TargetPlaneNormal.y.ToString() + ";          " + "z: " + tc.TargetPlaneNormal.z.ToString() + ";");
+            EditorGUILayout.EndHorizontal();
+            //------------------------------------------------------------End : TargetPlaneNormal<目标平面法向量>-----------------------------------------------------------//
+
+            //------------------------------------------------------------Begin : m_vMiddlePoint <相机朝向和目标平面的交点坐标>-----------------------------------------------------------//
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("相机朝向和目标平面的交点坐标");
+            EditorGUILayout.LabelField("x: " + tc.m_vMiddlePoint.x.ToString() + ";           " + "y: " + tc.m_vMiddlePoint.y.ToString() + ";          " + "z: " + tc.m_vMiddlePoint.z.ToString() + ";");
+            EditorGUILayout.EndHorizontal();
+            //------------------------------------------------------------End : m_vMiddlePoint <相机朝向和目标平面的交点坐标>-----------------------------------------------------------//
+
+            //------------------------------------------------------------Begin : m_dCamDir <目标平面和相机视野边缘交点>-----------------------------------------------------------//
+            if (m_nSelectedIndex != -1)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.Vector3Field("相机朝向和目标平面边缘交点坐标", tc.m_dCamDir[(eCamFourCorner)m_nSelectedIndex]);
+                EditorGUILayout.EndHorizontal();
+            }
+            //------------------------------------------------------------End : m_dCamDir <目标平面和相机视野边缘交点>-----------------------------------------------------------//
+
+            //------------------------------------------------------------Begin : m_dTargetCornerPoints <目标的边缘坐标>-----------------------------------------------------------//
+            if (m_nSelectedTargetBorderPointIndex != -1)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.Vector3Field("目标的边缘坐标", tc.m_dTargetCornerPoints[(eTargetFourCorner)m_nSelectedTargetBorderPointIndex]);
+                EditorGUILayout.EndHorizontal();
+            }
+            //------------------------------------------------------------End : m_dTargetCornerPoints <目标的边缘坐标>-----------------------------------------------------------//
+
+
+        }
+       
+        
+
+    }
+    float size = 1f;
+    float pickSize = 2f;
+    int m_nSelectedIndex = -1;
+    int m_nSelectedTargetBorderPointIndex = -1;
     void OnSceneGUI()
     {
         
         if (tc.m_tTarget)
         {
+
+            //HandleUtility.GetHandleSize(tc.transform.position);
+
+            //Handles.ScaleHandle(Vector3.one * 0.2f, tc.transform.position, Quaternion.identity, 1);
 
             //刷新界面
             tc.RefreshCamTargetBorderPoint();
@@ -32,14 +79,27 @@ public class TestCameraEditor : Editor {
             Handles.color = Handles.xAxisColor;
             for (int i = 0; i < 4; i++)
             {
-                Handles.SphereHandleCap(
-                                                           0,
-                                                           tc.m_vPoints[i],
-                                                           Quaternion.identity,
-                                                           1f,
-                                                           EventType.Repaint
-               );
+
+                if (Handles.Button(tc.m_vPoints[i], Quaternion.identity, size, pickSize, Handles.SphereHandleCap))
+                {
+                    m_nSelectedIndex = i;
+                    Repaint();
+                }
+
+               // Handles.SphereHandleCap(
+               //                                            0,
+               //                                            tc.m_vPoints[i],
+               //                                            Quaternion.identity,
+               //                                            1f,
+               //                                            EventType.Repaint
+               //);
                 Handles.DrawLine(tc.transform.position, tc.m_vPoints[i]);
+            }
+
+
+            if (m_nSelectedIndex != -1)
+            {
+                Handles.DoPositionHandle(tc.m_vPoints[m_nSelectedIndex], Quaternion.identity);
             }
 
            
@@ -62,14 +122,26 @@ public class TestCameraEditor : Editor {
             Handles.color = Handles.zAxisColor;
             for (int i = 0; i < tc.m_dTargetCornerPoints.Count; i++)
             {
-                Handles.SphereHandleCap(
-                                                           0,
-                                                           tc.m_dTargetCornerPoints[(eTargetFourCorner)i],
-                                                           Quaternion.identity,
-                                                           1f,
-                                                           EventType.Repaint
-               );
+
+                if (Handles.Button(tc.m_dTargetCornerPoints[(eTargetFourCorner)i], Quaternion.identity, size, pickSize, Handles.SphereHandleCap))
+                {
+                    m_nSelectedTargetBorderPointIndex = i;
+                    Repaint();
+                }
+               // Handles.SphereHandleCap(
+               //                                            0,
+               //                                            tc.m_dTargetCornerPoints[(eTargetFourCorner)i],
+               //                                            Quaternion.identity,
+               //                                            1f,
+               //                                            EventType.Repaint
+               //);
             }
+
+            if (m_nSelectedTargetBorderPointIndex != -1)
+            {
+                Handles.DoPositionHandle(tc.m_dTargetCornerPoints[(eTargetFourCorner)m_nSelectedTargetBorderPointIndex], Quaternion.identity);
+            }
+
 
             //绘制相机朝向和目标屏幕的焦点坐标
             Handles.color = Handles.yAxisColor;

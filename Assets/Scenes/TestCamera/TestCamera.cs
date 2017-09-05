@@ -8,7 +8,19 @@ namespace DT.Assets.CameraController
     public class TestCamera : MonoBehaviour
     {
         #region 变量
-        public Vector3 TargetPlaneNormal;
+        private Vector3 targetplanenormal = Vector3.back;
+        public Vector3 TargetPlaneNormal
+        {
+            get
+            {
+                return targetplanenormal;
+            }
+            set
+            {
+                if (value != targetplanenormal)
+                    targetplanenormal = value;
+            }
+        }
 
         [HideInInspector]
         public Transform m_tTarget;                                                                                                                                                                                //目标对象
@@ -20,9 +32,19 @@ namespace DT.Assets.CameraController
         [HideInInspector]
         public Dictionary<eTargetFourCorner, Vector3> m_dTargetCornerPoints = new Dictionary<eTargetFourCorner, Vector3>();                                   //目标视野边界顶点坐标          
 
-        public Vector3 m_vMiddlePoint;                                                                                                                                                                //相机朝向和目标平面的焦点.
-   
-                                                                                                                                           
+        private Vector3 middlepoint;
+        public Vector3 m_vMiddlePoint                                                                                                                                                                //相机朝向和目标平面的焦点.
+        {
+            get
+            {
+                return middlepoint;
+            }
+            set
+            {
+                if (value != middlepoint)
+                    middlepoint = value;
+            }
+        }                                                                             
         float m_fCamDis = 0.5f;                                                                                                                                                                             //设定距离相机的距离<帮助确定四个方向的向量>
 
         float m_fHalfFOVRad;                                                                                                                                                                                //相机角度一半的弧度值

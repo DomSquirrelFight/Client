@@ -14,6 +14,7 @@ public class CameraWallEvent : MonoBehaviour {
 
     public eCamMoveDir m_eCamMoveDir = eCamMoveDir.CamMove_Right;
     public bool BIsTriggerOnce = false;
+
     void OnTriggerEnter(Collider other)
     {
 
