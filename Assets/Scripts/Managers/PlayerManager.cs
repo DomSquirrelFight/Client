@@ -150,7 +150,7 @@ public class PlayerManager : MonoBehaviour
     #region 检测碰撞
     void OnCollisionEnter(Collision other)
     {
-        if ((other.gameObject.layer == BrickMaskGlossy || other.gameObject.layer == MaskGlossy) && m_bIsDescent == true && m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Grounded)
+        if ((other.gameObject.layer == BrickMaskGlossy || other.gameObject.layer == MaskGlossy) && m_bIsDescent == true && m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Grounded && Owner.ActorTrans.position.y >= other.transform.position.y)
         {
             m_bGounded = true;
             m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
