@@ -12,7 +12,10 @@ public class TestCameraEditor : Editor {
     void OnEnable()
     {
         tc = target as TestCamera;
+      
     }
+
+ 
 
     public override void OnInspectorGUI()
     {
@@ -20,44 +23,46 @@ public class TestCameraEditor : Editor {
 
         if (tc.m_tTarget)
         {
+
+            //DetectTransformChange();
+
             //------------------------------------------------------------Begin : TargetPlaneNormal<目标平面法向量>-----------------------------------------------------------//
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("目标平面法向量");
+            EditorGUILayout.LabelField("TargetPlaneNormal<目标平面法向量>");
             EditorGUILayout.LabelField("x: " + tc.TargetPlaneNormal.x.ToString() + ";           " + "y: " + tc.TargetPlaneNormal.y.ToString() + ";          " + "z: " + tc.TargetPlaneNormal.z.ToString() + ";");
             EditorGUILayout.EndHorizontal();
             //------------------------------------------------------------End : TargetPlaneNormal<目标平面法向量>-----------------------------------------------------------//
 
+
             //------------------------------------------------------------Begin : m_vMiddlePoint <相机朝向和目标平面的交点坐标>-----------------------------------------------------------//
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("相机朝向和目标平面的交点坐标");
+            EditorGUILayout.LabelField("m_vMiddlePoint<相机朝向和目标平面的交点坐标>");
             EditorGUILayout.LabelField("x: " + tc.m_vMiddlePoint.x.ToString() + ";           " + "y: " + tc.m_vMiddlePoint.y.ToString() + ";          " + "z: " + tc.m_vMiddlePoint.z.ToString() + ";");
             EditorGUILayout.EndHorizontal();
             //------------------------------------------------------------End : m_vMiddlePoint <相机朝向和目标平面的交点坐标>-----------------------------------------------------------//
+
 
             //------------------------------------------------------------Begin : m_dCamDir <目标平面和相机视野边缘交点>-----------------------------------------------------------//
             if (m_nSelectedIndex != -1)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.Vector3Field("相机朝向和目标平面边缘交点坐标", tc.m_dCamDir[(eCamFourCorner)m_nSelectedIndex]);
+                EditorGUILayout.Vector3Field("m_dCamDir<相机朝向和目标平面边缘交点坐标>", tc.m_dCamDir[(eCamFourCorner)m_nSelectedIndex]);
                 EditorGUILayout.EndHorizontal();
             }
             //------------------------------------------------------------End : m_dCamDir <目标平面和相机视野边缘交点>-----------------------------------------------------------//
+
 
             //------------------------------------------------------------Begin : m_dTargetCornerPoints <目标的边缘坐标>-----------------------------------------------------------//
             if (m_nSelectedTargetBorderPointIndex != -1)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.Vector3Field("目标的边缘坐标", tc.m_dTargetCornerPoints[(eTargetFourCorner)m_nSelectedTargetBorderPointIndex]);
+                EditorGUILayout.Vector3Field("m_dTargetCornerPoints<目标的边缘坐标>", tc.m_dTargetCornerPoints[(eTargetFourCorner)m_nSelectedTargetBorderPointIndex]);
                 EditorGUILayout.EndHorizontal();
             }
             //------------------------------------------------------------End : m_dTargetCornerPoints <目标的边缘坐标>-----------------------------------------------------------//
-
-
         }
-       
-        
-
     }
+
     float size = 1f;
     float pickSize = 2f;
     int m_nSelectedIndex = -1;
@@ -73,7 +78,7 @@ public class TestCameraEditor : Editor {
             //Handles.ScaleHandle(Vector3.one * 0.2f, tc.transform.position, Quaternion.identity, 1);
 
             //刷新界面
-            tc.RefreshCamTargetBorderPoint();
+            //DetectTransformChange();
 
             //显示四个交点<相机边界射线和目标平面>
             Handles.color = Handles.xAxisColor;

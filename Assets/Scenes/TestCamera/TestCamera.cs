@@ -25,6 +25,7 @@ namespace DT.Assets.CameraController
         [HideInInspector]
         public Transform m_tTarget;                                                                                                                                                                                //目标对象
 
+        [HideInInspector]        
         public Vector3[] m_vPoints = new Vector3[4];                                                                                                                                           //相机和目标平面的四个交点坐标
         [HideInInspector]
         public Dictionary<eCamFourCorner, Vector3> m_dCamDir = new Dictionary<eCamFourCorner, Vector3>();                                                      //相机视野四个角的方向向量
@@ -52,6 +53,7 @@ namespace DT.Assets.CameraController
         float m_fAspect;                                                                                                                                                                                        //相机的宽高比
 
         float height, width;
+
         #endregion
 
 
@@ -65,6 +67,15 @@ namespace DT.Assets.CameraController
 
             width = height * m_fAspect;
 
+            vLastPos = transform.position;
+
+            vLastRot = transform.rotation.eulerAngles;
+
+        }
+
+        void Update()
+        {
+            DetectTransformChange();
         }
 
         public void OnStart(Transform _target)
@@ -75,6 +86,18 @@ namespace DT.Assets.CameraController
 
         }
 
+        Vector3 vLastPos;
+        Vector3 vLastRot;
+        void DetectTransformChange()
+        {
+            if (vLastPos != transform.position || vLastRot != transform.rotation.eulerAngles)
+            {
+                RefreshCamTargetBorderPoint();
+            }
+
+            vLastPos = transform.position;
+            vLastRot = transform.rotation.eulerAngles;
+        }                                                                                                                                                        //检测相机的位置或者旋转是否发生了变化，如果发生变化，重新计算所有数据
 
         public void RefreshCamTargetBorderPoint()                                                                                                                                        //刷新相机到目标平面四个交点坐标, 目标自身边界顶点
         {
