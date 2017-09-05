@@ -277,7 +277,6 @@ public class PlayerManager : MonoBehaviour
         m_bIsDescent = false;
         m_fCurSpeed = m_curJumpData.m_fJumpInitSpeed;
         m_fStartTime = Time.time;
-        Owner.CameraContrl.BRefreshCameraData = true;                                                        //起跳开启 -> 刷新相机数据        
     }
 
     public void JumpBehaviour()

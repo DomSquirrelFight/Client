@@ -370,7 +370,7 @@ public class CameraController : MonoBehaviour {
                     {
                         if (Owner.ActorTrans.transform.position.y > m_vMiddlePoint.y)
                         {
-                            transform.Translate(Vector3.up * 3f * Time.deltaTime, Space.World);
+                            transform.Translate(Vector3.up * 4f * Time.deltaTime, Space.World);
                         }
                         break;
                     }
