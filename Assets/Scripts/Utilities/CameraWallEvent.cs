@@ -36,15 +36,17 @@ public class CameraWallEvent : MonoBehaviour {
             //{
             //    case eCamMoveDir.CamMove_Left:
             //        {
-            //            cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Right, cc.ZLineLength);
+            //            //cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Right, cc.ZLineLength);
+            //            cc.RefreshCamTargetBorderPoint();
             //            break;
             //        }
             //    case eCamMoveDir.CamMove_Right:
             //        {
-            //            cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Left, cc.ZLineLength);
+            //            cc.RefreshCamTargetBorderPoint();
             //            break;
             //        }
             //}
+            cc.BRefreshCameraData = true;           //碰到转向墙
 
             if (BIsTriggerOnce)
                 Destroy(gameObject);

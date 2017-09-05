@@ -51,6 +51,14 @@ public class PlayerManager : MonoBehaviour
     Vector3 m_vCurForward;                                                                                                                                             //保存当前角色朝向
 
     bool m_bIsBlocked = false;                                                                                                                                         //判定横向是否被盒子阻挡了
+
+    public float FPlayerJumpBeginYPos                                                                                                                            //角色起跳在Y轴方向的高度值
+    {
+        get
+        {
+            return fOrigHeight;
+        }
+    }
     #endregion
 
     #region 外部接口
@@ -117,6 +125,12 @@ public class PlayerManager : MonoBehaviour
 #endif
     }
 
+    public bool IsJump()
+    {
+        if (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Grounded)
+            return true;
+        return false;
+    }
     public bool CalJumpInput()                                              //获取跳跃输入
     {
         if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded)
@@ -124,7 +138,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
             {
-                DoBeforeJump();
+                DoBeforeJump(ePlayerNormalBeha.eNormalBehav_SmallJump);
                 return true;
             }
 
@@ -213,15 +227,20 @@ public class PlayerManager : MonoBehaviour
         if (m_vInputMove.x == 0f)
             return false;
 
-        //todo_erric
-        //if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
-        //{
-        //    if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.LeftPoint.x + Owner.ActorSize && m_vInputMove.x < 0f) return true;//block left
-        //}
-        //else if(cc.CamMoveDir == eCamMoveDir.CamMove_Left)
-        //{
-        //    if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.RightPoint.x - Owner.ActorSize && m_vInputMove.x > 0f) return true; //block right
-        //}
+        if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
+        {
+            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize && m_vInputMove.x < 0f) return true;//block left
+        }
+        else if (cc.CamMoveDir == eCamMoveDir.CamMove_Left)
+        {
+            if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize && m_vInputMove.x > 0f) return true; //block right
+        }
+        else if (cc.CamMoveDir == eCamMoveDir.CamMove_Up)
+        {
+            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize && m_vInputMove.x < 0f) return true;//block left
+            else if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize && m_vInputMove.x > 0f) return true; //block right
+
+        }
     
         return false; 
     }
@@ -249,15 +268,16 @@ public class PlayerManager : MonoBehaviour
     float m_fStartTime = 0f;                                                                                                      //跳跃开始前的计时变量
 
     float m_fDuration = 0;                                                                                                        //保存跳跃的时长
-    void DoBeforeJump()
+    void DoBeforeJump(ePlayerNormalBeha type)
     {
-
+                                                        
         Owner.RB.isKinematic = true;
-        m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_SmallJump;
+        m_ePlayerNormalBehav = type;
         fOrigHeight = m_curHeight = Owner.ActorTrans.transform.position.y;
         m_bIsDescent = false;
         m_fCurSpeed = m_curJumpData.m_fJumpInitSpeed;
         m_fStartTime = Time.time;
+        Owner.CameraContrl.BRefreshCameraData = true;                                                        //起跳开启 -> 刷新相机数据        
     }
 
     public void JumpBehaviour()

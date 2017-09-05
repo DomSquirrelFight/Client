@@ -15,16 +15,12 @@ public class TestCameraEditor : Editor {
       
     }
 
- 
-
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
 
         if (tc.m_tTarget)
         {
-
-            //DetectTransformChange();
 
             //------------------------------------------------------------Begin : TargetPlaneNormal<目标平面法向量>-----------------------------------------------------------//
             EditorGUILayout.BeginHorizontal();
@@ -72,13 +68,6 @@ public class TestCameraEditor : Editor {
         
         if (tc.m_tTarget)
         {
-
-            //HandleUtility.GetHandleSize(tc.transform.position);
-
-            //Handles.ScaleHandle(Vector3.one * 0.2f, tc.transform.position, Quaternion.identity, 1);
-
-            //刷新界面
-            //DetectTransformChange();
 
             //显示四个交点<相机边界射线和目标平面>
             Handles.color = Handles.xAxisColor;
