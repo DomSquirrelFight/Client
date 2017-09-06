@@ -56,6 +56,11 @@ public class PlayerManager : MonoBehaviour
 
     //bool m_bIsBlocked = false;                                                                                                                                         //判定横向是否被盒子阻挡了
 
+    BoxCollider m_bcCurBox = null;
+    bool m_bIsHoldBox = false;
+    float m_fPlayerBoxRaidus = 0f;
+
+
     public float FPlayerJumpBeginYPos                                                                                                                            //角色起跳在Y轴方向的高度值
     {
         get
@@ -173,6 +178,7 @@ public class PlayerManager : MonoBehaviour
             return true;
         return false;
     }
+
     public bool CalJumpInput()                                              //获取跳跃输入
     {
         if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded)
@@ -212,14 +218,27 @@ public class PlayerManager : MonoBehaviour
         return false;
     }
 
+    public bool CalPickUpBox()
+    {
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            if (m_bIsHoldBox == false && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
+            {
+                Debug.Log("Can Hold Box");
+                DoBeforePickUpBox();
+            }
+            else if (m_bIsHoldBox == true && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
+            {
+                Debug.Log("Can Throw Box");
+                m_bIsHoldBox = false;
+            }
+        }
+        return false;
+    }
+
     #endregion
 
     #region 检测碰撞
-
-//    void OnTriggerEnter(Collider other)
-//    {
-//        int a = 0;
-//    }
 
     void OnCollisionEnter(Collision other)
     {
@@ -232,9 +251,12 @@ public class PlayerManager : MonoBehaviour
                 m_bIsDescent = false;
                 SetJumpDownState(other);
             }
-            else if (other.contacts[0].thisCollider.gameObject.name == "Box")
+            else if (other.contacts[0].thisCollider.gameObject.name == "Front")
             {
-
+                if (null == m_bcCurBox)
+                {
+                    m_bcCurBox = (BoxCollider)other.contacts[0].thisCollider;
+                }
             }
         }
 
@@ -420,6 +442,31 @@ public class PlayerManager : MonoBehaviour
             Owner.AM.SetFloat(NameToHashScript.SpeedId, 1f);
         }
     }
+    #endregion
+
+    #region Pick up box, Throw box, Destroy box
+
+    void DestroyBox()
+    {
+        Destroy(m_bcCurBox);
+        m_bcCurBox = null;
+    }
+
+    void DoBeforePickUpBox()
+    {
+        m_bcCurBox.isTrigger = true;
+        m_fPlayerBoxRaidus = m_bcCurBox.size.y * 0.7f + Owner.BC.size.y * 0.7f;//确认运动半径
+        StartCoroutine(PickUpBoxBehaviour());
+    }
+
+    IEnumerator PickUpBoxBehaviour()
+    {
+        m_bIsHoldBox = true;
+        //盒子繞著指定的半徑，圍繞主角做圓周運動
+        yield return null;
+    }
+
+
     #endregion
 
 }

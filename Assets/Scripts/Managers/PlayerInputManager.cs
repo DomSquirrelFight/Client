@@ -21,7 +21,9 @@ public class PlayerInputManager : MonoBehaviour {
         InputSmallJump();
         InputBigJump();
         InputJumpDown();
+        InputPickUpBox();
         InputMove();
+
     }
 
     //检测是否触发小跳跃
@@ -40,6 +42,11 @@ public class PlayerInputManager : MonoBehaviour {
     void InputJumpDown()
     {
         PlayerMgr.CalJumpDown();
+    }
+
+    void InputPickUpBox()
+    {
+        PlayerMgr.CalPickUpBox();
     }
 
 }
