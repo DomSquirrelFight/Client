@@ -96,6 +96,8 @@ public class PlayerManager : MonoBehaviour
     float m_fDuration = 0;                                                                                                        //保存跳跃的时长
 
     float m_fInitSpeed = 0f;
+
+    float PI = 3.1415926f;
     #endregion
 
     #region 外部接口
@@ -251,11 +253,11 @@ public class PlayerManager : MonoBehaviour
                 m_bIsDescent = false;
                 SetJumpDownState(other);
             }
-            else if (other.contacts[0].thisCollider.gameObject.name == "Front")
+            else if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy)
             {
                 if (null == m_bcCurBox)
                 {
-                    m_bcCurBox = (BoxCollider)other.contacts[0].thisCollider;
+                    m_bcCurBox = (BoxCollider)other.contacts[0].otherCollider;
                 }
             }
         }
@@ -285,7 +287,9 @@ public class PlayerManager : MonoBehaviour
     {
         if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)
         {
-            if (fOrigHeight - m_curHeight >= Owner.BC.size.y && m_bIsDescent == true)
+            //if (fOrigHeight - m_curHeight >= Owner.BC.size.y && m_bIsDescent == true)
+            //todo_erric
+            if (fOrigHeight - m_curHeight >= 1f && m_bIsDescent == true)
             {
                 Owner.RB.isKinematic = false;
                 Owner.RB.velocity = new Vector3(0f, m_fCurSpeed, 0f);
@@ -455,7 +459,8 @@ public class PlayerManager : MonoBehaviour
     void DoBeforePickUpBox()
     {
         m_bcCurBox.isTrigger = true;
-        m_fPlayerBoxRaidus = m_bcCurBox.size.y * 0.7f + Owner.BC.size.y * 0.7f;//确认运动半径
+        m_fPlayerBoxRaidus = m_bcCurBox.size.y + 0.6f ;//确认运动半径
+        m_bcCurBox.transform.parent = Owner.ActorTrans.transform;
         StartCoroutine(PickUpBoxBehaviour());
     }
 
@@ -463,7 +468,42 @@ public class PlayerManager : MonoBehaviour
     {
         m_bIsHoldBox = true;
         //盒子繞著指定的半徑，圍繞主角做圓周運動
-        yield return null;
+
+        while (m_bcCurBox.transform.localPosition.y < m_fPlayerBoxRaidus - 0.1f)
+        {
+            m_bcCurBox.transform.localPosition = Vector3.Lerp(m_bcCurBox.transform.localPosition, new Vector3(0f, m_fPlayerBoxRaidus, 0f), 30 * Time.deltaTime);
+
+             yield return null;
+        }
+       
+
+        //Vector3 dir = (Owner.ActorTrans.position - m_bcCurBox.transform.position).normalized;
+
+
+        //float startTime = Time.time;
+        //float v = 2 * PI * m_fPlayerBoxRaidus;
+        //Debug.Log("Owner.ActorTrans.position.x" + Owner.ActorTrans.position.x);
+        //Debug.Log("m_bcCurBox.transform.position.x" + m_bcCurBox.transform.position.x);
+        //Debug.Log(m_bcCurBox.transform.name);
+        ////while (Mathf.Abs(Owner.ActorTrans.position.x - m_bcCurBox.transform.position.x) > 0.1f)
+        //while (v * (Time.time - startTime) < 90f * Mathf.Deg2Rad)
+        //{
+        //    //Owner.ActorTrans.LookAt(m_bcCurBox.transform);
+
+        //    //Owner.ActorTrans.Translate(Vector3.up * v * Time.deltaTime);
+        //    m_bcCurBox.transform.LookAt(Owner.ActorTrans);
+
+        //    m_bcCurBox.transform.Translate(Vector3.up * v * Time.deltaTime);
+
+        //    yield return null;
+        //}
+
+        ////m_bcCurBox.transform.position = new Vector3(
+        ////    Owner.ActorTrans.position.x,
+        ////    m_bcCurBox.transform.position.y,
+        ////    Owner.ActorTrans.position.z
+        ////    );
+
     }
 
 
