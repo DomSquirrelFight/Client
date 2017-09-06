@@ -6,7 +6,7 @@ using AttTypeDefine;
 public class PlayerManager : MonoBehaviour
 {
     #region 变量
-    ePlayerBehaviour m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;                                                                        //角色行为
+    //ePlayerBehaviour m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;                                                                        //角色行为
     
     ePlayerNormalBeha m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;                                             //角色普通行为
     
@@ -38,9 +38,13 @@ public class PlayerManager : MonoBehaviour
 
     int BrickMask;                                                                                                                                                             //Brick Layer <用在射线>
 
+    int BoxMask;
+
     int MaskGlossy;                                                                                                                                                          //层级平移位数<对比碰撞双方的层级>
 
     int BrickMaskGlossy;                                                                                                                                                 //层级平移位数<对比碰撞双方的层级>
+
+    int BoxMaskGlossy;
 
     JumpDataStore m_curJumpData;                                                                                                                                 //跳跃数据
 
@@ -59,6 +63,34 @@ public class PlayerManager : MonoBehaviour
             return fOrigHeight;
         }
     }
+
+    bool m_bCanJumpDown = false;
+    bool BCanJumpDown
+    {
+        get
+        {
+            return m_bCanJumpDown;
+        }
+        set
+        {
+            if (value != m_bCanJumpDown)
+                m_bCanJumpDown = value;
+        }
+    }                                                                                                                                              //是否可以下跳
+
+    float fOrigHeight = 0f;                                                                                                         //开始跳跃或者下降前的高度
+
+    float m_curHeight = 0f;                                                                                                       //保存角色当前高度
+
+    bool m_bIsDescent = false;                                                                                                  //判断是否在下降
+
+    float m_fCurSpeed = 0f;                                                                                                      //获取当前的速度
+
+    float m_fStartTime = 0f;                                                                                                      //跳跃开始前的计时变量
+
+    float m_fDuration = 0;                                                                                                        //保存跳跃的时长
+
+    float m_fInitSpeed = 0f;
     #endregion
 
     #region 外部接口
@@ -68,6 +100,10 @@ public class PlayerManager : MonoBehaviour
         mask = 1 << MaskGlossy;
         BrickMaskGlossy = LayerMask.NameToLayer("Brick");
         BrickMask = 1 << BrickMaskGlossy;
+
+        BoxMaskGlossy = LayerMask.NameToLayer("Box");
+        BoxMask = 1 << BoxMaskGlossy;
+
         Owner = owner;
         cc = Owner.CameraContrl;
         m_curJumpData = Owner.SmallJumpDataStore;
@@ -75,36 +111,42 @@ public class PlayerManager : MonoBehaviour
 
     public void PlayerMove()
     {
-        switch (m_ePlayerBeha)
-        {
-            case ePlayerBehaviour.eBehav_Normal:
-                {
-                    //执行旋转操作
-                    RotatePlayer();
-                    //播放位移动画
-                    PlayMoveAnim();
-                    if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
-                    {
-                        if (!RayCastBlock(cc.CamMoveDir))//横向阻挡
-                        {
-                            //执行move操作
-                            TranslatePlayer();
-                        }
-                    }
 
-                    //执行小跳跃
-                    JumpBehaviour();
-                    break;
-                }
-            case ePlayerBehaviour.eBehav_Hide:
-                {
-                    break;
-                }
-            case ePlayerBehaviour.eBehav_JumpDown:
-                {
-                    break;
-                }
+        //执行旋转操作
+        RotatePlayer();
+        //播放位移动画
+        PlayMoveAnim();
+        if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
+        {
+            if (!RayCastBlock(cc.CamMoveDir))//横向阻挡
+            {
+                //执行move操作
+                TranslatePlayer();
+            }
         }
+
+        //执行小跳跃
+        JumpBehaviour();
+
+        //执行下跳操作
+        JumpDownBehaviour();
+
+        //switch (m_ePlayerBeha)
+        //{
+        //    case ePlayerBehaviour.eBehav_Normal:
+        //        {
+                  
+        //            break;
+        //        }
+        //    case ePlayerBehaviour.eBehav_Hide:
+        //        {
+        //            break;
+        //        }
+        //    case ePlayerBehaviour.eBehav_JumpDown:
+        //        {
+        //            break;
+        //        }
+        //}
     }
     #endregion
 
@@ -115,7 +157,7 @@ public class PlayerManager : MonoBehaviour
     {
         m_vInputMove.x = Input.GetAxis("Horizontal");
         m_vInputMove.y = Input.GetAxis("Vertical");
-        m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;
+        //m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;
         m_bIsBlocked = false;
 #if UNITY_EDITOR
         if (0f != m_vInputMove.x)
@@ -138,13 +180,35 @@ public class PlayerManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
             {
-                DoBeforeJump(ePlayerNormalBeha.eNormalBehav_SmallJump);
+                DoBeforeJump(ePlayerNormalBeha.eNormalBehav_SmallJump, m_curJumpData.m_fJumpInitSpeed, false);
                 return true;
             }
 
         }
         return false;
     }
+
+    public bool CalJumpDown()
+    {
+
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && BCanJumpDown == true)
+            {
+               
+                Debug.Log("Can jump down");
+                DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, 0f, true);
+                return true;
+            }
+            else
+            {
+                Debug.Log("Cann't jump down");
+            }
+
+        }
+        return false;
+    }
+
     #endregion
 
     #region 检测碰撞
@@ -155,15 +219,93 @@ public class PlayerManager : MonoBehaviour
             m_bGounded = true;
             m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
             m_bIsDescent = false;
+            SetJumpDownState(other);
         }
         else if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && other.gameObject.layer == BrickMaskGlossy && m_vInputMove.x != 0f)
         {
+#if UNITY_EDITOR
+            if (m_bGounded == false) 
+                Debug.LogError("Error Logic, m_bGrounded should be false");
+#endif
             m_bIsBlocked = true;
+            SetJumpDownState(other);
         }
     }
     #endregion
 
-    #region Player Translate
+    #region Jump
+
+    void JumpDownBehaviour()                                                                                      //处理角色下跳行为
+    {
+        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)
+        {
+            if (fOrigHeight - m_curHeight >= Owner.BC.size.y && m_bIsDescent == true)
+            {
+                Owner.RB.isKinematic = false;
+                Owner.RB.velocity = new Vector3(0f, m_fCurSpeed, 0f);
+                return;
+            }
+
+            CalCharacterJump();
+        }
+    }
+
+    public void JumpBehaviour()                                                                                     //处理角色跳跃行为
+    {
+        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_SmallJump)
+        {
+            if (m_fCurSpeed <= 0f && m_bIsDescent == false)
+            {
+                m_bIsDescent = true;
+                Owner.RB.isKinematic = false;
+                return;
+            }
+            //如果在下降，则直接返回
+            if (m_bIsDescent)
+                return;
+
+            CalCharacterJump();
+
+        }
+    }
+
+    void SetJumpDownState(Collision other)                                                                      //设置角色下跳权限
+    {
+        if (other.gameObject.layer == BrickMaskGlossy)
+            BCanJumpDown = true;
+        else if (other.gameObject.layer == MaskGlossy || other.gameObject.layer == BoxMaskGlossy)
+            BCanJumpDown = false;
+    }
+
+    void DoBeforeJump(ePlayerNormalBeha type, float InitSpeed, bool isDescent)                   //jump前的数据准备
+    {
+
+        Owner.RB.isKinematic = true;
+        m_ePlayerNormalBehav = type;
+        fOrigHeight = m_curHeight = Owner.ActorTrans.transform.position.y;
+        //m_bIsDescent = false;
+        m_bIsDescent = isDescent;
+        //m_fCurSpeed = m_curJumpData.m_fJumpInitSpeed;
+        m_fInitSpeed = m_fCurSpeed = InitSpeed;
+        m_fStartTime = Time.time;
+    }
+
+    void CalCharacterJump()                                                                         //计算角色位移<运动学刚体>
+    {
+        Owner.ActorTrans.transform.position = new Vector3(
+               Owner.ActorTrans.transform.position.x,
+               m_curHeight,
+               Owner.ActorTrans.transform.position.z
+               );
+        m_fDuration = Time.time - m_fStartTime;
+
+        m_fCurSpeed = m_fInitSpeed + (m_curJumpData.m_fJumpAccel * m_fDuration);
+        m_curHeight = fOrigHeight + (m_fInitSpeed * m_fDuration + 0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
+    }
+   
+    #endregion
+
+    #region Translate
     bool RayCastBlock(eCamMoveDir side)
     {
         if (m_bIsBlocked)
@@ -256,56 +398,6 @@ public class PlayerManager : MonoBehaviour
     }
     #endregion
 
-    #region Player Jump
-    float fOrigHeight = 0f;                                                                                                         //开始跳跃或者下降前的高度
-
-    float m_curHeight = 0f;                                                                                                       //保存角色当前高度
-
-    bool m_bIsDescent = false;                                                                                                  //判断是否在下降
-
-    float m_fCurSpeed = 0f;                                                                                                      //获取当前的速度
-
-    float m_fStartTime = 0f;                                                                                                      //跳跃开始前的计时变量
-
-    float m_fDuration = 0;                                                                                                        //保存跳跃的时长
-    void DoBeforeJump(ePlayerNormalBeha type)
-    {
-                                                        
-        Owner.RB.isKinematic = true;
-        m_ePlayerNormalBehav = type;
-        fOrigHeight = m_curHeight = Owner.ActorTrans.transform.position.y;
-        m_bIsDescent = false;
-        m_fCurSpeed = m_curJumpData.m_fJumpInitSpeed;
-        m_fStartTime = Time.time;
-    }
-
-    public void JumpBehaviour()
-    {
-        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_SmallJump)
-        {
-            if (m_fCurSpeed <=0f && m_bIsDescent == false)
-            {
-                m_bIsDescent = true;
-                Owner.RB.isKinematic = false;
-                return;
-            }
-            //如果在下降，则直接返回
-            if (m_bIsDescent)
-                return;
-
-            
-            Owner.ActorTrans.transform.position = new Vector3(
-                Owner.ActorTrans.transform.position.x,
-                m_curHeight,
-                Owner.ActorTrans.transform.position.z
-                );
-            m_fDuration = Time.time - m_fStartTime;
-
-            m_fCurSpeed = m_curJumpData.m_fJumpInitSpeed + (m_curJumpData.m_fJumpAccel * m_fDuration);
-            m_curHeight = fOrigHeight + (m_curJumpData.m_fJumpInitSpeed * m_fDuration + 0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
-        }
-    }
-    #endregion
 }
 
 

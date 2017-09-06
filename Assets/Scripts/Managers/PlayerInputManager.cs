@@ -20,6 +20,7 @@ public class PlayerInputManager : MonoBehaviour {
     {
         InputSmallJump();
         InputBigJump();
+        InputJumpDown();
         InputMove();
     }
 
@@ -35,4 +36,10 @@ public class PlayerInputManager : MonoBehaviour {
     void InputMove() {
         PlayerMgr.CalMoveInput();//计算平移输入
     }
+
+    void InputJumpDown()
+    {
+        PlayerMgr.CalJumpDown();
+    }
+
 }
