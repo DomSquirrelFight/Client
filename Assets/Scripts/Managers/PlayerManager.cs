@@ -46,6 +46,10 @@ public class PlayerManager : MonoBehaviour
 
     int BoxMaskGlossy;
 
+    int NpcMaskGlossy;
+
+    int NpcMask;
+
     JumpDataStore m_curJumpData;                                                                                                                                 //跳跃数据
 
     float TmpDis;                                                                                                                                                               //保存临时变量
@@ -103,6 +107,10 @@ public class PlayerManager : MonoBehaviour
     #region 外部接口
     public void OnStart(BaseActor owner)
     {
+
+        NpcMaskGlossy = LayerMask.NameToLayer("NPC");
+        NpcMask = 1 << NpcMaskGlossy;
+
         MaskGlossy = LayerMask.NameToLayer("Ground");
         mask = 1 << MaskGlossy;
         BrickMaskGlossy = LayerMask.NameToLayer("Brick");
@@ -292,7 +300,7 @@ public class PlayerManager : MonoBehaviour
     {
         if (other.contacts.Length > 0)
         {
-            if (other.contacts[0].thisCollider.gameObject.name == "Ground")                                    //角色碰到了地面
+            if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了地面
             {
                 m_bGounded = true;
                 m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
