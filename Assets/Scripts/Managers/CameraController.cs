@@ -346,6 +346,9 @@ public class CameraController : MonoBehaviour {
         void Update()
         {
 
+            if (!Owner)
+                return;
+
             DetectTransformChange();
 
             switch (cammovedir)

@@ -220,12 +220,25 @@ public class PlayerManager : MonoBehaviour
         return false;
     }
 
+    RaycastHit m_HitInfo;
     public bool CalPickUpBox()
     {
         if (Input.GetKeyDown(KeyCode.U))
         {
-            if (m_bIsHoldBox == false && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
+            //if (m_bIsHoldBox == false && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
+             if (m_bIsHoldBox == false && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide && m_vInputMove.x != 0f)
             {
+
+                //发射一个盒子
+                if(Physics.BoxCast (Owner.ActorTrans.position + new Vector3 (0f, 0.4f, 0.5f), 0.2f * Vector3.one, Owner.ActorTrans.forward, out hitInfo, Quaternion.identity, 1f, BoxMask)) {
+
+                    m_bcCurBox = (BoxCollider)hitInfo.collider;
+                }
+                else if (Physics.BoxCast(Owner.ActorTrans.position + new Vector3(0f, 1.2f, 0.5f), 0.2f * Vector3.one, Owner.ActorTrans.forward, out hitInfo, Quaternion.identity, 1f, BoxMask))
+                {
+                    m_bcCurBox = (BoxCollider)hitInfo.collider;
+                }
+
                 Debug.Log("Can Hold Box");
                 DoBeforePickUpBox();
             }
@@ -233,6 +246,10 @@ public class PlayerManager : MonoBehaviour
             {
                 Debug.Log("Can Throw Box");
                 m_bIsHoldBox = false;
+                m_bcCurBox.transform.parent = null;
+                BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();
+                boxCon.OnStart();
+                m_bcCurBox = null;                  //这样接下来就可以在举箱子
             }
         }
         return false;
@@ -242,24 +259,60 @@ public class PlayerManager : MonoBehaviour
 
     #region 检测碰撞
 
+    //void OnCollisionStay(Collision other)
+    //{
+    //    if (other.contacts.Length > 0)
+    //    {
+    //        //if (other.contacts[0].thisCollider.gameObject.name == "Ground")                                    //角色碰到了地面
+    //        //{
+    //        //    m_bGounded = true;
+    //        //    m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
+    //        //    m_bIsDescent = false;
+    //        //    SetJumpDownState(other);
+    //        //}
+    //        //else 
+    //        if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy && m_vInputMove.x != 0f)                   //角色碰到了盒子
+    //        {
+    //            Debug.Log(other.contacts[0].thisCollider.name);
+
+    //            if (!m_bIsHoldBox)
+    //            {
+
+    //            }
+    //            //if (null == m_bcCurBox)
+
+    //            //{
+    //            //    m_bcCurBox = (BoxCollider)other.contacts[0].otherCollider;
+    //            //}
+    //        }
+    //    }
+    //}
+
     void OnCollisionEnter(Collision other)
     {
         if (other.contacts.Length > 0)
         {
-            if (other.contacts[0].thisCollider.gameObject.name == "Ground")
+            if (other.contacts[0].thisCollider.gameObject.name == "Ground")                                    //角色碰到了地面
             {
                 m_bGounded = true;
                 m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
                 m_bIsDescent = false;
                 SetJumpDownState(other);
             }
-            else if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy)
-            {
-                if (null == m_bcCurBox)
-                {
-                    m_bcCurBox = (BoxCollider)other.contacts[0].otherCollider;
-                }
-            }
+            //else if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy)                   //角色碰到了盒子
+            //{
+            //    Debug.Log(other.contacts[0].thisCollider.name);
+
+            //    if (!m_bIsHoldBox)
+            //    {
+
+            //    }
+            //    //if (null == m_bcCurBox)
+
+            //    //{
+            //    //    m_bcCurBox = (BoxCollider)other.contacts[0].otherCollider;
+            //    //}
+            //}
         }
 
         //if ((other.gameObject.layer == BrickMaskGlossy || other.gameObject.layer == MaskGlossy) && m_bIsDescent == true && m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Grounded && Owner.ActorTrans.position.y >= other.transform.position.y)
@@ -404,6 +457,7 @@ public class PlayerManager : MonoBehaviour
         {
             m_vCurForward = new Vector3(m_vInputMove.x, 0f, 0f);
             Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, GlobalHelper.SRotSpeed * Time.deltaTime);
+            //Debug.Log(Owner.ActorTrans.forward);
         }
     }
 
@@ -461,12 +515,12 @@ public class PlayerManager : MonoBehaviour
         m_bcCurBox.isTrigger = true;
         m_fPlayerBoxRaidus = m_bcCurBox.size.y + 0.6f ;//确认运动半径
         m_bcCurBox.transform.parent = Owner.ActorTrans.transform;
+        m_bIsHoldBox = true;
         StartCoroutine(PickUpBoxBehaviour());
     }
 
     IEnumerator PickUpBoxBehaviour()
     {
-        m_bIsHoldBox = true;
         //盒子繞著指定的半徑，圍繞主角做圓周運動
 
         while (m_bcCurBox.transform.localPosition.y < m_fPlayerBoxRaidus - 0.1f)
