@@ -16,6 +16,11 @@ namespace AttTypeDefine
         SelecteLoading,
         FightLoading,
     }
+    public  enum StateUI
+    {
+        State_Move,
+        State_Stay,
+    }
     #endregion
 
     #region Character Behaviour

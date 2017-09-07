@@ -1,14 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using AttTypeDefine;
 
 public class Inite : MonoBehaviour {
     //存放grid
     public GameObject Grid;
     //存放panelbutton
     public GameObject Button;
-	// Use this for initialization
-	void Awake () {
+    // Use this for initialization
+    void Awake () {
         InitePanel();
     }
     void InitePanel()
@@ -23,10 +24,4 @@ public class Inite : MonoBehaviour {
 
     }
 
-
-	
-	// Update is called once per frame
-	void Update () {
-      
-	}
 }
