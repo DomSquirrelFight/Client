@@ -157,28 +157,26 @@ public class BaseActor : MonoBehaviour
     #endregion
 
     #region 角色大小, 碰撞器
-    //private BoxCollider bc;
-    //public BoxCollider BC
-    //{
-    //    get {
-    //        if (null == bc)
-    //        {
-    //            bc = Actor.GetOrAddComponent<BoxCollider>();
-    //        }
-    //        return bc;
-    //    }
-    //}
+    private CapsuleCollider ccol;
+    public CapsuleCollider CCOL
+    {
+        get
+        {
+            if (null == ccol)
+            {
+                ccol = Actor.GetOrAddComponent<CapsuleCollider>();
+            }
+            return ccol;
+        }
+    }
     float actorsize = 0f;
     public float ActorSize
     {
         get
         {
-            //todo erric
-            //if (0f == actorsize)
-                //actorsize = Actor.GetComponent<CapsuleCollider>().radius;
-                //actorsize = Actor.GetComponent<BoxCollider>().size.z * 0.5f;
-            //return actorsize;
-            return 0.5f;
+            if (0f == actorsize)
+                actorsize = Actor.GetComponent<CapsuleCollider>().radius;
+            return actorsize;
         }
     }
 
@@ -187,12 +185,9 @@ public class BaseActor : MonoBehaviour
     {
         get
         {
-            //todo_erric
-            return 0.5f;
-            //if (0f == actorheight)
-                //actorheight = Actor.GetComponent<CapsuleCollider>().height;
-                //actorheight = Actor.GetComponent<BoxCollider>().size.y * 0.5f;
-            //return actorheight;
+            if (0f == actorheight)
+                actorheight = Actor.GetComponent<CapsuleCollider>().height;
+            return actorheight;
         }
     }
 

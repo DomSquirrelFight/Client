@@ -13,6 +13,7 @@ public class PlayerInputManager : MonoBehaviour {
     }
 	
 	void FixedUpdate () {
+       
         PlayerMgr.PlayerMove();        
 	}
 
