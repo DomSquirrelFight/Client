@@ -175,7 +175,7 @@ public class BaseActor : MonoBehaviour
         get
         {
             if (0f == actorsize)
-                actorsize = Actor.GetComponent<CapsuleCollider>().radius;
+                actorsize = Actor.GetComponent<BoxCollider>().size.x;
             return actorsize;
         }
     }
@@ -186,7 +186,7 @@ public class BaseActor : MonoBehaviour
         get
         {
             if (0f == actorheight)
-                actorheight = Actor.GetComponent<CapsuleCollider>().height;
+                actorheight = Actor.GetComponent<BoxCollider>().size.y;
             return actorheight;
         }
     }

@@ -50,6 +50,11 @@ public class PlayerManager : MonoBehaviour
 
     int NpcMask;
 
+    int NpcGroundMaskGlossy;
+
+    int NpcGroundMask;
+
+
     JumpDataStore m_curJumpData;                                                                                                                                 //跳跃数据
 
     float TmpDis;                                                                                                                                                               //保存临时变量
@@ -119,6 +124,9 @@ public class PlayerManager : MonoBehaviour
         BoxMaskGlossy = LayerMask.NameToLayer("Box");
         BoxMask = 1 << BoxMaskGlossy;
 
+        NpcGroundMaskGlossy = LayerMask.NameToLayer("NpcGround");
+        NpcGroundMask = 1 << NpcGroundMaskGlossy;
+
         Owner = owner;
         cc = Owner.CameraContrl;
         m_curJumpData = Owner.SmallJumpDataStore;
@@ -173,7 +181,7 @@ public class PlayerManager : MonoBehaviour
         m_vInputMove.x = Input.GetAxis("Horizontal");
         m_vInputMove.y = Input.GetAxis("Vertical");
         //m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;
-        m_bIsBlocked = false;
+
 #if UNITY_EDITOR
         if (0f != m_vInputMove.x)
         {
@@ -263,7 +271,7 @@ public class PlayerManager : MonoBehaviour
                 //}
 
                 pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-                Debug.Log(Owner.ActorTrans.position + "  " + pos);
+                //Debug.Log(Owner.ActorTrans.position + "  " + pos);
                  //if(Physics.Raycast(pos, Owner.ActorTrans.forward, out hitInfo, 1.5f, BoxMask)) {
                  //    Debug.DrawLine(pos, hitInfo.point);
                  //}
@@ -274,23 +282,27 @@ public class PlayerManager : MonoBehaviour
                 //if (Physics.BoxCast(pos, Vector3.one * 0.8f, Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), 1.5f, BoxMask))
                 {
                     m_bcCurBox = (BoxCollider)hitInfo.collider;
+#if UNITY_EDITOR
+                    Debug.Log("Successfully Pick up the Box");
+#endif
+                    DoBeforePickUpBox();
+                    return true;
                 }
                 else
                 {
-                    return false;
+#if UNITY_EDITOR
+                    Debug.Log("Fail to pick up the box");
+#endif
                 }
-                
-                Debug.Log("Can Hold Box");
-                DoBeforePickUpBox();
             }
             else if (m_bIsHoldBox == true && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
             {
-                Debug.Log("Can Throw Box");
-                m_bIsHoldBox = false;
-                m_bcCurBox.transform.parent = null;
-                BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();
+                m_bIsHoldBox = false;                                                                                               //复位托举状态
+                m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空
+                BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
                 boxCon.OnStart();
                 m_bcCurBox = null;                  //这样接下来就可以在举箱子
+                return true;
             }
         }
         return false;
@@ -299,6 +311,18 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 检测碰撞
+
+    //void OnTriggerEnter(Collider other)
+    //{
+
+    //    if (other.gameObject.layer == MaskGlossy || other.gameObject.layer == BrickMaskGlossy || other.gameObject.layer == BoxMaskGlossy)
+    //    {
+    //        m_bGounded = true;
+    //        m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
+    //        m_bIsDescent = false;
+    //        SetJumpDownState(other);
+    //    }
+    //}
 
     //void OnCollisionStay(Collision other)
     //{
@@ -328,6 +352,18 @@ public class PlayerManager : MonoBehaviour
     //        }
     //    }
     //}
+
+    void OnCollisionStay(Collision other)
+    {
+        if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy && m_vInputMove.x != 0f)
+        {
+            //Debug.Log(other.contacts[0].thisCollider.name);
+            m_bIsBlocked = true;
+        }
+        else
+        m_bIsBlocked = false;
+    }
+
     void OnCollisionEnter(Collision other)
     {
 
@@ -336,34 +372,44 @@ public class PlayerManager : MonoBehaviour
             //Debug.Log(other.contacts[0].thisCollider.name);
             m_bIsBlocked = true;
         }
-        //todo_erric
-        //if (other.contacts.Length > 0)
-        //{
-        //    if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了地面
-        //    {
-        //        m_bGounded = true;
-        //        m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
-        //        m_bIsDescent = false;
-        //        SetJumpDownState(other);
-        //    }
-        //}
+        else
+            m_bIsBlocked = false;
 
-        //if ((other.gameObject.layer == BrickMaskGlossy || other.gameObject.layer == MaskGlossy) && m_bIsDescent == true && m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Grounded && Owner.ActorTrans.position.y >= other.transform.position.y)
-        //{
-        //    m_bGounded = true;
-        //    m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
-        //    m_bIsDescent = false;
-        //    SetJumpDownState(other);
-        //}
-        //        else if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && other.gameObject.layer == BrickMaskGlossy && m_vInputMove.x != 0f)
-        //        {
-        //#if UNITY_EDITOR
-        //            if (m_bGounded == false) 
-        //                Debug.LogError("Error Logic, m_bGrounded should be false");
-        //#endif
-        //            //m_bIsBlocked = true;
-        //            SetJumpDownState(other);
-        //        }
+        if (other.contacts.Length > 0)
+        {
+            if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了地面
+            {
+
+                if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy)                              //如果判定碰到的是box
+                {
+                    //如果在角色朝向方向射到了box，那么直接返回
+                    m_fCurSpeed = 0f;
+                    //如果在角色垂直向下方向射到了box，那么处理落地逻辑
+                    if (m_bIsDescent == true)
+                    {
+                        float y = Owner.ActorTrans.position.y +Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
+
+                        pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+
+                        if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Vector3.down, out hitInfo, 1.5f, BoxMask))
+                        {
+                            if (hitInfo.collider.gameObject == other.collider.gameObject)
+                                 SetJumpDownState(other);
+                        }
+                    }
+                }
+                else if (other.contacts[0].otherCollider.gameObject.layer == MaskGlossy || other.contacts[0].otherCollider.gameObject.layer == BrickMaskGlossy)
+                {
+
+                    m_fCurSpeed = 0f;
+
+                    if (m_bIsDescent)
+                    {
+                        SetJumpDownState(other);  
+                    }
+                }
+            }
+        }
     }
     #endregion
 
@@ -393,20 +439,24 @@ public class PlayerManager : MonoBehaviour
             if (m_fCurSpeed <= 0f && m_bIsDescent == false)
             {
                 m_bIsDescent = true;
-                Owner.RB.isKinematic = false;
                 return;
             }
             //如果在下降，则直接返回
             if (m_bIsDescent)
                 return;
 
-            CalCharacterJump();
+            //m_fCurSpeed = Owner.RB.velocity.y;
+           CalCharacterJump();
 
         }
     }
 
     void SetJumpDownState(Collision other)                                                                      //设置角色下跳权限
     {
+        m_bGounded = true;
+        m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
+        m_bIsDescent = false;
+
         if (other.gameObject.layer == BrickMaskGlossy)
             BCanJumpDown = true;
         else if (other.gameObject.layer == MaskGlossy || other.gameObject.layer == BoxMaskGlossy)
@@ -417,7 +467,7 @@ public class PlayerManager : MonoBehaviour
     {
 
         //Owner.RB.isKinematic = true;
-        Owner.RB.velocity = new Vector3(0f, 12f, 0f);
+        Owner.RB.velocity = new Vector3(0f, InitSpeed, 0f);
         m_ePlayerNormalBehav = type;
         fOrigHeight = m_curHeight = Owner.ActorTrans.transform.position.y;
         //m_bIsDescent = false;
@@ -435,8 +485,9 @@ public class PlayerManager : MonoBehaviour
                Owner.ActorTrans.transform.position.z
                );
         m_fDuration = Time.time - m_fStartTime;
-
-        m_fCurSpeed = m_fInitSpeed + (m_curJumpData.m_fJumpAccel * m_fDuration);
+        
+        Owner.RB.velocity = new Vector3(0f, m_fInitSpeed + (m_curJumpData.m_fJumpAccel * m_fDuration), 0f);
+        m_fCurSpeed = Owner.RB.velocity.y;
         m_curHeight = fOrigHeight + (m_fInitSpeed * m_fDuration + 0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
     }
    
@@ -512,11 +563,11 @@ public class PlayerManager : MonoBehaviour
 
     void DoBeforePickUpBox()
     {
-        m_bcCurBox.isTrigger = true;
-        m_fPlayerBoxRaidus = m_bcCurBox.size.y + 0.6f ;//确认运动半径
-        m_bcCurBox.transform.parent = Owner.ActorTrans.transform;
-        m_bIsHoldBox = true;
-        StartCoroutine(PickUpBoxBehaviour());
+        m_bcCurBox.isTrigger = true;                                                                                            //将盒子变成触发器           
+        m_fPlayerBoxRaidus = m_bcCurBox.size.y + Owner.ActorHeight * 0.5f ;                             //确认运动半径
+        m_bcCurBox.transform.parent = Owner.ActorTrans.transform;                                          //将盒子变成主角的孩子
+        m_bIsHoldBox = true;                                                                                                       //标识当前是举着箱子的状态
+        StartCoroutine(PickUpBoxBehaviour());                                                                             //播放举箱子动画
     }
 
     IEnumerator PickUpBoxBehaviour()
@@ -529,35 +580,6 @@ public class PlayerManager : MonoBehaviour
 
              yield return null;
         }
-       
-
-        //Vector3 dir = (Owner.ActorTrans.position - m_bcCurBox.transform.position).normalized;
-
-
-        //float startTime = Time.time;
-        //float v = 2 * PI * m_fPlayerBoxRaidus;
-        //Debug.Log("Owner.ActorTrans.position.x" + Owner.ActorTrans.position.x);
-        //Debug.Log("m_bcCurBox.transform.position.x" + m_bcCurBox.transform.position.x);
-        //Debug.Log(m_bcCurBox.transform.name);
-        ////while (Mathf.Abs(Owner.ActorTrans.position.x - m_bcCurBox.transform.position.x) > 0.1f)
-        //while (v * (Time.time - startTime) < 90f * Mathf.Deg2Rad)
-        //{
-        //    //Owner.ActorTrans.LookAt(m_bcCurBox.transform);
-
-        //    //Owner.ActorTrans.Translate(Vector3.up * v * Time.deltaTime);
-        //    m_bcCurBox.transform.LookAt(Owner.ActorTrans);
-
-        //    m_bcCurBox.transform.Translate(Vector3.up * v * Time.deltaTime);
-
-        //    yield return null;
-        //}
-
-        ////m_bcCurBox.transform.position = new Vector3(
-        ////    Owner.ActorTrans.position.x,
-        ////    m_bcCurBox.transform.position.y,
-        ////    Owner.ActorTrans.position.z
-        ////    );
-
     }
 
 

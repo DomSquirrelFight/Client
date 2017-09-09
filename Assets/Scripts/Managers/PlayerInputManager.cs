@@ -13,7 +13,7 @@ public class PlayerInputManager : MonoBehaviour {
     }
 	
 	void FixedUpdate () {
-       
+        InputMove();
         PlayerMgr.PlayerMove();        
 	}
 
@@ -23,7 +23,7 @@ public class PlayerInputManager : MonoBehaviour {
         InputBigJump();
         InputJumpDown();
         InputPickUpBox();
-        InputMove();
+     
 
     }
 
