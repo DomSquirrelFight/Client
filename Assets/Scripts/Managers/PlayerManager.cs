@@ -435,10 +435,34 @@ public class PlayerManager : MonoBehaviour
 
             pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
 
-            if (Owner.RB.isKinematic == false && Physics.SphereCast(pos, 0.2f, (new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized, out hitInfo, Owner.ActorHeight * 0.5f + 0.1f, BrickMask) &&
-                !Physics.SphereCast(pos, 0.2f, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x) , m_fCurSpeed, 0f)).normalized, out hitInfo, Owner.ActorHeight * 1.4f, BoxMask))
+            if (Owner.RB.isKinematic == false && Physics.SphereCast(pos, 0.2f, (new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized, out hitInfo, Owner.ActorHeight * 0.5f + 0.1f, BrickMask) 
+               )
             {
+                if (
+                    !Physics.SphereCast(pos, 0.2f, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed, 0f)).normalized, out hitInfo, Owner.ActorHeight * 1.4f, BoxMask) 
+                    )
                 Owner.RB.isKinematic = true;
+                else
+                {
+                    if (m_bIsHoldBox)               //当前在举箱子的状态下
+                    {
+                        bool bIsBoxBlocked = false;
+                        RaycastHit[] hits = Physics.SphereCastAll(pos, 0.2f, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed, 0f)).normalized, Owner.ActorHeight * 1.4f, BoxMask);
+                        for (int i = 0; i < hits.Length; i++)
+                        {
+                            if (hits[i].collider.isTrigger == false)
+                            {
+                                bIsBoxBlocked = true;
+                                break;
+                            }   
+                        }
+
+                        if(bIsBoxBlocked == false)
+                            Owner.RB.isKinematic = true;
+
+                    }
+                }
+
             }
 
             CalCharacterJump();
