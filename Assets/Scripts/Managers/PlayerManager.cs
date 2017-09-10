@@ -5,6 +5,7 @@ using AttTypeDefine;
 
 public class PlayerManager : MonoBehaviour
 {
+
     #region 变量
     //ePlayerBehaviour m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;                                                                        //角色行为
     
@@ -152,6 +153,8 @@ public class PlayerManager : MonoBehaviour
                 //执行move操作
                 TranslatePlayer();
             }
+            m_bIsBlocked = false;
+
         }
 
         //执行小跳跃
@@ -242,12 +245,17 @@ public class PlayerManager : MonoBehaviour
         return false;
     }
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(pos, GlobalHelper.SBoxSize * 0.5f);
-        //Debug.DrawLine(pos, hitInfo.point);
-    }
+    //void OnDrawGizmos()
+    //{
+    //    //Gizmos.color = Color.red;
+    //    //Gizmos.DrawSphere(pos, GlobalHelper.SBoxSize * 0.5f);
+    //    //Debug.DrawLine(pos, hitInfo.point);
+
+    //        // !Physics.SphereCast(pos, 0.1f, , out hitInfo, Owner.ActorHeight * 4.4f, BoxMask))
+    //    //Gizmos.DrawRay(Owner.ActorTrans.position, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed, 0f)).normalized);
+    //    //Debug.Log((new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x) , m_fCurSpeed, 0f)).normalized);
+
+    //}
     RaycastHit m_HitInfo;
     Vector3 pos;
     public bool CalPickUpBox()
@@ -432,6 +440,7 @@ public class PlayerManager : MonoBehaviour
             if (m_fCurSpeed <= 0f && m_bIsDescent == false)
             {
                 m_bIsDescent = true;
+                Owner.RB.isKinematic = false;
                 Owner.RB.velocity = new Vector3(0f, -1f, 0f);//将物体速度归0。
                 Debug.Log("Jump to the top already");
                 return;
@@ -440,9 +449,20 @@ public class PlayerManager : MonoBehaviour
             if (m_bIsDescent)
                 return;
 
-           CalCharacterJump();
 
+            float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
+
+            pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+
+            if (Owner.RB.isKinematic == false && Physics.SphereCast(pos, 0.1f, (new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized, out hitInfo, Owner.ActorHeight * 0.5f + 0.1f, BrickMask) &&
+                !Physics.SphereCast(pos, 0.2f, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x) , m_fCurSpeed, 0f)).normalized, out hitInfo, Owner.ActorHeight * 1.4f, BoxMask))
+            {
+                Owner.RB.isKinematic = true;
+            }
+
+            CalCharacterJump();
         }
+
     }
 
     void SetJumpDownState(Collision other)                                                                      //设置角色下跳权限
@@ -478,9 +498,15 @@ public class PlayerManager : MonoBehaviour
                Owner.ActorTrans.transform.position.z
                );
         m_fDuration = Time.time - m_fStartTime;
+        if(Owner.RB.isKinematic == false) {
+              Owner.RB.velocity = new Vector3(0f, m_fInitSpeed + (m_curJumpData.m_fJumpAccel * m_fDuration), 0f);
+              m_fCurSpeed = Owner.RB.velocity.y;
+        }
+        else {
+            m_fCurSpeed = m_fInitSpeed + (m_curJumpData.m_fJumpAccel * m_fDuration);
+        }
         
-        Owner.RB.velocity = new Vector3(0f, m_fInitSpeed + (m_curJumpData.m_fJumpAccel * m_fDuration), 0f);
-        m_fCurSpeed = Owner.RB.velocity.y;
+      
         m_curHeight = fOrigHeight + (m_fInitSpeed * m_fDuration + 0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
     }
    
@@ -508,7 +534,9 @@ public class PlayerManager : MonoBehaviour
     void TranslatePlayer()
     {
         if(m_vInputMove.x != 0f)
-               Owner.ActorTrans.Translate(new Vector3(0f, 0f, GlobalHelper.SMoveSpeed * Time.deltaTime));
+            Owner.ActorTrans.Translate(new Vector3(0f, 0f,  Mathf.Abs(m_vInputMove.x) * GlobalHelper.SMoveSpeed * Time.deltaTime));
+
+       
     }
 
     bool CheckMoveBoundaryBlock() 
