@@ -111,11 +111,16 @@ public class PlayerManager : MonoBehaviour
     float m_fInitSpeed = 0f;
 
     float PI = 3.1415926f;
+
+    float k1, k2;                                                                                                                   //角色下落判定
+
     #endregion
 
     #region 外部接口
     public void OnStart(BaseActor owner)
     {
+
+    
 
         NpcMaskGlossy = LayerMask.NameToLayer("NPC");
         NpcMask = 1 << NpcMaskGlossy;
@@ -137,6 +142,10 @@ public class PlayerManager : MonoBehaviour
         Owner = owner;
         cc = Owner.CameraContrl;
         m_curJumpData = Owner.SmallJumpDataStore;
+
+        k1 = (m_curJumpData.m_fJumpHeight - 0.1f) / Owner.ActorHeight;
+        k2 = (m_curJumpData.m_fJumpHeight - 0.1f - GlobalHelper.SBoxSize * 2) / Owner.ActorHeight;
+
     }
 
     public void PlayerMove()
@@ -207,6 +216,39 @@ public class PlayerManager : MonoBehaviour
         return false;
     }
 
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        //Gizmos.DrawSphere(pos, GlobalHelper.SBoxSize * 0.5f);
+        //Debug.DrawLine(pos, hitInfo.point);
+
+        // !Physics.SphereCast(pos, 0.1f, , out hitInfo, Owner.ActorHeight * 4.4f, BoxMask))
+        Gizmos.DrawRay(Owner.ActorTrans.position, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), 0 - GlobalHelper.SMoveSpeed, 0f)).normalized);
+        //Debug.Log((new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x) , m_fCurSpeed, 0f)).normalized);
+
+
+    }
+    bool CheckJumpDown()                                                 //解决在下跳的时候，下一层有很多的盒子，导致角色不能完全跳下去，而卡在两个层中间
+    {
+
+        float y = Owner.ActorTrans.position.y;
+        pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+        if (Physics.SphereCast(pos, 0.3f, (new Vector3((m_vInputMove.x) * GlobalHelper.SMoveSpeed, 0 - (Mathf.Abs(m_vInputMove.x) * GlobalHelper.SMoveSpeed * k2), 0f)).normalized, out hitInfo, Owner.ActorHeight * 2.5f + 0.1f, BoxMask))
+        {
+            return false;
+        }
+        else if (Physics.SphereCast(pos, 0.3f, (new Vector3((m_vInputMove.x) * GlobalHelper.SMoveSpeed, 0 - (Mathf.Abs(m_vInputMove.x) * GlobalHelper.SMoveSpeed * k1), 0f)).normalized, out hitInfo, Owner.ActorHeight * 2.5f + 0.1f, BoxMask))
+        {
+            return false;
+        }
+        else if (Physics.SphereCast(pos, 0.3f, Vector3.down, out hitInfo, Owner.ActorHeight * 2.5f + 0.1f, BoxMask))
+        {
+            return false;
+        }
+
+        return true;
+    }
     public bool CalJumpDown()
     {
         if (Input.GetKeyDown(KeyCode.J))
@@ -216,6 +258,12 @@ public class PlayerManager : MonoBehaviour
 #if UNITY_EDITOR
                 Debug.Log("Can jump down");
 #endif
+                if (!CheckJumpDown())                   //检查下落的下方是否有盒子.
+                {
+                    BCanJumpDown = false;
+                    return false;
+                }
+
                 Owner.RB.isKinematic = true;
                 DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, 0f, true);
                 return true;
@@ -241,33 +289,8 @@ public class PlayerManager : MonoBehaviour
             {
 
                 float y = Owner.ActorTrans.position.y +Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
-
-                //if (y <= GlobalHelper.SBoxSize) // y < 0.8 -> y = 0.4
-                //{
-                //    y = GlobalHelper.SBoxSize * 0.5f;
-                //   // y = 0f;
-                //}
-                //else if (y > GlobalHelper.SBoxSize && y <= 2 * GlobalHelper.SBoxSize)   //y >0.8f && y <= 1.6f -> y = 1.2
-                //{
-                //    y = GlobalHelper.SBoxSize * 0.5f + GlobalHelper.SBoxSize;
-                //   // y = GlobalHelper.SBoxSize;
-                //}
-                //else                                                                                                       // y > 1.6f -> y = 2f;
-                //{
-                //    y = GlobalHelper.SBoxSize * 0.5f + GlobalHelper.SBoxSize * 2;
-                //    //y = GlobalHelper.SBoxSize * 2;
-                //}
-
                 pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-                //Debug.Log(Owner.ActorTrans.position + "  " + pos);
-                 //if(Physics.Raycast(pos, Owner.ActorTrans.forward, out hitInfo, 1.5f, BoxMask)) {
-                 //    Debug.DrawLine(pos, hitInfo.point);
-                 //}
-
-                //发射一个盒子
-                 //SphereCast(Vector3 origin, float radius, Vector3 direction, out RaycastHit hitInfo, float maxDistance, int layerMask);
                 if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Owner.ActorTrans.forward, out hitInfo, 1.5f, BoxMask))
-                //if (Physics.BoxCast(pos, Vector3.one * 0.8f, Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), 1.5f, BoxMask))
                 {
                     m_bcCurBox = (BoxCollider)hitInfo.collider;
 #if UNITY_EDITOR
