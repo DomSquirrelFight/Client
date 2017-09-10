@@ -141,7 +141,6 @@ public class PlayerManager : MonoBehaviour
 
     public void PlayerMove()
     {
-
         //执行旋转操作
         RotatePlayer();
         //播放位移动画
@@ -157,28 +156,15 @@ public class PlayerManager : MonoBehaviour
 
         }
 
+        //角色自由下落
+        FreeFall();
+
         //执行小跳跃
         JumpBehaviour();
 
         //执行下跳操作
         JumpDownBehaviour();
 
-        //switch (m_ePlayerBeha)
-        //{
-        //    case ePlayerBehaviour.eBehav_Normal:
-        //        {
-                  
-        //            break;
-        //        }
-        //    case ePlayerBehaviour.eBehav_Hide:
-        //        {
-        //            break;
-        //        }
-        //    case ePlayerBehaviour.eBehav_JumpDown:
-        //        {
-        //            break;
-        //        }
-        //}
     }
     #endregion
 
@@ -223,7 +209,6 @@ public class PlayerManager : MonoBehaviour
 
     public bool CalJumpDown()
     {
-
         if (Input.GetKeyDown(KeyCode.J))
         {
             if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && BCanJumpDown == true)
@@ -231,31 +216,20 @@ public class PlayerManager : MonoBehaviour
 #if UNITY_EDITOR
                 Debug.Log("Can jump down");
 #endif
+                Owner.RB.isKinematic = true;
                 DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, 0f, true);
                 return true;
             }
             else
             {
 #if UNITY_EDITOR
-                Debug.Log("Cann't jump down");
+                Debug.Log("Can't jump down");
 #endif
             }
-
         }
         return false;
     }
 
-    //void OnDrawGizmos()
-    //{
-    //    //Gizmos.color = Color.red;
-    //    //Gizmos.DrawSphere(pos, GlobalHelper.SBoxSize * 0.5f);
-    //    //Debug.DrawLine(pos, hitInfo.point);
-
-    //        // !Physics.SphereCast(pos, 0.1f, , out hitInfo, Owner.ActorHeight * 4.4f, BoxMask))
-    //    //Gizmos.DrawRay(Owner.ActorTrans.position, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed, 0f)).normalized);
-    //    //Debug.Log((new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x) , m_fCurSpeed, 0f)).normalized);
-
-    //}
     RaycastHit m_HitInfo;
     Vector3 pos;
     public bool CalPickUpBox()
@@ -415,20 +389,27 @@ public class PlayerManager : MonoBehaviour
 
     #region Jump
 
+    void FreeFall()
+    {
+        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && m_bIsDescent == false && Owner.RB.velocity.y < 0f)
+        {
+            DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, Owner.RB.velocity.y, true);
+        }
+    }
+
     void JumpDownBehaviour()                                                                                      //处理角色下跳行为
     {
         if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)
         {
             //if (fOrigHeight - m_curHeight >= Owner.BC.size.y && m_bIsDescent == true)
             //todo_erric
-            if (fOrigHeight - m_curHeight >= 1f && m_bIsDescent == true)
+            if (fOrigHeight - m_curHeight >= Owner.ActorHeight && m_bIsDescent == true)
             {
-                //Owner.RB.isKinematic = false;
-                Owner.RB.velocity = Vector3.zero;
+                Owner.RB.isKinematic = false;
+                Owner.RB.velocity = new Vector3(0f, m_fCurSpeed, 0f);
                 m_bIsDescent = true;
                 return;
             }
-
             CalCharacterJump();
         }
     }
@@ -454,7 +435,7 @@ public class PlayerManager : MonoBehaviour
 
             pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
 
-            if (Owner.RB.isKinematic == false && Physics.SphereCast(pos, 0.1f, (new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized, out hitInfo, Owner.ActorHeight * 0.5f + 0.1f, BrickMask) &&
+            if (Owner.RB.isKinematic == false && Physics.SphereCast(pos, 0.2f, (new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized, out hitInfo, Owner.ActorHeight * 0.5f + 0.1f, BrickMask) &&
                 !Physics.SphereCast(pos, 0.2f, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x) , m_fCurSpeed, 0f)).normalized, out hitInfo, Owner.ActorHeight * 1.4f, BoxMask))
             {
                 Owner.RB.isKinematic = true;
@@ -476,15 +457,13 @@ public class PlayerManager : MonoBehaviour
         else if (other.gameObject.layer == MaskGlossy || other.gameObject.layer == BoxMaskGlossy)
             BCanJumpDown = false;
     }
-
+    
     void DoBeforeJump(ePlayerNormalBeha type, float InitSpeed, bool isDescent)                   //jump前的数据准备
     {
 
-        //Owner.RB.isKinematic = true;
         Owner.RB.velocity = new Vector3(0f, InitSpeed, 0f);
         m_ePlayerNormalBehav = type;
         fOrigHeight = m_curHeight = Owner.ActorTrans.transform.position.y;
-        //m_bIsDescent = false;
         m_bIsDescent = isDescent;
         m_fCurSpeed = m_fInitSpeed = InitSpeed;
         m_fStartTime = Time.time;
@@ -517,7 +496,17 @@ public class PlayerManager : MonoBehaviour
     {
         if (m_bIsBlocked)
             return true;
-        return false;
+        else
+        {
+            if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)    //添加jump down 逻辑
+            {
+                float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
+                pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+                if (Physics.SphereCast(pos, 0.2f, Owner.ActorTrans.forward, out hitInfo, 1.5f))
+                    m_bIsBlocked = true;
+            }
+        }
+        return m_bIsBlocked;
 
     }
 
@@ -934,3 +923,14 @@ public class PlayerManager : MonoBehaviour
 //        }
 //    }
 // #endif
+//void OnDrawGizmos()
+//{
+//    //Gizmos.color = Color.red;
+//    //Gizmos.DrawSphere(pos, GlobalHelper.SBoxSize * 0.5f);
+//    //Debug.DrawLine(pos, hitInfo.point);
+
+//        // !Physics.SphereCast(pos, 0.1f, , out hitInfo, Owner.ActorHeight * 4.4f, BoxMask))
+//    //Gizmos.DrawRay(Owner.ActorTrans.position, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed, 0f)).normalized);
+//    //Debug.Log((new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x) , m_fCurSpeed, 0f)).normalized);
+
+//}
