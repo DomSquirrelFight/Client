@@ -614,6 +614,9 @@ public class PlayerManager : MonoBehaviour
 
              yield return null;
         }
+
+        m_bcCurBox.gameObject.transform.localRotation = Quaternion.identity;
+
     }
 
 
