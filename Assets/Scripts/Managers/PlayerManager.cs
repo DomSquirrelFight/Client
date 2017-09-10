@@ -54,6 +54,9 @@ public class PlayerManager : MonoBehaviour
 
     int NpcGroundMask;
 
+    int WallMaskGlossy;
+
+    int WallMask;
 
     JumpDataStore m_curJumpData;                                                                                                                                 //跳跃数据
 
@@ -126,6 +129,9 @@ public class PlayerManager : MonoBehaviour
 
         NpcGroundMaskGlossy = LayerMask.NameToLayer("NpcGround");
         NpcGroundMask = 1 << NpcGroundMaskGlossy;
+
+        WallMaskGlossy = LayerMask.NameToLayer("Wall");
+        WallMask = 1 << WallMaskGlossy;
 
         Owner = owner;
         cc = Owner.CameraContrl;
@@ -312,105 +318,90 @@ public class PlayerManager : MonoBehaviour
 
     #region 检测碰撞
 
-    //void OnTriggerEnter(Collider other)
-    //{
-
-    //    if (other.gameObject.layer == MaskGlossy || other.gameObject.layer == BrickMaskGlossy || other.gameObject.layer == BoxMaskGlossy)
-    //    {
-    //        m_bGounded = true;
-    //        m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
-    //        m_bIsDescent = false;
-    //        SetJumpDownState(other);
-    //    }
-    //}
-
-    //void OnCollisionStay(Collision other)
-    //{
-    //    if (other.contacts.Length > 0)
-    //    {
-    //        //if (other.contacts[0].thisCollider.gameObject.name == "Ground")                                    //角色碰到了地面
-    //        //{
-    //        //    m_bGounded = true;
-    //        //    m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
-    //        //    m_bIsDescent = false;
-    //        //    SetJumpDownState(other);
-    //        //}
-    //        //else 
-    //        if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy && m_vInputMove.x != 0f)                   //角色碰到了盒子
-    //        {
-    //            Debug.Log(other.contacts[0].thisCollider.name);
-
-    //            if (!m_bIsHoldBox)
-    //            {
-
-    //            }
-    //            //if (null == m_bcCurBox)
-
-    //            //{
-    //            //    m_bcCurBox = (BoxCollider)other.contacts[0].otherCollider;
-    //            //}
-    //        }
-    //    }
-    //}
-
     void OnCollisionStay(Collision other)
-    {
-        if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy && m_vInputMove.x != 0f)
-        {
-            //Debug.Log(other.contacts[0].thisCollider.name);
-            m_bIsBlocked = true;
-        }
-        else
-        m_bIsBlocked = false;
-    }
-
-    void OnCollisionEnter(Collision other)
+ //   void OnCollisionEnter(Collision other)
     {
 
-        if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy && m_vInputMove.x != 0f)
+        if ((other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy || other.contacts[0].otherCollider.gameObject.layer == WallMaskGlossy) && m_vInputMove.x != 0f)
         {
-            //Debug.Log(other.contacts[0].thisCollider.name);
-            m_bIsBlocked = true;
+            //需要发射朝向球体
+            float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
+
+            pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+
+            if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Owner.ActorTrans.forward, out hitInfo, 1.5f, 1 << other.contacts[0].otherCollider.gameObject.layer))     //如果在角色垂直向下方向射到了box，那么处理落地逻辑
+            {
+                if (hitInfo.collider.gameObject == other.collider.gameObject)
+                {
+                    m_bIsBlocked = true;
+                }
+            }
+         
         }
         else
             m_bIsBlocked = false;
 
         if (other.contacts.Length > 0)
         {
-            if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了地面
+            if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了ground, brick or box
             {
+
+                //OperateGround(other, mask);
 
                 if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy)                              //如果判定碰到的是box
                 {
-                    //如果在角色朝向方向射到了box，那么直接返回
-                    m_fCurSpeed = 0f;
-                    //如果在角色垂直向下方向射到了box，那么处理落地逻辑
-                    if (m_bIsDescent == true)
-                    {
-                        float y = Owner.ActorTrans.position.y +Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
-
-                        pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-
-                        if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Vector3.down, out hitInfo, 1.5f, BoxMask))
-                        {
-                            if (hitInfo.collider.gameObject == other.collider.gameObject)
-                                 SetJumpDownState(other);
-                        }
-                    }
+                    OperateGround(other, BoxMask);
                 }
-                else if (other.contacts[0].otherCollider.gameObject.layer == MaskGlossy || other.contacts[0].otherCollider.gameObject.layer == BrickMaskGlossy)
+                else if (other.contacts[0].otherCollider.gameObject.layer == BrickMaskGlossy)                                           //如果判定接触到的是brick
                 {
-
-                    m_fCurSpeed = 0f;
-
+                    OperateGround(other, BrickMask);
+                }
+                else if (other.contacts[0].otherCollider.gameObject.layer == MaskGlossy)
+                {
+                    //OperateGround(other, mask);
                     if (m_bIsDescent)
                     {
-                        SetJumpDownState(other);  
+                        SetJumpDownState(other);
                     }
                 }
             }
         }
     }
+
+    void OperateGround(Collision other, int layer)                                //处理落地逻辑
+    {
+        float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
+
+        pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+
+        if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Vector3.down, out hitInfo, Owner.ActorHeight * 0.5f + 0.1f, layer))     //如果在角色垂直向下方向射到了box，那么处理落地逻辑
+        {
+            if (hitInfo.collider.gameObject == other.collider.gameObject && m_bIsDescent == true)//在下降过程中
+            {
+
+#if UNITY_EDITOR
+                if(layer == mask)
+                    Debug.Log(1);
+#endif
+
+                SetJumpDownState(other);
+            }
+        }
+        else if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Vector3.up, out hitInfo, Owner.ActorHeight * 0.5f + 0.1f, layer))
+        {
+            if (hitInfo.collider.gameObject == other.collider.gameObject && m_bIsDescent == false)//在上升过程中
+            {
+#if UNITY_EDITOR
+                if(layer == mask)
+                    Debug.Log(1);
+#endif
+                m_fCurSpeed = 0f;//判定速度结束，启动下降流程
+                //SetJumpDownState(other);
+            }
+
+        }
+    }
+
     #endregion
 
     #region Jump
@@ -423,8 +414,9 @@ public class PlayerManager : MonoBehaviour
             //todo_erric
             if (fOrigHeight - m_curHeight >= 1f && m_bIsDescent == true)
             {
-                Owner.RB.isKinematic = false;
-                Owner.RB.velocity = new Vector3(0f, m_fCurSpeed, 0f);
+                //Owner.RB.isKinematic = false;
+                Owner.RB.velocity = Vector3.zero;
+                m_bIsDescent = true;
                 return;
             }
 
@@ -439,13 +431,15 @@ public class PlayerManager : MonoBehaviour
             if (m_fCurSpeed <= 0f && m_bIsDescent == false)
             {
                 m_bIsDescent = true;
+                Owner.RB.velocity = new Vector3(0f, -1f, 0f);//将物体速度归0。
+                Debug.Log("Jump to the top already");
+                m_fCurSpeed = Owner.RB.velocity.y;
                 return;
             }
             //如果在下降，则直接返回
             if (m_bIsDescent)
                 return;
 
-            //m_fCurSpeed = Owner.RB.velocity.y;
            CalCharacterJump();
 
         }
@@ -453,6 +447,7 @@ public class PlayerManager : MonoBehaviour
 
     void SetJumpDownState(Collision other)                                                                      //设置角色下跳权限
     {
+        m_fCurSpeed = 0f;
         m_bGounded = true;
         m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
         m_bIsDescent = false;
@@ -586,8 +581,6 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
 }
-
-
 
 //    #region 通用变量和接口
 //    ePlayerState m_ePlayerState = ePlayerState.PlayerState_Idle;//角色状态

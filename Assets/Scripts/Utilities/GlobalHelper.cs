@@ -8,7 +8,7 @@ public class GlobalHelper
     #region 常量表
     public static float SMoveSpeed = 3f;
     public static float SRotSpeed = 60f;
-    public static float SBoxSize = 0.8f;
+    public static float SBoxSize = 0.6f;
     #endregion
 
 
