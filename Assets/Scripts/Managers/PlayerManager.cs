@@ -101,7 +101,7 @@ public class PlayerManager : MonoBehaviour
 
     bool m_bIsDescent = false;                                                                                                  //判断是否在下降
 
-    float m_fCurSpeed = 0f;                                                                                                      //获取当前的速度
+    //float m_fCurSpeed = 0f;                                                                                                      //获取当前的速度
 
     float m_fStartTime = 0f;                                                                                                      //跳跃开始前的计时变量
 
@@ -341,6 +341,7 @@ public class PlayerManager : MonoBehaviour
         else
             m_bIsBlocked = false;
 
+
         if (other.contacts.Length > 0)
         {
             if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了ground, brick or box
@@ -395,7 +396,7 @@ public class PlayerManager : MonoBehaviour
                 if(layer == mask)
                     Debug.Log(1);
 #endif
-                m_fCurSpeed = 0f;//判定速度结束，启动下降流程
+                Owner.RB.velocity = Vector3.zero;
                 //SetJumpDownState(other);
             }
 
@@ -428,12 +429,11 @@ public class PlayerManager : MonoBehaviour
     {
         if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_SmallJump)
         {
-            if (m_fCurSpeed <= 0f && m_bIsDescent == false)
+            if (Owner.RB.velocity.y <= 0f && m_bIsDescent == false)
             {
                 m_bIsDescent = true;
                 Owner.RB.velocity = new Vector3(0f, -1f, 0f);//将物体速度归0。
                 Debug.Log("Jump to the top already");
-                m_fCurSpeed = Owner.RB.velocity.y;
                 return;
             }
             //如果在下降，则直接返回
@@ -447,7 +447,6 @@ public class PlayerManager : MonoBehaviour
 
     void SetJumpDownState(Collision other)                                                                      //设置角色下跳权限
     {
-        m_fCurSpeed = 0f;
         m_bGounded = true;
         m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
         m_bIsDescent = false;
@@ -467,8 +466,7 @@ public class PlayerManager : MonoBehaviour
         fOrigHeight = m_curHeight = Owner.ActorTrans.transform.position.y;
         //m_bIsDescent = false;
         m_bIsDescent = isDescent;
-        //m_fCurSpeed = m_curJumpData.m_fJumpInitSpeed;
-        m_fInitSpeed = m_fCurSpeed = InitSpeed;
+        m_fInitSpeed  = InitSpeed;
         m_fStartTime = Time.time;
     }
 
@@ -482,7 +480,6 @@ public class PlayerManager : MonoBehaviour
         m_fDuration = Time.time - m_fStartTime;
         
         Owner.RB.velocity = new Vector3(0f, m_fInitSpeed + (m_curJumpData.m_fJumpAccel * m_fDuration), 0f);
-        m_fCurSpeed = Owner.RB.velocity.y;
         m_curHeight = fOrigHeight + (m_fInitSpeed * m_fDuration + 0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
     }
    
