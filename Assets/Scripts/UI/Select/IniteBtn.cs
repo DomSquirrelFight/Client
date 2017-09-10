@@ -51,8 +51,9 @@ public class IniteBtn : MakeMove {
         {
             MoveOutDrag(indedx);
         }
-        if ((Mathf.Abs(Global.Grid.transform.localPosition.x + (Global.Grid_CurrentIndex * Global.Grid_PerSize))) < 0.5f)
+        if ((Mathf.Abs(Global.Grid.transform.localPosition.x + (Global.Grid_CurrentIndex * Global.Grid_PerSize))) < 10f)
         {
+            //MoveInmarginal(indedx);
             Global.e_State = StateUI.State_Stay;
         }
 

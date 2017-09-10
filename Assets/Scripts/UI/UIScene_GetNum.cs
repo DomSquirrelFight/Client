@@ -17,7 +17,7 @@ public class UIScene_GetNum : UIScene {
     void Login(GameObject obj)
     {
         //做一次判断，当前用户名和密码是不是和数据库相符
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Loading");
+        GlobalHelper.LoadLevel("Loading");
     }
 	// Update is called once per frame
 	void Update () {

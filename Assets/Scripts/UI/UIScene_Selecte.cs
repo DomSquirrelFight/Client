@@ -30,12 +30,12 @@ public class UIScene_Selecte : UIScene {
     }
     void Back(GameObject obj)
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Login");
+        GlobalHelper.LoadLevel("Login");
     }
     void Ok(GameObject obj)
     {
         //切换到战斗场景
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Fight");
+        GlobalHelper.LoadLevel("Fight");
         //确定人物 m_Select
         
     }

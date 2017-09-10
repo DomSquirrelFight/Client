@@ -15,7 +15,7 @@ public class UIScene_Register : MonoBehaviour {
         {
             //判断所有input的值不为空，并且手机验证码和数据库中的数据相符
             //跳转到申请成功的界面
-            UnityEngine.SceneManagement.SceneManager.LoadScene("GetNum");
+            GlobalHelper.LoadLevel("GetNum");
         }
 
     }

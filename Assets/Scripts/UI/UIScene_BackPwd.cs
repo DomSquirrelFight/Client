@@ -20,7 +20,7 @@ public class UIScene_BackPwd : MonoBehaviour {
         //如果返回true，跳转到重置密码界面
         if(IsRight)
         {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("NewPwd");
+            GlobalHelper.LoadLevel("NewPwd");
         }
         else
         {
@@ -31,7 +31,7 @@ public class UIScene_BackPwd : MonoBehaviour {
     void Back(GameObject obj)
     {
         //返回到登录场景
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Login");
+        GlobalHelper.LoadLevel("Login");
     }
 
 	// Update is called once per frame
