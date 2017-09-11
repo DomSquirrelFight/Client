@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
+using System;
 public class BaseActor : MonoBehaviour
 {
 
@@ -70,11 +71,11 @@ public class BaseActor : MonoBehaviour
             ba.PlayerInputMgr.OnStart(ba);//启动角色输入管理器
             //ba.RB.isKinematic = true;
         }
-
+        
         //初始化角色身体数据
-        ba.m_fSphereCastRadius = Mathf.Sqrt(ba.ActorHeight * ba.ActorHeight * 0.5f);
-
-
+        double radius = Mathf.Sqrt(ba.ActorHeight * ba.ActorHeight * 0.5f);
+        double tmp =  Math.Round(radius, 1);
+        ba.m_fSphereCastRadius = (float)tmp - 0.1f;
         return ba;
     }
 
@@ -97,7 +98,7 @@ public class BaseActor : MonoBehaviour
                     break;
                 }
         }
-        Object obj = Resources.Load(route);
+        UnityEngine.Object obj = Resources.Load(route);
         GameObject actor = Instantiate(obj) as GameObject;
         actor.name = obj.name;
         actor.transform.parent = baparent.transform;
