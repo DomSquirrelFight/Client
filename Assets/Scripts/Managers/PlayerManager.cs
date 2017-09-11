@@ -226,7 +226,6 @@ public class PlayerManager : MonoBehaviour
         return false;
     }
 
-
     bool CheckJumpDown()                                                 //解决在下跳的时候，下一层有很多的盒子，导致角色不能完全跳下去，而卡在两个层中间
     {
 
@@ -461,59 +460,102 @@ public class PlayerManager : MonoBehaviour
 
     }
 
+    bool bUp = false;
+    bool bUpForward = false;
     void SetPlayerKinematic()
     {
-        //如果已经是运动学刚体，那么直接返回
-        //if (Owner.RB.isKinematic)
-        //    return;
 
         //1 在角色上升过程中
         //2 朝着角色运动方向， 发射SphereCastRayLength(0.8f)的射线
         //3 射线球体半径SphereCastRadius(0.7f)(角色运动半径).
         if (
-            Physics.SphereCast
-            (
-                    Owner.ActorMiddlePoint,
-                    Owner.SphereCastRadius,
-                    Vector3.up,
-                    //(new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized,
-                    out hitInfo,
-                    Owner.SphereCastRayLength,
-                    BrickMask
-            ))
-        {
 
-            if (
-                     !Physics.SphereCast
-                       (
-                               Owner.ActorMiddlePoint,
-                               Owner.SphereCastRadius * 0.7f,
-                                Vector3.up,
-                               out hitInfo,
-                               Owner.SphereCastRayLength + GlobalHelper.SBrickDis,
-                               BoxMask
-                       )
-            //如果没有碰到盒子
-            ) 
-            {
-                Owner.RB.isKinematic = true;
-            }
-            else if(
-                  !Physics.SphereCast
+                Physics.SphereCast
                 (
                         Owner.ActorMiddlePoint,
-                        Owner.SphereCastRadius ,
-                        (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed , 0f)).normalized,
+                        Owner.SphereCastRadius * 0.5f,
+                        Vector3.up,
+                        //(new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized,
                         out hitInfo,
-                        Owner.SphereCastRayLength + GlobalHelper.SBrickDis,
-                        BoxMask
+                        Owner.SphereCastRayLength,
+                        BrickMask
+                ) ||
+                Physics.SphereCast
+                (
+                        Owner.ActorMiddlePoint,
+                        Owner.SphereCastRadius * 0.5f,
+                        Vector3.up + Owner.ActorTrans.forward,
+            //(new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized,
+                        out hitInfo,
+                        Owner.SphereCastRayLength,
+                        BrickMask
                 )
+
             )
+        {
+            if (hitInfo.collider.transform.position.y - (Owner.ActorTrans.position.y + Owner.ActorHeight) < 0.1f)
             {
-                Owner.RB.isKinematic = true;
+                bUp = false;
+                bUpForward = false;
+                if (!m_bIsHoldBox)
+                {
+                    #region 没有举着盒子
+                    //如果没有发现brick上面有盒子，那么可以将角色变成运动学刚体
+                    if (
+                             !Physics.SphereCast
+                               (
+                                       Owner.ActorMiddlePoint ,
+                                       Owner.ActorHeight * 0.28f,
+                                        Vector3.up,
+                                       out hitInfo,
+                                       Owner.SphereCastRadius,
+                                       BoxMask
+                               )
+                    )
+                    {
+                        bUp = true;
+                    }
+                    
+                    if (
+                        0f != m_vInputMove.x &&
+                          !Physics.SphereCast
+                        (
+                                Owner.ActorMiddlePoint ,
+                                 Owner.ActorHeight * 0.28f,
+                                (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed * 0.3f, 0f)).normalized,
+                                out hitInfo,
+                                Owner.SphereCastRadius,
+                                BoxMask
+                        )
+                    )
+                    {
+                        bUpForward = true;
+                    }
+
+                    //上方，前方 都没有碰到盒子
+                    if ((bUp && bUpForward) || (bUp && m_vInputMove.x == 0f && !bUpForward))
+                    {
+                        Owner.RB.isKinematic = true;
+                    }
+                    else if (m_vInputMove.x != 0f && bUp && !bUpForward || m_vInputMove.x != 0f && bUpForward && !bUp || m_vInputMove.x != 0f && !bUp && !bUpForward)
+                    {
+                        Owner.RB.isKinematic = false;
+                    }
+                    #endregion
+                }
+                else
+                {
+                    #region 举着盒子
+                    //先看垂直方向全部的盒子
+
+                    //然后再看运动方向全部的盒子
+
+                    #endregion
+                }
             }
-            else
-                Owner.RB.isKinematic = false;
+
+       
+          
         }
     }
 
@@ -673,7 +715,7 @@ public class PlayerManager : MonoBehaviour
     {
         Gizmos.color = Color.red;
 
-        Gizmos.DrawLine(Owner.ActorMiddlePoint, Owner.ActorMiddlePoint + ( new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed * 0.3f, 0f)).normalized * (Owner.SphereCastRayLength + GlobalHelper.SBrickDis * 5f));
+        Gizmos.DrawLine(Owner.ActorMiddlePoint, Owner.ActorMiddlePoint + (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed * 0.3f, 0f)).normalized * (Owner.SphereCastRadius));
          
 
         //Gizmos.DrawSphere(pos, GlobalHelper.SBoxSize * 0.5f);
