@@ -101,9 +101,19 @@ public class PlayerManager : MonoBehaviour
     float m_curHeight = 0f;                                                                                                       //保存角色当前高度
 
     bool m_bIsDescent = false;                                                                                                  //判断是否在下降
-
-    float m_fCurSpeed = 0f;                                                                                                      //获取当前的速度
-
+    
+    float curspeed = 0f;
+    float m_fCurSpeed                                                                                                     //获取当前的速度
+    {
+        get {
+            return curspeed;
+        }
+        set
+        {
+            if (value != curspeed)
+                curspeed = value;
+        }
+    }
     float m_fStartTime = 0f;                                                                                                      //跳跃开始前的计时变量
 
     float m_fDuration = 0;                                                                                                        //保存跳跃的时长
@@ -216,18 +226,7 @@ public class PlayerManager : MonoBehaviour
         return false;
     }
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        //Gizmos.DrawSphere(pos, GlobalHelper.SBoxSize * 0.5f);
-        //Debug.DrawLine(pos, hitInfo.point);
 
-        // !Physics.SphereCast(pos, 0.1f, , out hitInfo, Owner.ActorHeight * 4.4f, BoxMask))
-        Gizmos.DrawRay(Owner.ActorTrans.position, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), 0 - GlobalHelper.SMoveSpeed, 0f)).normalized);
-        //Debug.Log((new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x) , m_fCurSpeed, 0f)).normalized);
-
-
-    }
     bool CheckJumpDown()                                                 //解决在下跳的时候，下一层有很多的盒子，导致角色不能完全跳下去，而卡在两个层中间
     {
 
@@ -465,8 +464,8 @@ public class PlayerManager : MonoBehaviour
     void SetPlayerKinematic()
     {
         //如果已经是运动学刚体，那么直接返回
-        if (Owner.RB.isKinematic)
-            return;
+        //if (Owner.RB.isKinematic)
+        //    return;
 
         //1 在角色上升过程中
         //2 朝着角色运动方向， 发射SphereCastRayLength(0.8f)的射线
@@ -476,13 +475,45 @@ public class PlayerManager : MonoBehaviour
             (
                     Owner.ActorMiddlePoint,
                     Owner.SphereCastRadius,
-                    (new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized,
+                    Vector3.up,
+                    //(new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized,
                     out hitInfo,
                     Owner.SphereCastRayLength,
                     BrickMask
             ))
         {
-            Owner.RB.isKinematic = true;
+
+            if (
+                     !Physics.SphereCast
+                       (
+                               Owner.ActorMiddlePoint,
+                               Owner.SphereCastRadius * 0.7f,
+                                Vector3.up,
+                               out hitInfo,
+                               Owner.SphereCastRayLength + GlobalHelper.SBrickDis,
+                               BoxMask
+                       )
+            //如果没有碰到盒子
+            ) 
+            {
+                Owner.RB.isKinematic = true;
+            }
+            else if(
+                  !Physics.SphereCast
+                (
+                        Owner.ActorMiddlePoint,
+                        Owner.SphereCastRadius ,
+                        (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed , 0f)).normalized,
+                        out hitInfo,
+                        Owner.SphereCastRayLength + GlobalHelper.SBrickDis,
+                        BoxMask
+                )
+            )
+            {
+                Owner.RB.isKinematic = true;
+            }
+            else
+                Owner.RB.isKinematic = false;
         }
     }
 
@@ -637,6 +668,23 @@ public class PlayerManager : MonoBehaviour
 
 
     #endregion
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+
+        Gizmos.DrawLine(Owner.ActorMiddlePoint, Owner.ActorMiddlePoint + ( new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed * 0.3f, 0f)).normalized * (Owner.SphereCastRayLength + GlobalHelper.SBrickDis * 5f));
+         
+
+        //Gizmos.DrawSphere(pos, GlobalHelper.SBoxSize * 0.5f);
+        //Debug.DrawLine(pos, hitInfo.point);
+
+        // !Physics.SphereCast(pos, 0.1f, , out hitInfo, Owner.ActorHeight * 4.4f, BoxMask))
+        //Gizmos.DrawRay(Owner.ActorTrans.position, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), 0 - GlobalHelper.SMoveSpeed, 0f)).normalized);
+        //Debug.Log((new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x) , m_fCurSpeed, 0f)).normalized);
+
+
+    }
 
 }
 
