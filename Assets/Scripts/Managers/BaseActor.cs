@@ -71,6 +71,10 @@ public class BaseActor : MonoBehaviour
             //ba.RB.isKinematic = true;
         }
 
+        //初始化角色身体数据
+        ba.m_fSphereCastRadius = Mathf.Sqrt(ba.ActorHeight * ba.ActorHeight * 0.5f);
+
+
         return ba;
     }
 
@@ -157,18 +161,7 @@ public class BaseActor : MonoBehaviour
     #endregion
 
     #region 角色大小, 碰撞器
-    private CapsuleCollider ccol;
-    public CapsuleCollider CCOL
-    {
-        get
-        {
-            if (null == ccol)
-            {
-                ccol = Actor.GetOrAddComponent<CapsuleCollider>();
-            }
-            return ccol;
-        }
-    }
+    
     float actorsize = 0f;
     public float ActorSize
     {
@@ -190,6 +183,41 @@ public class BaseActor : MonoBehaviour
             return actorheight;
         }
     }
+
+    public float ActorMiddleYPos
+    {
+        get
+        {
+            return ActorTrans.position.y + ActorHeight * 0.5f;
+        }
+    }
+
+    public Vector3 ActorMiddlePoint
+    {
+        get
+        {
+            return new Vector3(ActorTrans.position.x, ActorMiddleYPos, ActorTrans.position.z);
+        }
+    }
+
+    //根据角色的身体大小，来计算角色的运动球体半径
+    private float m_fSphereCastRadius;
+    public float SphereCastRadius
+    {
+        get
+        {
+            return m_fSphereCastRadius;
+        }
+    }
+
+    public float SphereCastRayLength
+    {
+        get
+        {
+            return SphereCastRadius + 0.1f;
+        }
+    }
+
 
     #endregion
 

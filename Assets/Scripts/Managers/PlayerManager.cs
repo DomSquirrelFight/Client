@@ -216,7 +216,6 @@ public class PlayerManager : MonoBehaviour
         return false;
     }
 
-
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
@@ -452,45 +451,39 @@ public class PlayerManager : MonoBehaviour
             //如果在下降，则直接返回
             if (m_bIsDescent)
                 return;
-
-
-            float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
-
-            pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-
-            if (Owner.RB.isKinematic == false && Physics.SphereCast(pos, 0.2f, (new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized, out hitInfo, Owner.ActorHeight * 0.5f + 0.1f, BrickMask) 
-               )
+            else
             {
-                if (
-                    !Physics.SphereCast(pos, 0.2f, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed, 0f)).normalized, out hitInfo, Owner.ActorHeight * 1.4f, BoxMask) 
-                    )
-                Owner.RB.isKinematic = true;
-                else
-                {
-                    if (m_bIsHoldBox)               //当前在举箱子的状态下
-                    {
-                        bool bIsBoxBlocked = false;
-                        RaycastHit[] hits = Physics.SphereCastAll(pos, 0.2f, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed, 0f)).normalized, Owner.ActorHeight * 1.4f, BoxMask);
-                        for (int i = 0; i < hits.Length; i++)
-                        {
-                            if (hits[i].collider.isTrigger == false)
-                            {
-                                bIsBoxBlocked = true;
-                                break;
-                            }   
-                        }
 
-                        if(bIsBoxBlocked == false)
-                            Owner.RB.isKinematic = true;
-
-                    }
-                }
-
+                SetPlayerKinematic(); //设置玩家是否可以穿越障碍.
+                CalCharacterJump();
             }
 
-            CalCharacterJump();
         }
 
+    }
+
+    void SetPlayerKinematic()
+    {
+        //如果已经是运动学刚体，那么直接返回
+        if (Owner.RB.isKinematic)
+            return;
+
+        //1 在角色上升过程中
+        //2 朝着角色运动方向， 发射SphereCastRayLength(0.8f)的射线
+        //3 射线球体半径SphereCastRadius(0.7f)(角色运动半径).
+        if (
+            Physics.SphereCast
+            (
+                    Owner.ActorMiddlePoint,
+                    Owner.SphereCastRadius,
+                    (new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized,
+                    out hitInfo,
+                    Owner.SphereCastRayLength,
+                    BrickMask
+            ))
+        {
+            Owner.RB.isKinematic = true;
+        }
     }
 
     void SetJumpDownState(Collision other)                                                                      //设置角色下跳权限
