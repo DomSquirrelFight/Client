@@ -159,10 +159,10 @@ public class PlayerManager : MonoBehaviour
         //角色垂直上跳，碰到brick的距离
         m_fUpDisForBrick = m_curJumpData.m_fJumpHeight - 0.2f - Owner.ActorHeight + 0.1f;
 
-        float tmp = m_curJumpData.m_fJumpHeight - 0.2f;
+        float tmp = m_curJumpData.m_fJumpHeight + 0.1f;
         float dis = Mathf.Sqrt(tmp * tmp * 2);
-        float halfDiagonal = Mathf.Sqrt(Owner.ActorHeight * Owner.ActorHeight * 2) * 0.5f;
-        m_fBiasDisForBrick = dis - halfDiagonal + 0.1f;
+        //float halfDiagonal = Mathf.Sqrt(Owner.ActorHeight * Owner.ActorHeight * 2) * 0.5f;
+        m_fBiasDisForBrick = dis;// -halfDiagonal + 0.1f;
 
     }
 
@@ -511,27 +511,31 @@ public class PlayerManager : MonoBehaviour
         m_fCurSpeed = m_fInitSpeed = InitSpeed;
         m_fStartTime = Time.time;
     }
+    float tmpx = 1f;
     void SetPlayerKinematic()
     {
-
         if (Owner.RB.isKinematic == false && Time.time - m_fStartTime >= 0.04f) //0.04 通过计算可以让角色跳跃0.44米高度, 角色头顶和brick的距离是0.5f。
         {
-                    if (
-                        Physics.BoxCast(
-                                                    Owner.ActorTrans.position,// + Vector3.up * Owner.ActorHeight * 0.5f,
-                                                     new Vector3 (Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),//Vector3.one * Owner.ActorHeight * 0.5f,
-                                                     Vector3.up,
-                                                     out m_rayCheckJumpBrick,
-                                                     Quaternion.Euler(Vector3.up),
-                                                     0.1f + Owner.ActorHeight,//m_fUpDisForBrick,
-                                                     BrickMask)
-                   ) 
+            if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up), 0.1f + Owner.ActorHeight, BrickMask))                               
+            {
+                //检测上方是否有box
+                if (!Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up), 0.2f/*brick的厚度*/ + Owner.ActorHeight, BoxMask))                                  
                     {
-                         Owner.RB.isKinematic = true;
-                          Debug.Log(m_rayCheckJumpBrick.transform.parent.name);
+                        tmpx = 1f;
+                        if (Owner.ActorTrans.forward.x < 0f)
+                            tmpx = -1;
+                        if (!Physics.BoxCast(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up + Vector3.right * tmpx, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up + Vector3.right * tmpx), m_fBiasDisForBrick, BoxMask))
+                        {
+                            Owner.RB.isKinematic = true;
+                        }
+                        else
+                        {
+
+                        }
+                      
                     }
+            }
         }
-       
     }
 
     void CalCharacterJump()                                                                         //计算角色位移<运动学刚体>
