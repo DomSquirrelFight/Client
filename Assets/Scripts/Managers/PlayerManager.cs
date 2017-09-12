@@ -156,6 +156,14 @@ public class PlayerManager : MonoBehaviour
         k1 = (m_curJumpData.m_fJumpHeight - 0.1f) / Owner.ActorHeight;
         k2 = (m_curJumpData.m_fJumpHeight - 0.1f - GlobalHelper.SBoxSize * 2) / Owner.ActorHeight;
 
+        //角色垂直上跳，碰到brick的距离
+        m_fUpDisForBrick = m_curJumpData.m_fJumpHeight - 0.2f - Owner.ActorHeight + 0.1f;
+
+        float tmp = m_curJumpData.m_fJumpHeight - 0.2f;
+        float dis = Mathf.Sqrt(tmp * tmp * 2);
+        float halfDiagonal = Mathf.Sqrt(Owner.ActorHeight * Owner.ActorHeight * 2) * 0.5f;
+        m_fBiasDisForBrick = dis - halfDiagonal + 0.1f;
+
     }
 
     public void PlayerMove()
@@ -166,7 +174,7 @@ public class PlayerManager : MonoBehaviour
         PlayMoveAnim();
         if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
         {
-            if (!RayCastBlock(cc.CamMoveDir))//横向阻挡
+           // if (!RayCastBlock(cc.CamMoveDir))//横向阻挡
             {
                 //执行move操作
                 TranslatePlayer();
@@ -176,13 +184,13 @@ public class PlayerManager : MonoBehaviour
         }
 
         //角色自由下落
-        FreeFall();
+        //FreeFall();
 
         //执行小跳跃
         JumpBehaviour();
 
         //执行下跳操作
-        JumpDownBehaviour();
+        //JumpDownBehaviour();
 
     }
     #endregion
@@ -226,95 +234,95 @@ public class PlayerManager : MonoBehaviour
         return false;
     }
 
-    bool CheckJumpDown()                                                 //解决在下跳的时候，下一层有很多的盒子，导致角色不能完全跳下去，而卡在两个层中间
-    {
+    //bool CheckJumpDown()                                                 //解决在下跳的时候，下一层有很多的盒子，导致角色不能完全跳下去，而卡在两个层中间
+    //{
 
-        float y = Owner.ActorTrans.position.y;
-        pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-        if (Physics.SphereCast(pos, 0.3f, (new Vector3((m_vInputMove.x) * GlobalHelper.SMoveSpeed, 0 - (Mathf.Abs(m_vInputMove.x) * GlobalHelper.SMoveSpeed * k2), 0f)).normalized, out hitInfo, Owner.ActorHeight * 2.5f + 0.1f, BoxMask))
-        {
-            return false;
-        }
-        else if (Physics.SphereCast(pos, 0.3f, (new Vector3((m_vInputMove.x) * GlobalHelper.SMoveSpeed, 0 - (Mathf.Abs(m_vInputMove.x) * GlobalHelper.SMoveSpeed * k1), 0f)).normalized, out hitInfo, Owner.ActorHeight * 2.5f + 0.1f, BoxMask))
-        {
-            return false;
-        }
-        else if (Physics.SphereCast(pos, 0.3f, Vector3.down, out hitInfo, Owner.ActorHeight * 2.5f + 0.1f, BoxMask))
-        {
-            return false;
-        }
+    //    float y = Owner.ActorTrans.position.y;
+    //    pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+    //    if (Physics.SphereCast(pos, 0.3f, (new Vector3((m_vInputMove.x) * GlobalHelper.SMoveSpeed, 0 - (Mathf.Abs(m_vInputMove.x) * GlobalHelper.SMoveSpeed * k2), 0f)).normalized, out hitInfo, Owner.ActorHeight * 2.5f + 0.1f, BoxMask))
+    //    {
+    //        return false;
+    //    }
+    //    else if (Physics.SphereCast(pos, 0.3f, (new Vector3((m_vInputMove.x) * GlobalHelper.SMoveSpeed, 0 - (Mathf.Abs(m_vInputMove.x) * GlobalHelper.SMoveSpeed * k1), 0f)).normalized, out hitInfo, Owner.ActorHeight * 2.5f + 0.1f, BoxMask))
+    //    {
+    //        return false;
+    //    }
+    //    else if (Physics.SphereCast(pos, 0.3f, Vector3.down, out hitInfo, Owner.ActorHeight * 2.5f + 0.1f, BoxMask))
+    //    {
+    //        return false;
+    //    }
 
-        return true;
-    }
-    public bool CalJumpDown()
-    {
-        if (Input.GetKeyDown(KeyCode.J))
-        {
-            if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && BCanJumpDown == true)
-            {
-#if UNITY_EDITOR
-                Debug.Log("Can jump down");
-#endif
-                if (!CheckJumpDown())                   //检查下落的下方是否有盒子.
-                {
-                    BCanJumpDown = false;
-                    return false;
-                }
+    //    return true;
+    //}
+//    public bool CalJumpDown()
+//    {
+//        if (Input.GetKeyDown(KeyCode.J))
+//        {
+//            if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && BCanJumpDown == true)
+//            {
+//#if UNITY_EDITOR
+//                Debug.Log("Can jump down");
+//#endif
+//                if (!CheckJumpDown())                   //检查下落的下方是否有盒子.
+//                {
+//                    BCanJumpDown = false;
+//                    return false;
+//                }
 
-                Owner.RB.isKinematic = true;
-                DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, 0f, true);
-                return true;
-            }
-            else
-            {
-#if UNITY_EDITOR
-                Debug.Log("Can't jump down");
-#endif
-            }
-        }
-        return false;
-    }
+//                Owner.RB.isKinematic = true;
+//                DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, 0f, true);
+//                return true;
+//            }
+//            else
+//            {
+//#if UNITY_EDITOR
+//                Debug.Log("Can't jump down");
+//#endif
+//            }
+//        }
+//        return false;
+//    }
 
     RaycastHit m_HitInfo;
     Vector3 pos;
-    public bool CalPickUpBox()
-    {
-        if (Input.GetKeyDown(KeyCode.U))
-        {
-            //if (m_bIsHoldBox == false && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
-             if (m_bIsHoldBox == false && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide && m_vInputMove.x != 0f)
-            {
+//    public bool CalPickUpBox()
+//    {
+//        if (Input.GetKeyDown(KeyCode.U))
+//        {
+//            //if (m_bIsHoldBox == false && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
+//             if (m_bIsHoldBox == false && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide && m_vInputMove.x != 0f)
+//            {
 
-                float y = Owner.ActorTrans.position.y +Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
-                pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-                if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Owner.ActorTrans.forward, out hitInfo, 1.5f, BoxMask))
-                {
-                    m_bcCurBox = (BoxCollider)hitInfo.collider;
-#if UNITY_EDITOR
-                    Debug.Log("Successfully Pick up the Box");
-#endif
-                    DoBeforePickUpBox();
-                    return true;
-                }
-                else
-                {
-#if UNITY_EDITOR
-                    Debug.Log("Fail to pick up the box");
-#endif
-                }
-            }
-            else if (m_bIsHoldBox == true && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
-            {
-                m_bIsHoldBox = false;                                                                                               //复位托举状态
-                m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空
-                BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
-                boxCon.OnStart();
-                m_bcCurBox = null;                  //这样接下来就可以在举箱子
-                return true;
-            }
-        }
-        return false;
-    }
+//                float y = Owner.ActorTrans.position.y +Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
+//                pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+//                if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Owner.ActorTrans.forward, out hitInfo, 1.5f, BoxMask))
+//                {
+//                    m_bcCurBox = (BoxCollider)hitInfo.collider;
+//#if UNITY_EDITOR
+//                    Debug.Log("Successfully Pick up the Box");
+//#endif
+//                    DoBeforePickUpBox();
+//                    return true;
+//                }
+//                else
+//                {
+//#if UNITY_EDITOR
+//                    Debug.Log("Fail to pick up the box");
+//#endif
+//                }
+//            }
+//            else if (m_bIsHoldBox == true && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
+//            {
+//                m_bIsHoldBox = false;                                                                                               //复位托举状态
+//                m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空
+//                BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
+//                boxCon.OnStart();
+//                m_bcCurBox = null;                  //这样接下来就可以在举箱子
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     #endregion
 
@@ -324,24 +332,24 @@ public class PlayerManager : MonoBehaviour
  //   void OnCollisionEnter(Collision other)
     {
 
-        if ((other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy || other.contacts[0].otherCollider.gameObject.layer == WallMaskGlossy) && m_vInputMove.x != 0f)
-        {
-            //需要发射朝向球体
-            float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
+        //if ((other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy || other.contacts[0].otherCollider.gameObject.layer == WallMaskGlossy) && m_vInputMove.x != 0f)
+        //{
+        //    //需要发射朝向球体
+        //    float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
 
-            pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+        //    pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
 
-            if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Owner.ActorTrans.forward, out hitInfo, 1.5f, 1 << other.contacts[0].otherCollider.gameObject.layer))     //如果在角色垂直向下方向射到了box，那么处理落地逻辑
-            {
-                if (hitInfo.collider.gameObject == other.collider.gameObject)
-                {
-                    m_bIsBlocked = true;
-                }
-            }
+        ////    //if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Owner.ActorTrans.forward, out hitInfo, 1.5f, 1 << other.contacts[0].otherCollider.gameObject.layer))     //如果在角色运动正方向发现box，那么判定为阻挡状态
+        //    //{
+        //    //    if (hitInfo.collider.gameObject == other.collider.gameObject)
+        //    //    {
+        //    //        m_bIsBlocked = true;
+        //    //    }
+        //    //}
          
-        }
-        else
-            m_bIsBlocked = false;
+        //}
+        //else
+        //    m_bIsBlocked = false;
 
 
         if (other.contacts.Length > 0)
@@ -409,30 +417,30 @@ public class PlayerManager : MonoBehaviour
 
     #region Jump
 
-    void FreeFall()
-    {
-        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && m_bIsDescent == false && Owner.RB.velocity.y < 0f)
-        {
-            DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, Owner.RB.velocity.y, true);
-        }
-    }
+    //void FreeFall()
+    //{
+    //    if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && m_bIsDescent == false && Owner.RB.velocity.y < 0f)
+    //    {
+    //        DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, Owner.RB.velocity.y, true);
+    //    }
+    //}
 
-    void JumpDownBehaviour()                                                                                      //处理角色下跳行为
-    {
-        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)
-        {
-            //if (fOrigHeight - m_curHeight >= Owner.BC.size.y && m_bIsDescent == true)
-            //todo_erric
-            if (fOrigHeight - m_curHeight >= Owner.ActorHeight && m_bIsDescent == true)
-            {
-                Owner.RB.isKinematic = false;
-                Owner.RB.velocity = new Vector3(0f, m_fCurSpeed, 0f);
-                m_bIsDescent = true;
-                return;
-            }
-            CalCharacterJump();
-        }
-    }
+    //void JumpDownBehaviour()                                                                                      //处理角色下跳行为
+    //{
+    //    if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)
+    //    {
+    //        //if (fOrigHeight - m_curHeight >= Owner.BC.size.y && m_bIsDescent == true)
+    //        //todo_erric
+    //        if (fOrigHeight - m_curHeight >= Owner.ActorHeight && m_bIsDescent == true)
+    //        {
+    //            Owner.RB.isKinematic = false;
+    //            Owner.RB.velocity = new Vector3(0f, m_fCurSpeed, 0f);
+    //            m_bIsDescent = true;
+    //            return;
+    //        }
+    //        CalCharacterJump();
+    //    }
+    //}
 
     public void JumpBehaviour()                                                                                     //处理角色跳跃行为
     {
@@ -460,105 +468,6 @@ public class PlayerManager : MonoBehaviour
 
     }
 
-    bool bUp = false;
-    bool bUpForward = false;
-    void SetPlayerKinematic()
-    {
-
-        //1 在角色上升过程中
-        //2 朝着角色运动方向， 发射SphereCastRayLength(0.8f)的射线
-        //3 射线球体半径SphereCastRadius(0.7f)(角色运动半径).
-        if (
-
-                Physics.SphereCast
-                (
-                        Owner.ActorMiddlePoint,
-                        Owner.SphereCastRadius * 0.5f,
-                        Vector3.up,
-                        //(new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized,
-                        out hitInfo,
-                        Owner.SphereCastRayLength,
-                        BrickMask
-                ) ||
-                Physics.SphereCast
-                (
-                        Owner.ActorMiddlePoint,
-                        Owner.SphereCastRadius * 0.5f,
-                        Vector3.up + Owner.ActorTrans.forward,
-            //(new Vector3(GlobalHelper.SMoveSpeed * Mathf.Abs(m_vInputMove.x), m_fCurSpeed, 0f)).normalized,
-                        out hitInfo,
-                        Owner.SphereCastRayLength,
-                        BrickMask
-                )
-
-            )
-        {
-            if (hitInfo.collider.transform.position.y - (Owner.ActorTrans.position.y + Owner.ActorHeight) < 0.1f)
-            {
-                bUp = false;
-                bUpForward = false;
-                if (!m_bIsHoldBox)
-                {
-                    #region 没有举着盒子
-                    //如果没有发现brick上面有盒子，那么可以将角色变成运动学刚体
-                    if (
-                             !Physics.SphereCast
-                               (
-                                       Owner.ActorMiddlePoint ,
-                                       Owner.ActorHeight * 0.28f,
-                                        Vector3.up,
-                                       out hitInfo,
-                                       Owner.SphereCastRadius,
-                                       BoxMask
-                               )
-                    )
-                    {
-                        bUp = true;
-                    }
-                    
-                    if (
-                        0f != m_vInputMove.x &&
-                          !Physics.SphereCast
-                        (
-                                Owner.ActorMiddlePoint ,
-                                 Owner.ActorHeight * 0.28f,
-                                (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed * 0.3f, 0f)).normalized,
-                                out hitInfo,
-                                Owner.SphereCastRadius,
-                                BoxMask
-                        )
-                    )
-                    {
-                        bUpForward = true;
-                    }
-
-                    //上方，前方 都没有碰到盒子
-                    if ((bUp && bUpForward) || (bUp && m_vInputMove.x == 0f && !bUpForward))
-                    {
-                        Owner.RB.isKinematic = true;
-                    }
-                    else if (m_vInputMove.x != 0f && bUp && !bUpForward || m_vInputMove.x != 0f && bUpForward && !bUp || m_vInputMove.x != 0f && !bUp && !bUpForward)
-                    {
-                        Owner.RB.isKinematic = false;
-                    }
-                    #endregion
-                }
-                else
-                {
-                    #region 举着盒子
-                    //先看垂直方向全部的盒子
-
-                    //然后再看运动方向全部的盒子
-
-                    #endregion
-                }
-            }
-
-       
-          
-        }
-    }
-
     void SetJumpDownState(Collision other)                                                                      //设置角色下跳权限
     {
         m_bGounded = true;
@@ -571,8 +480,29 @@ public class PlayerManager : MonoBehaviour
             BCanJumpDown = false;
     }
     
+
+    bool bUp = false;
+    bool bUpForward = false;
+    RaycastHit m_rayCheckJumpBrick;//用来检测开始上跳时，上方是否有brick
+    float m_fUpDisForBrick;
+    float m_fBiasDisForBrick;//
+ 
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        if (null != hitInfo.transform)
+        Gizmos.DrawLine(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, hitInfo.transform.position);
+
+        Gizmos.DrawSphere(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, 0.55f);
+    }
+
+
+
     void DoBeforeJump(ePlayerNormalBeha type, float InitSpeed, bool isDescent)                   //jump前的数据准备
     {
+        //float t = 0.04f;
+        //float a = 12f * t - 20f * t * t;
 
         Owner.RB.velocity = new Vector3(0f, InitSpeed, 0f);
         m_ePlayerNormalBehav = type;
@@ -580,6 +510,28 @@ public class PlayerManager : MonoBehaviour
         m_bIsDescent = isDescent;
         m_fCurSpeed = m_fInitSpeed = InitSpeed;
         m_fStartTime = Time.time;
+    }
+    void SetPlayerKinematic()
+    {
+
+        if (Owner.RB.isKinematic == false && Time.time - m_fStartTime >= 0.04f) //0.04 通过计算可以让角色跳跃0.44米高度, 角色头顶和brick的距离是0.5f。
+        {
+                    if (
+                        Physics.BoxCast(
+                                                    Owner.ActorTrans.position,// + Vector3.up * Owner.ActorHeight * 0.5f,
+                                                     new Vector3 (Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),//Vector3.one * Owner.ActorHeight * 0.5f,
+                                                     Vector3.up,
+                                                     out m_rayCheckJumpBrick,
+                                                     Quaternion.Euler(Vector3.up),
+                                                     0.1f + Owner.ActorHeight,//m_fUpDisForBrick,
+                                                     BrickMask)
+                   ) 
+                    {
+                         Owner.RB.isKinematic = true;
+                          Debug.Log(m_rayCheckJumpBrick.transform.parent.name);
+                    }
+        }
+       
     }
 
     void CalCharacterJump()                                                                         //计算角色位移<运动学刚体>
@@ -605,23 +557,23 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region Translate
-    bool RayCastBlock(eCamMoveDir side)
-    {
-        if (m_bIsBlocked)
-            return true;
-        else
-        {
-            if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)    //添加jump down 逻辑
-            {
-                float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
-                pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-                if (Physics.SphereCast(pos, 0.2f, Owner.ActorTrans.forward, out hitInfo, 1.5f))
-                    m_bIsBlocked = true;
-            }
-        }
-        return m_bIsBlocked;
+    //bool RayCastBlock(eCamMoveDir side)
+    //{
+    //    if (m_bIsBlocked)
+    //        return true;
+    //    else
+    //    {
+    //        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)    //添加jump down 逻辑
+    //        {
+    //            float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
+    //            pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+    //            if (Physics.SphereCast(pos, 0.2f, Owner.ActorTrans.forward, out hitInfo, 1.5f))
+    //                m_bIsBlocked = true;
+    //        }
+    //    }
+    //    return m_bIsBlocked;
 
-    }
+    //}
 
     void RotatePlayer()
     {
@@ -711,22 +663,7 @@ public class PlayerManager : MonoBehaviour
 
     #endregion
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
 
-        Gizmos.DrawLine(Owner.ActorMiddlePoint, Owner.ActorMiddlePoint + (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), m_fCurSpeed * 0.3f, 0f)).normalized * (Owner.SphereCastRadius));
-         
-
-        //Gizmos.DrawSphere(pos, GlobalHelper.SBoxSize * 0.5f);
-        //Debug.DrawLine(pos, hitInfo.point);
-
-        // !Physics.SphereCast(pos, 0.1f, , out hitInfo, Owner.ActorHeight * 4.4f, BoxMask))
-        //Gizmos.DrawRay(Owner.ActorTrans.position, (new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x), 0 - GlobalHelper.SMoveSpeed, 0f)).normalized);
-        //Debug.Log((new Vector3(GlobalHelper.SMoveSpeed * (m_vInputMove.x) , m_fCurSpeed, 0f)).normalized);
-
-
-    }
 
 }
 
