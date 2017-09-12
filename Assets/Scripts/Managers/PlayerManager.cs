@@ -512,9 +512,10 @@ public class PlayerManager : MonoBehaviour
         m_fStartTime = Time.time;
     }
     float tmpx = 1f;
+    readonly float fCheckJumpTime = 0.04f;
     void SetPlayerKinematic()
     {
-        if (Owner.RB.isKinematic == false && Time.time - m_fStartTime >= 0.04f) //0.04 通过计算可以让角色跳跃0.44米高度, 角色头顶和brick的距离是0.5f。
+        if (Owner.RB.isKinematic == false && Time.time - m_fStartTime >= fCheckJumpTime) //0.04 通过计算可以让角色跳跃0.44米高度, 角色头顶和brick的距离是0.5f。
         {
             if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up), 0.1f + Owner.ActorHeight, BrickMask))                               
             {
@@ -531,6 +532,43 @@ public class PlayerManager : MonoBehaviour
                         else
                         {
 
+                            /*
+                             * dis = 0.5 - 0.44 + 0.2f; -> 0.26f
+                             * v0 * t + 0.5f * a * t * t = 0.26f
+                             * 
+                             * a = 0.5f * a;
+                             * b = v0
+                             * c = -0.26;
+                             * 
+                             * */
+                            float v0 = m_curJumpData.m_fJumpInitSpeed + 0.5f * m_curJumpData.m_fJumpAccel * fCheckJumpTime;
+                            float a = 0.5f * m_curJumpData.m_fJumpAccel;
+                            float b = v0;
+                            float c = 0f - 0.26f;
+
+                            float upright = Mathf.Sqrt(b * b - 4f * a * c);
+                            float upleft = 0 - b;
+                            float down = 2f * a;
+
+                            
+                            float t1 = (upleft - upright) / down;
+                            float t2 = (upleft + upright) / down;
+
+                            float t = t1 < t2 ? t1 : t2;
+                            if (t < 0f)
+                            {
+                                Debug.LogErrorFormat("t1 = {0}, t2 = {1}", t1, t2);
+                                return;
+                            }
+
+                            float s = GlobalHelper.SMoveSpeed * t;
+
+                            float s1 = Mathf.Abs(m_rayCheckJumpBrick.transform.position.x - Owner.ActorTrans.position.x) - Owner.ActorHeight * 0.5f - GlobalHelper.SBoxSize * 0.5f ;
+
+                            if (s1 > s + 0.2f)
+                            {
+                                Owner.RB.isKinematic = true;
+                            }
                         }
                       
                     }
