@@ -47,7 +47,7 @@ public class PlayerInputManager : MonoBehaviour {
 
     void InputPickUpBox()
     {
-      //  PlayerMgr.CalPickUpBox();
+        PlayerMgr.CalPickUpBox();
     }
 
 }

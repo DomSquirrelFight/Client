@@ -43,4 +43,12 @@ public class GlobalHelper
         return camPos;
     }
 
+
+    public static  Transform GetValues(RaycastHit hit)
+    {
+        return hit.transform;
+    }
+       
+
+
 }

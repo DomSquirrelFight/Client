@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
-
+using System.Linq;
 public class PlayerManager : MonoBehaviour
 {
 
@@ -285,44 +285,52 @@ public class PlayerManager : MonoBehaviour
 
     RaycastHit m_HitInfo;
     Vector3 pos;
-//    public bool CalPickUpBox()
-//    {
-//        if (Input.GetKeyDown(KeyCode.U))
-//        {
-//            //if (m_bIsHoldBox == false && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
-//             if (m_bIsHoldBox == false && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide && m_vInputMove.x != 0f)
-//            {
 
-//                float y = Owner.ActorTrans.position.y +Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
-//                pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-//                if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Owner.ActorTrans.forward, out hitInfo, 1.5f, BoxMask))
-//                {
-//                    m_bcCurBox = (BoxCollider)hitInfo.collider;
-//#if UNITY_EDITOR
-//                    Debug.Log("Successfully Pick up the Box");
-//#endif
-//                    DoBeforePickUpBox();
-//                    return true;
-//                }
-//                else
-//                {
-//#if UNITY_EDITOR
-//                    Debug.Log("Fail to pick up the box");
-//#endif
-//                }
-//            }
-//            else if (m_bIsHoldBox == true && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
-//            {
-//                m_bIsHoldBox = false;                                                                                               //复位托举状态
-//                m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空
-//                BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
-//                boxCon.OnStart();
-//                m_bcCurBox = null;                  //这样接下来就可以在举箱子
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
+
+    public bool CalPickUpBox()
+    {
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            //if (m_bIsHoldBox == false && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
+            if (m_bIsHoldBox == false && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide && m_vInputMove.x != 0f && null == m_bcCurBox)
+            {
+
+                float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;
+                pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+
+                //拿到所有的盒子，然后判定盒子位置最低的
+                RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3 (0.1f, Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.5f), Owner.ActorTrans.forward, Quaternion.Euler (Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BoxMask);
+                if (hits.Length > 0)
+                {
+                    if (hits.Length > 1)
+                        m_bcCurBox = (hits[0].transform.position.y > hits[1].transform.position.y ? (BoxCollider)(hits[1].collider) : (BoxCollider)(hits[0].collider));
+                    else
+                        m_bcCurBox = (BoxCollider)(hits[0].collider);
+#if UNITY_EDITOR
+                    Debug.Log("Successfully Pick up the Box");
+#endif
+                    DoBeforePickUpBox();
+                    return true;
+                }
+                else
+                {
+#if UNITY_EDITOR
+                    Debug.Log("Fail to pick up the box");
+#endif
+                }
+            }
+            else if (m_bIsHoldBox == true && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
+            {
+                m_bIsHoldBox = false;                                                                                               //复位托举状态
+                m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空
+                BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
+                boxCon.OnStart();
+                m_bcCurBox = null;                  //这样接下来就可以在举箱子
+                return true;
+            }
+        }
+        return false;
+    }
 
     #endregion
 
@@ -541,6 +549,7 @@ public class PlayerManager : MonoBehaviour
                              * c = -0.26;
                              * 
                              * */
+
                             float v0 = m_curJumpData.m_fJumpInitSpeed + 0.5f * m_curJumpData.m_fJumpAccel * fCheckJumpTime;
                             float a = 0.5f * m_curJumpData.m_fJumpAccel;
                             float b = v0;
