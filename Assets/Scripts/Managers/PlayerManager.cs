@@ -437,10 +437,17 @@ public class PlayerManager : MonoBehaviour
         }
         else
         {
-            tmpx = 1f;
-            if (Owner.ActorTrans.forward.x < 0f)
+            if(m_vInputMove.x == 0f)
+            {
+                tmpx = 0f;
+            }
+            else if (m_vInputMove.x > 0f)
+            {
+                tmpx = 1f;
+            }
+            else  if (Owner.ActorTrans.forward.x < 0f)
                 tmpx = -1;
-            if (Physics.BoxCast(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up + Vector3.right * tmpx, out m_rayCheckJumpBrick, Quaternion.LookRotation((new Vector3(tmpx * -1, 1, 0)).normalized), m_fBiasDisForBrick, BoxMask))
+            if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down + Vector3.right * tmpx, out m_rayCheckJumpBrick, Quaternion.LookRotation((new Vector3(tmpx * -1, -1, 0)).normalized), m_fBiasDisForBrick, BoxMask))
             {
                 return false;
             }
