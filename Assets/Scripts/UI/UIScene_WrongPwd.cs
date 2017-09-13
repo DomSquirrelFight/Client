@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIScene_Fight : UIScene {
-    public GameObject button;
+public class UIScene_WrongPwd : MonoBehaviour {
+    public GameObject m_oBtn;
 	// Use this for initialization
 	void Start () {
-        UIEventListener.Get(button).onClick = GoBegin;
+        UIEventListener.Get(m_oBtn).onClick = ClickOK;
 	}
-	void GoBegin(GameObject obj)
+	void ClickOK(GameObject obj)
     {
-        GlobalHelper.LoadLevel("Begin");
+        Destroy(gameObject);
     }
 	// Update is called once per frame
 	void Update () {

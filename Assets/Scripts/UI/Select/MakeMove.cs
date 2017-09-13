@@ -9,7 +9,7 @@ public class MakeMove : MonoBehaviour {
     public  void MoveInDrag(Vector2 delta)
     {
         //移动ui
-        Global.Grid.transform.localPosition += (Vector3)delta;
+        Global.Grid.transform.localPosition += new Vector3(((Vector3)delta).x,0,0);
         //移动curbtn
         Global.CurBtn.transform.localPosition += new Vector3(-((Vector3)delta).x / 4, 0, 0);
     }

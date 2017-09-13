@@ -6,10 +6,12 @@ using AttTypeDefine;
 public class UIScene_Start : MonoBehaviour {
     public GameObject m_btn;
     public GameObject m_panel;
+    //背景图片的uisprite
     public UISprite m_Bg;
     AnimState anim;
     //动画播放速度、
     public float m_fPlaySpeed;
+
 	// Use this for initialization
 	void Start () {
         UIEventListener.Get(m_btn).onClick = PressBtn;
@@ -17,6 +19,7 @@ public class UIScene_Start : MonoBehaviour {
         anim = AnimState.Start_BgAnim;
         //初始化pic和btn，让他们出生在屏幕的外边
         m_panel.transform.localPosition = new Vector3(0, -999, 0);
+
 
 	}
 	void PressBtn(GameObject obj)

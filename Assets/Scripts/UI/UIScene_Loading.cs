@@ -10,8 +10,12 @@ public class UIScene_Loading : UIScene {
     //背景图片
     public UISprite m_uBg;
     AnimState animState;
-	// Use this for initialization
-	void Start () {
+    //pic的实例
+    public GameObject m_oPic;
+    //Bar的实例
+    public GameObject m_oBar;
+    // Use this for initialization
+    void Start () {
         if (eState == LoadingState.e_LoadLevel)
         {
             eScene = SceneType.FightLoading;
@@ -42,19 +46,24 @@ public class UIScene_Loading : UIScene {
         //pic的加载
         if(animState==AnimState.Start_PicAnim)
         {
-
+            TweenPosition.Begin(m_oPic, 2f, new Vector3(0, 0, 0)).method = UITweener.Method.BounceIn;
+            animState = AnimState.Start_ProgressBar;
         }
        //进度条的加载
        if(animState==AnimState.Start_ProgressBar)
         {
-
+            TweenPosition.Begin(m_oBar, 1f, new Vector3(0, -200, 0)).method = UITweener.Method.BounceIn;
+            //StartCoroutine(LaterDo());
+            animState = AnimState.Start_null;
+           
         }
-        else
+        else if(animState==AnimState.Start_null)
         {
             //资源预加载
             LoadRes(eScene);
             //进度条推进
-            ProcessBar();
+            Invoke("ProcessBar", 2f);
+           
             eState = LoadingState.e_Null;
         }
 
@@ -68,11 +77,11 @@ public class UIScene_Loading : UIScene {
         //清理策划表实例缓存
         if(type==SceneType.SelecteLoading)
         {
-
+            Debug.Log("Selecte");
         }
         if (type == SceneType.FightLoading)
         {
-
+            Debug.Log("Fight");
         }
     }
     //进度条推进
@@ -86,16 +95,21 @@ public class UIScene_Loading : UIScene {
         else
         {
             //进度条走到百分之百，资源销毁
-            StartCoroutine(LateDestroy());
-            DestroyLoading();
+            StartCoroutine(LaterDo());
+            //DestroyLoading();
+            Invoke("DestroyLoading", 1f);
             //场景切换
           // SceneChange(eScene);
         }
     }
     //延迟销毁
-    IEnumerator LateDestroy()
+    IEnumerator LaterDo()
     {
-        yield return new WaitForSeconds(0.5f);
+        while(true)
+        {
+            yield return new WaitForSeconds(5);
+        }
+
     }
     //场景切换，异步加载
     AsyncOperation asyn;
