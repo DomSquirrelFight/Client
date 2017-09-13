@@ -126,7 +126,7 @@ public class PlayerManager : MonoBehaviour
 
     float PI = 3.1415926f;
 
-    float k1, k2;                                                                                                                   //角色下落判定
+    
 
     #endregion
 
@@ -162,8 +162,8 @@ public class PlayerManager : MonoBehaviour
         cc = Owner.CameraContrl;
         m_curJumpData = Owner.SmallJumpDataStore;
 
-        k1 = (m_curJumpData.m_fJumpHeight - 0.1f) / Owner.ActorHeight;
-        k2 = (m_curJumpData.m_fJumpHeight - 0.1f - GlobalHelper.SBoxSize * 2) / Owner.ActorHeight;
+        //k1 = (m_curJumpData.m_fJumpHeight - 0.1f) / Owner.ActorHeight;
+        //k2 = (m_curJumpData.m_fJumpHeight - 0.1f - GlobalHelper.SBoxSize * 2) / Owner.ActorHeight;
 
         //角色垂直上跳，碰到brick的距离
         m_fUpDisForBrick = m_curJumpData.m_fJumpHeight - 0.2f - Owner.ActorHeight + 0.1f;
@@ -580,6 +580,12 @@ public class PlayerManager : MonoBehaviour
         m_bIsDescent = isDescent;
         m_fCurSpeed = m_fInitSpeed = InitSpeed;
         m_fStartTime = Time.time;
+
+        //找到brick，然后计算fCheckJumpTime
+
+        //检测上方，前后和后方是否有brick, 
+
+
     }
 
     float tmpx = 1f;
