@@ -468,7 +468,7 @@ public class PlayerManager : MonoBehaviour
                 m_bIsDescent = true;
                 Owner.RB.isKinematic = false;
                 Owner.RB.velocity = new Vector3(0f, -1f, 0f);//将物体速度归0。
-                Debug.Log("Jump to the top already");
+                //Debug.Log("Jump to the top already");
                 return;
             }
             //如果在下降，则直接返回
@@ -521,36 +521,46 @@ public class PlayerManager : MonoBehaviour
         else if (m_vInputMove.x < 0f)
             tmpx = -1;
         ExtDebug.DrawBoxCastBox(
-        Owner.ActorTrans.position,
+        Owner.ActorTrans.position + Vector3.up * 0.44f,
         new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),
-        Quaternion.identity, new Vector3(0f, 1f, 0f), 20, Color.green
+        Quaternion.identity, new Vector3(0f, 1f, 0f), m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f, Color.green
         );
 
-        if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up),
+        if (Physics.BoxCast(Owner.ActorTrans.position + Vector3.up * 0.44f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up),
             m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f, BoxMask))
         {
             Gizmos.color = Color.green;
             Gizmos.DrawCube(m_rayCheckJumpBrick.point, 0.1f * Vector3.one);
         }
-        
-        Debug.DrawLine(Owner.ActorTrans.position, Owner.ActorTrans.position + Vector3.up * (m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f), Color.green);
+
+        Debug.DrawLine(Owner.ActorTrans.position + Vector3.up * 0.44f, 
+                                   Owner.ActorTrans.position + Vector3.up * 0.44f + Vector3.up * (m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f), Color.green);
 
 
 
         ExtDebug.DrawBoxCastBox(
-        Owner.ActorTrans.position - Owner.BC.size.x * 0.5f * Vector3.right * tmpx,
+        Owner.ActorTrans.position - Owner.BC.size.x * 0.5f * Vector3.right * tmpx + Vector3.up * 0.44f,
         new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),
-        Quaternion.LookRotation((new Vector3(tmpx * -1f, 1f, 0f)).normalized), new Vector3(tmpx * 1f, 1f, 0f), 20, Color.red
+        Quaternion.LookRotation((new Vector3(tmpx * -1f, 1f, 0f)).normalized), new Vector3(tmpx * 1f, 1f, 0f), m_fBiasDisForBrick * 2f, Color.red
         );
 
-        if (Physics.BoxCast(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up + Vector3.right * tmpx, out m_rayCheckJumpBrick, Quaternion.LookRotation((new Vector3(tmpx * -1, 1, 0)).normalized), m_fBiasDisForBrick, BoxMask))
+        Gizmos.color = Color.red;
+        RaycastHit[] hits = Physics.BoxCastAll(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),
+                                                                                    Vector3.up + Vector3.right * tmpx, Quaternion.LookRotation((new Vector3(tmpx * -1, 1, 0)).normalized), m_fBiasDisForBrick * 2f, BoxMask);
+
+        for (int i = 0; i < hits.Length; i++)
         {
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(m_rayCheckJumpBrick.point, 0.1f);
+            Gizmos.DrawSphere(hits[i].point, 0.1f);
         }
 
-        Debug.DrawLine(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f,
-            Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + (Vector3.up + Vector3.right * tmpx) * (m_fBiasDisForBrick),
+            //if (Physics.BoxCast(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up + Vector3.right * tmpx, out m_rayCheckJumpBrick, Quaternion.LookRotation((new Vector3(tmpx * -1, 1, 0)).normalized), m_fBiasDisForBrick * 2f, BoxMask))
+            //{
+               
+                
+            //}
+
+        Debug.DrawLine(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f,
+            Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f + (Vector3.up + Vector3.right * tmpx) * (2*m_fBiasDisForBrick),
             Color.red);
 
         lastTmpx = tmpx;
@@ -571,6 +581,7 @@ public class PlayerManager : MonoBehaviour
         m_fCurSpeed = m_fInitSpeed = InitSpeed;
         m_fStartTime = Time.time;
     }
+
     float tmpx = 1f;
     float lastTmpx = 1f;
     readonly float fCheckJumpTime = 0.04f;
@@ -588,53 +599,78 @@ public class PlayerManager : MonoBehaviour
                         tmpx = 1f;
                         if (Owner.ActorTrans.forward.x < 0f)
                             tmpx = -1;
-                        if (!Physics.BoxCast(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up + Vector3.right * tmpx, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up + Vector3.right * tmpx), m_fBiasDisForBrick * 2f, BoxMask))
-                        {
-                            Owner.RB.isKinematic = true;
-                        }
-                        else
-                        {
-
+                        //if (Physics.BoxCast(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up + Vector3.right * tmpx, out m_rayCheckJumpBrick, Quaternion.LookRotation((new Vector3(tmpx * -1, 1, 0)).normalized), m_fBiasDisForBrick, BoxMask))
+                            
+                            //检测全部的box，
                             /*
-                             * dis = 0.5 - 0.44 + 0.2f; -> 0.26f
-                             * v0 * t + 0.5f * a * t * t = 0.26f
-                             * 
-                             * a = 0.5f * a;
-                             * b = v0
-                             * c = -0.26;
+                             * if(length <= 0) {iskinematic = true}
+                             * else {
+                             *          
+                             * }
                              * 
                              * */
-
-                            float v0 = m_curJumpData.m_fJumpInitSpeed + 0.5f * m_curJumpData.m_fJumpAccel * fCheckJumpTime;
-                            float a = 0.5f * m_curJumpData.m_fJumpAccel;
-                            float b = v0;
-                            float c = 0f - 0.26f;
-
-                            float upright = Mathf.Sqrt(b * b - 4f * a * c);
-                            float upleft = 0 - b;
-                            float down = 2f * a;
-
+                            RaycastHit[] hits = Physics.BoxCastAll(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), 
+                                                                                      Vector3.up+Vector3.right * tmpx, Quaternion.LookRotation((new Vector3(tmpx * -1, 1, 0)).normalized), m_fBiasDisForBrick * 2f, BoxMask);
                             
-                            float t1 = (upleft - upright) / down;
-                            float t2 = (upleft + upright) / down;
-
-                            float t = t1 < t2 ? t1 : t2;
-                            if (t < 0f)
-                            {
-                                Debug.LogErrorFormat("t1 = {0}, t2 = {1}", t1, t2);
-                                return;
-                            }
-
-                            float s = GlobalHelper.SMoveSpeed * t;
-
-                            float s1 = Mathf.Abs(m_rayCheckJumpBrick.transform.position.x - Owner.ActorTrans.position.x) - Owner.ActorHeight * 0.5f - GlobalHelper.SBoxSize * 0.5f ;
-
-                            if (s1 > s + 0.15f)
-                            {
+                            if(hits.Length <= 0)
                                 Owner.RB.isKinematic = true;
-                            }
-                        }
-                      
+                            else
+                            {
+                                /*
+                         * dis = 0.5 - 0.44 + 0.2f; -> 0.26f
+                         * v0 * t + 0.5f * a * t * t = 0.26f
+                         * 
+                         * a = 0.5f * a;
+                         * b = v0
+                         * c = -0.26;
+                         * 
+                         * */
+                                float v0 = m_curJumpData.m_fJumpInitSpeed + 0.5f * m_curJumpData.m_fJumpAccel * fCheckJumpTime;
+                                float a = 0.5f * m_curJumpData.m_fJumpAccel;
+                                float b = v0;
+                                float c = 0f - 0.26f;
+
+                                float upright = Mathf.Sqrt(b * b - 4f * a * c);
+                                float upleft = 0 - b;
+                                float down = 2f * a;
+
+
+                                float t1 = (upleft - upright) / down;
+                                float t2 = (upleft + upright) / down;
+
+                                float t = t1 < t2 ? t1 : t2;
+                                if (t < 0f)
+                                {
+                                    Debug.LogErrorFormat("t1 = {0}, t2 = {1}", t1, t2);
+                                    return;
+                                }
+
+                                //bool test = false;
+
+                                float s = GlobalHelper.SMoveSpeed * t;
+                                int i = 0;
+                                for (i = 0; i < hits.Length; i++)
+                                {
+                                    float s1 = Mathf.Abs(hits[i].transform.position.x - Owner.ActorTrans.position.x) - Owner.ActorHeight * 0.5f - GlobalHelper.SBoxSize * 0.5f;
+                                    if (s1 <= s + 0.2f)
+                                    {
+                                        //Owner.RB.isKinematic = true;
+                                        //test = true;
+                                        break;
+                                    }
+                                }
+                                //if (test)
+                                //    Debug.Log(i + "hits.length = " + hits.Length);
+                                //else
+                                //{
+
+                                //    Debug.Log("cur index = " + i + "hits.length = " + hits.Length);
+                                //}
+                                if(i == hits.Length) {
+                                    Owner.RB.isKinematic = true;
+                                }
+
+                            }  
                     }
             }
         }
