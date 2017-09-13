@@ -42,7 +42,7 @@ public class PlayerInputManager : MonoBehaviour {
 
     void InputJumpDown()
     {
-      // PlayerMgr.CalJumpDown();
+       PlayerMgr.CalJumpDown();
     }
 
     void InputPickUpBox()
