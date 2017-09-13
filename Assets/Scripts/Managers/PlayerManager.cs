@@ -8,8 +8,25 @@ public class PlayerManager : MonoBehaviour
 
     #region 变量
     //ePlayerBehaviour m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;                                                                        //角色行为
-    
-    ePlayerNormalBeha m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;                                             //角色普通行为
+    ePlayerNormalBeha PlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;  
+    ePlayerNormalBeha m_ePlayerNormalBehav                                            //角色普通行为
+    {
+        get
+        {
+            return PlayerNormalBehav;
+        }
+        set
+        {
+            if (value != PlayerNormalBehav)
+            {
+                if (PlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && value == ePlayerNormalBeha.eNormalBehav_JumpDown)
+                {
+                    Debug.Log(123);
+                }
+                            PlayerNormalBehav = value;
+            }
+        }
+    }
     
     bool bGrounded = true;                                                                                                                                             //判定角色是否落地
     bool m_bGounded
@@ -322,6 +339,23 @@ public class PlayerManager : MonoBehaviour
 
     #region 检测碰撞
 
+    void OnCollisionEnter(Collision other)
+    {
+        if (other.contacts.Length > 0)
+        {
+            if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了ground, brick or box
+            {
+                if (other.contacts[0].otherCollider.gameObject.layer == MaskGlossy)
+                {
+                    if (m_bIsDescent)
+                    {
+                        SetJumpDownState(other);
+                    }
+                }
+            }
+        }
+    }
+
     void OnCollisionStay(Collision other)
     {
 
@@ -329,7 +363,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了ground, brick or box
             {
-
+               
                 if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy)                              //如果判定碰到的是box
                 {
                     OperateGround(other, BoxMask);
@@ -338,13 +372,18 @@ public class PlayerManager : MonoBehaviour
                 {
                     OperateGround(other, BrickMask);
                 }
-                else if (other.contacts[0].otherCollider.gameObject.layer == MaskGlossy)
-                {
-                    if (m_bIsDescent)
-                    {
-                        SetJumpDownState(other);
-                    }
-                }
+                //else if (other.contacts[0].otherCollider.gameObject.layer == MaskGlossy)
+                //{
+                //    if (m_bIsDescent)
+                //    {
+                //        //if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)
+                //        //{
+                //        //    Debug.Log("Jump down grounded");
+                //        //}
+                            
+                //        SetJumpDownState(other);
+                //    }
+                //}
             }
         }
     }
@@ -413,7 +452,7 @@ public class PlayerManager : MonoBehaviour
 
     void FreeFall()
     {
-        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && m_bIsDescent == false && Owner.RB.velocity.y < 0f)
+        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && m_bIsDescent == false && Owner.RB.velocity.y < -0.1f && m_vInputMove.x != 0f && Owner.ActorTrans.position.y > 0.2f)
         {
             DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, Owner.RB.velocity.y, true);
         }
@@ -463,8 +502,9 @@ public class PlayerManager : MonoBehaviour
     {
         m_bGounded = true;
         m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
+        Owner.RB.velocity = Vector3.zero;
+        m_fCurSpeed = 0f;
         m_bIsDescent = false;
-
         if (other.gameObject.layer == BrickMaskGlossy)
             BCanJumpDown = true;
         else if (other.gameObject.layer == MaskGlossy || other.gameObject.layer == BoxMaskGlossy)
