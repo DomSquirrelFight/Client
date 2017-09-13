@@ -59,6 +59,10 @@ public class PlayerManager : MonoBehaviour
 
     int WallMask;
 
+    int HoldBoxMaskGlossy;
+
+    int HoldBoxMask;
+
     JumpDataStore m_curJumpData;                                                                                                                                 //跳跃数据
 
     float TmpDis;                                                                                                                                                               //保存临时变量
@@ -148,6 +152,11 @@ public class PlayerManager : MonoBehaviour
 
         WallMaskGlossy = LayerMask.NameToLayer("Wall");
         WallMask = 1 << WallMaskGlossy;
+
+        HoldBoxMaskGlossy = LayerMask.NameToLayer("HoldBox");
+        HoldBoxMask = 1 << HoldBoxMaskGlossy;
+
+
 
         Owner = owner;
         cc = Owner.CameraContrl;
@@ -495,14 +504,57 @@ public class PlayerManager : MonoBehaviour
     float m_fUpDisForBrick;
     float m_fBiasDisForBrick;//
  
-
+   
     void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        if (null != hitInfo.transform)
-        Gizmos.DrawLine(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, hitInfo.transform.position);
+        //Gizmos.color = Color.red;
+        //if (null != hitInfo.transform)
+        //Gizmos.DrawLine(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, hitInfo.transform.position);
 
-        Gizmos.DrawSphere(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, 0.55f);
+        //Gizmos.DrawSphere(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, 0.55f);
+
+        tmpx = 1;
+        if (m_vInputMove.x == 0f)
+        {
+            tmpx = lastTmpx;
+        }
+        else if (m_vInputMove.x < 0f)
+            tmpx = -1;
+        ExtDebug.DrawBoxCastBox(
+        Owner.ActorTrans.position,
+        new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),
+        Quaternion.identity, new Vector3(0f, 1f, 0f), 20, Color.green
+        );
+
+        if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up),
+            m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f, BoxMask))
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawCube(m_rayCheckJumpBrick.point, 0.1f * Vector3.one);
+        }
+        
+        Debug.DrawLine(Owner.ActorTrans.position, Owner.ActorTrans.position + Vector3.up * (m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f), Color.green);
+
+
+
+        ExtDebug.DrawBoxCastBox(
+        Owner.ActorTrans.position - Owner.BC.size.x * 0.5f * Vector3.right * tmpx,
+        new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),
+        Quaternion.LookRotation((new Vector3(tmpx * -1f, 1f, 0f)).normalized), new Vector3(tmpx * 1f, 1f, 0f), 20, Color.red
+        );
+
+        if (Physics.BoxCast(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up + Vector3.right * tmpx, out m_rayCheckJumpBrick, Quaternion.LookRotation((new Vector3(tmpx * -1, 1, 0)).normalized), m_fBiasDisForBrick, BoxMask))
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(m_rayCheckJumpBrick.point, 0.1f);
+        }
+
+        Debug.DrawLine(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f,
+            Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + (Vector3.up + Vector3.right * tmpx) * (m_fBiasDisForBrick),
+            Color.red);
+
+        lastTmpx = tmpx;
+
     }
 
 
@@ -520,6 +572,7 @@ public class PlayerManager : MonoBehaviour
         m_fStartTime = Time.time;
     }
     float tmpx = 1f;
+    float lastTmpx = 1f;
     readonly float fCheckJumpTime = 0.04f;
     void SetPlayerKinematic()
     {
@@ -528,12 +581,14 @@ public class PlayerManager : MonoBehaviour
             if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up), 0.1f + Owner.ActorHeight, BrickMask))                               
             {
                 //检测上方是否有box
-                if (!Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up), 0.2f/*brick的厚度*/ + Owner.ActorHeight, BoxMask))                                  
+                if (!Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up), 
+                    m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f,
+                    BoxMask))                                  
                     {
                         tmpx = 1f;
                         if (Owner.ActorTrans.forward.x < 0f)
                             tmpx = -1;
-                        if (!Physics.BoxCast(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up + Vector3.right * tmpx, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up + Vector3.right * tmpx), m_fBiasDisForBrick, BoxMask))
+                        if (!Physics.BoxCast(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up + Vector3.right * tmpx, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up + Vector3.right * tmpx), m_fBiasDisForBrick * 2f, BoxMask))
                         {
                             Owner.RB.isKinematic = true;
                         }
@@ -574,7 +629,7 @@ public class PlayerManager : MonoBehaviour
 
                             float s1 = Mathf.Abs(m_rayCheckJumpBrick.transform.position.x - Owner.ActorTrans.position.x) - Owner.ActorHeight * 0.5f - GlobalHelper.SBoxSize * 0.5f ;
 
-                            if (s1 > s + 0.2f)
+                            if (s1 > s + 0.15f)
                             {
                                 Owner.RB.isKinematic = true;
                             }
@@ -689,6 +744,7 @@ public class PlayerManager : MonoBehaviour
 
     void DoBeforePickUpBox()
     {
+        m_bcCurBox.gameObject.layer = HoldBoxMaskGlossy;
         m_bcCurBox.isTrigger = true;                                                                                            //将盒子变成触发器           
         m_fPlayerBoxRaidus = m_bcCurBox.size.y + Owner.ActorHeight * 0.5f ;                             //确认运动半径
         m_bcCurBox.transform.parent = Owner.ActorTrans.transform;                                          //将盒子变成主角的孩子
