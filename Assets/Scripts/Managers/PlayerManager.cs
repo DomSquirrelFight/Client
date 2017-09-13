@@ -134,8 +134,6 @@ public class PlayerManager : MonoBehaviour
     public void OnStart(BaseActor owner)
     {
 
-    
-
         NpcMaskGlossy = LayerMask.NameToLayer("NPC");
         NpcMask = 1 << NpcMaskGlossy;
 
@@ -181,16 +179,19 @@ public class PlayerManager : MonoBehaviour
         RotatePlayer();
         //播放位移动画
         PlayMoveAnim();
-        if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
+        if(0f != m_vInputMove.x) 
         {
-           // if (!RayCastBlock(cc.CamMoveDir))//横向阻挡
+            if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
             {
-                //执行move操作
-                TranslatePlayer();
+                if (!RayCastBlock(cc.CamMoveDir))//横向阻挡
+                {
+                    //执行move操作
+                    TranslatePlayer();
+                }
+                m_bIsBlocked = false;
             }
-            m_bIsBlocked = false;
-
         }
+       
 
         //角色自由下落
         //FreeFall();
@@ -295,7 +296,6 @@ public class PlayerManager : MonoBehaviour
     RaycastHit m_HitInfo;
     Vector3 pos;
 
-
     public bool CalPickUpBox()
     {
         if (Input.GetKeyDown(KeyCode.U))
@@ -346,35 +346,12 @@ public class PlayerManager : MonoBehaviour
     #region 检测碰撞
 
     void OnCollisionStay(Collision other)
- //   void OnCollisionEnter(Collision other)
     {
-
-        //if ((other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy || other.contacts[0].otherCollider.gameObject.layer == WallMaskGlossy) && m_vInputMove.x != 0f)
-        //{
-        //    //需要发射朝向球体
-        //    float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
-
-        //    pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-
-        ////    //if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Owner.ActorTrans.forward, out hitInfo, 1.5f, 1 << other.contacts[0].otherCollider.gameObject.layer))     //如果在角色运动正方向发现box，那么判定为阻挡状态
-        //    //{
-        //    //    if (hitInfo.collider.gameObject == other.collider.gameObject)
-        //    //    {
-        //    //        m_bIsBlocked = true;
-        //    //    }
-        //    //}
-         
-        //}
-        //else
-        //    m_bIsBlocked = false;
-
 
         if (other.contacts.Length > 0)
         {
             if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了ground, brick or box
             {
-
-                //OperateGround(other, mask);
 
                 if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy)                              //如果判定碰到的是box
                 {
@@ -386,7 +363,6 @@ public class PlayerManager : MonoBehaviour
                 }
                 else if (other.contacts[0].otherCollider.gameObject.layer == MaskGlossy)
                 {
-                    //OperateGround(other, mask);
                     if (m_bIsDescent)
                     {
                         SetJumpDownState(other);
@@ -480,9 +456,7 @@ public class PlayerManager : MonoBehaviour
                 SetPlayerKinematic(); //设置玩家是否可以穿越障碍.
                 CalCharacterJump();
             }
-
         }
-
     }
 
     void SetJumpDownState(Collision other)                                                                      //设置角色下跳权限
@@ -584,8 +558,6 @@ public class PlayerManager : MonoBehaviour
         //找到brick，然后计算fCheckJumpTime
 
         //检测上方，前后和后方是否有brick, 
-
-
     }
 
     float tmpx = 1f;
@@ -705,23 +677,33 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region Translate
-    //bool RayCastBlock(eCamMoveDir side)
-    //{
-    //    if (m_bIsBlocked)
-    //        return true;
-    //    else
-    //    {
-    //        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)    //添加jump down 逻辑
-    //        {
-    //            float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
-    //            pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-    //            if (Physics.SphereCast(pos, 0.2f, Owner.ActorTrans.forward, out hitInfo, 1.5f))
-    //                m_bIsBlocked = true;
-    //        }
-    //    }
-    //    return m_bIsBlocked;
+    bool RayCastBlock(eCamMoveDir side)
+    {
+        //if (m_bIsBlocked)
+        //    return true;
+        //else
+        //{
+        //    if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)    //添加jump down 逻辑
+            //{
+                tmpx = 1f;
+                if (Owner.ActorTrans.forward.x < 0f)
+                    tmpx = -1;
+                //float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
+                //pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+                //if (Physics.SphereCast(pos, 0.2f, Owner.ActorTrans.forward, out hitInfo, 1.5f))
+                //    m_bIsBlocked = true;                      
+                if(Physics.BoxCast (Owner.ActorTrans.position + Owner.BC.center, new Vector3 (Owner.ActorHeight * 0.5f,  Owner.ActorHeight* 0.5f, 0.1f),
+                                              Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation (Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f, BoxMask
+                    ) )
+                {
+                    m_bIsBlocked = true;
+                }
 
-    //}
+        //    }
+        //}
+        return m_bIsBlocked;
+
+    }
 
     void RotatePlayer()
     {
