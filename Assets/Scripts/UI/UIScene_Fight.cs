@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-<<<<<<< HEAD
 using AttTypeDefine;
-public class UIScene_Fight : MonoBehaviour {
+public class UIScene_Fight : MonoBehaviour
+{
 
     BaseActor ba;
     BaseActor BA
@@ -18,12 +18,12 @@ public class UIScene_Fight : MonoBehaviour {
         }
     }
     //摇杆处理
-    public GameObject m_oJoyBack;
-    public GameObject m_oJoyFront;
-    private Vector3 m_vJoyBackOrigPos;//摇杆原始位置
-    public float m_fRadius = 0.2f;
-    public GameObject m_oNormalAttack;
-    public GameObject m_oSkill1;
+    public GameObject m_oJoyBack;                                                                                  //摇杆背景对象
+    public GameObject m_oJoyFront;                                                                                 //摇杆方向对象
+    private Vector3 m_vJoyBackOrigPos;                                                                            //摇杆原始位置
+    public float m_fRadius = 0.2f;                                                                                      //摇杆移动半径
+    public GameObject m_oJump;                                                                                     //跳跃
+    public GameObject m_oPickUpBox;                                                                             //捡箱子
     Camera cam;
 
     public void OnStart(BaseActor _owner)
@@ -32,60 +32,46 @@ public class UIScene_Fight : MonoBehaviour {
     }
     void Awake()
     {
-        UIEventListener.Get(m_oNormalAttack).onClick = PressNormalAttack;
-        UIEventListener.Get(m_oSkill1).onClick = PressSkill1;
+        UIEventListener.Get(m_oJump).onClick = PressJump;
+        UIEventListener.Get(m_oPickUpBox).onClick = PressPickUpBox;
     }
 
-    void PressNormalAttack(GameObject obj)
+    void PressJump(GameObject obj)
     {
-        //BA.SkillMgr.UseSkill(eSkillType.NormalAttack);
+        BA.PlayerMgr.CalJump();
+
     }
 
-    void PressSkill1(GameObject obj)
+    void PressPickUpBox(GameObject obj)
     {
-        //BA.SkillMgr.UseSkill(eSkillType.Skill1);
+        BA.PlayerMgr.CalPickUpBox();
     }
 
     //认为最多不会超过10个
     bool[] m_bCanJoy = new bool[10];
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         m_oJoyBack.SetActive(false);
 
         m_vJoyBackOrigPos = m_oJoyBack.transform.position;
 
         cam = NGUITools.FindCameraForLayer(gameObject.layer);
-=======
-
-public class UIScene_Fight : UIScene {
-    public GameObject button;
-	// Use this for initialization
-	void Start () {
-        UIEventListener.Get(button).onClick = GoBegin;
->>>>>>> Alla_Branch
-	}
-	void GoBegin(GameObject obj)
-    {
-        GlobalHelper.LoadLevel("Begin");
     }
-	// Update is called once per frame
-	void Update () {
+
+    void Update()
+    {
 #if UNITY_EDITOR
         MouseController();
 #else
         TouchController ();
 #endif
-      }
-
-    bool bpressed = false;
-    public bool PRESSED
-    {
-        get
+        if (m_oJoyFront.transform.localPosition.y > 0f)
         {
-            return bpressed;
+            m_oJoyFront.transform.localPosition = new Vector3(m_oJoyFront.transform.localPosition.x, 0f, m_oJoyFront.transform.localPosition.z);
         }
     }
-    bool bTouchJoy = false;
+
     Vector3 TouchPos;
     void TouchController()
     {
@@ -102,7 +88,7 @@ public class UIScene_Fight : UIScene {
                             m_bCanJoy[i] = false;
                             return;
                         }
-                        bpressed = m_bCanJoy[i] = true;
+                        m_bCanJoy[i] = true;
                         TouchPos = cam.ScreenToWorldPoint(touch.position);//获取点击起点位置
                         m_oJoyFront.transform.localPosition = Vector3.zero;
                         m_oJoyBack.transform.position = m_vJoyBackOrigPos = TouchPos;//赋值给起点游戏对象
@@ -112,6 +98,7 @@ public class UIScene_Fight : UIScene {
                 case TouchPhase.Moved:
                     {
                         if (!m_bCanJoy[i]) return;
+                        Debug.Log("TouchController :: TouchPhase.Moved");
                         TouchPos = cam.ScreenToWorldPoint(touch.position);
                         CalculateDir();
                         if (Vector3.Distance(TouchPos, m_oJoyBack.transform.position) >= m_fRadius)
@@ -128,17 +115,24 @@ public class UIScene_Fight : UIScene {
                     {
                         if (!m_bCanJoy[i]) return;
                         m_oJoyBack.SetActive(false);//关闭活性
-                        bpressed = false;
+                        Debug.Log("TouchController :: TouchPhase.Ended");
+                        dirpos = Vector2.zero;
+                        //bpressed = false;
                         break;
                     }
                 case TouchPhase.Canceled:
                     {
+
                         if (!m_bCanJoy[i]) return;
+                        Debug.Log("TouchController :: TouchPhase.Canceled");
+                        dirpos = Vector2.zero;
                         break;
                     }
                 case TouchPhase.Stationary:
                     {
                         if (!m_bCanJoy[i]) return;
+                        Debug.Log("TouchController :: TouchPhase.Stationary");
+                        //dirpos = Vector2.zero;
                         break;
                     }
             }
@@ -151,12 +145,13 @@ public class UIScene_Fight : UIScene {
     {
         if (Input.GetMouseButtonDown(0))
         {
-            if (Input.mousePosition.x > Screen.width / 2f) {
+            if (Input.mousePosition.x > Screen.width / 2f)
+            {
                 bCanJoy = false;
                 return;
             }
             bCanJoy = true;
-            bpressed = true;
+            //bpressed = true;
             pos = cam.ScreenToWorldPoint(Input.mousePosition);
             m_oJoyFront.transform.localPosition = Vector3.zero;
             m_oJoyBack.transform.position = m_vJoyBackOrigPos = pos;
@@ -165,7 +160,7 @@ public class UIScene_Fight : UIScene {
         else if (Input.GetMouseButton(0))
         {
             if (!bCanJoy) return;
-            pos =  cam.ScreenToWorldPoint(Input.mousePosition);
+            pos = cam.ScreenToWorldPoint(Input.mousePosition);
             CalculateDir();
             if (Vector3.Distance(pos, m_vJoyBackOrigPos) >= m_fRadius)
             {
@@ -180,15 +175,15 @@ public class UIScene_Fight : UIScene {
         {
             if (!bCanJoy) return;
             m_oJoyBack.SetActive(false);
-            bpressed = false;
+            //bpressed = false;
+            dirpos = Vector2.zero;
         }
     }
 
     void CalculateDir()
     {
-        Vector2 vdir = m_oJoyFront.transform.position -  m_oJoyBack.transform.position;
+        Vector2 vdir = m_oJoyFront.transform.position - m_oJoyBack.transform.position;
         dirpos = new Vector2(vdir.x / m_fRadius, vdir.y / m_fRadius);
-        //dir = Mathf.Atan2(vdir.x, vdir.y) * Mathf.Rad2Deg;
     }
 
     private Vector2 dirpos;
