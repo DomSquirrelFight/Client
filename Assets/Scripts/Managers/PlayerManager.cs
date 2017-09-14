@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 using System.Linq;
+using Assets.Scripts.Helper;
 public class PlayerManager : MonoBehaviour
 {
 
@@ -142,13 +143,16 @@ public class PlayerManager : MonoBehaviour
     float m_fInitSpeed = 0f;
 
     Vector2 m_vInputMove;                                                   //发送平移输入
-  
+
+    UIScene_Fight m_UISceneFight;
+
     #endregion
 
     #region 外部接口 / 系统接口
     public void OnStart(BaseActor owner)
     {
 
+      
         NpcMaskGlossy = LayerMask.NameToLayer("NPC");
         NpcMask = 1 << NpcMaskGlossy;
 
@@ -170,6 +174,8 @@ public class PlayerManager : MonoBehaviour
         HoldBoxMask = 1 << HoldBoxMaskGlossy;
 
         Owner = owner;
+        m_UISceneFight = Helpers.UIScene<UIScene_Fight>();
+        m_UISceneFight.OnStart(Owner);
         cc = Owner.CameraContrl;
         m_curJumpData = Owner.SmallJumpDataStore;
 

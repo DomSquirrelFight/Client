@@ -17,12 +17,12 @@ public class UIScene_Fight : MonoBehaviour {
         }
     }
     //摇杆处理
-    public GameObject m_oJoyBack;
-    public GameObject m_oJoyFront;
-    private Vector3 m_vJoyBackOrigPos;//摇杆原始位置
-    public float m_fRadius = 0.2f;
-    public GameObject m_oNormalAttack;
-    public GameObject m_oSkill1;
+    public GameObject m_oJoyBack;                                                                                  //摇杆背景对象
+    public GameObject m_oJoyFront;                                                                                 //摇杆方向对象
+    private Vector3 m_vJoyBackOrigPos;                                                                            //摇杆原始位置
+    public float m_fRadius = 0.2f;                                                                                      //摇杆移动半径
+    public GameObject m_oJump;                                                                                     //跳跃
+    public GameObject m_oPickUpBox;                                                                             //捡箱子
     Camera cam;
 
     public void OnStart(BaseActor _owner)
@@ -31,16 +31,16 @@ public class UIScene_Fight : MonoBehaviour {
     }
     void Awake()
     {
-        UIEventListener.Get(m_oNormalAttack).onClick = PressNormalAttack;
-        UIEventListener.Get(m_oSkill1).onClick = PressSkill1;
+        UIEventListener.Get(m_oJump).onClick = PressJump;
+        UIEventListener.Get(m_oPickUpBox).onClick = PressPickUpBox;
     }
 
-    void PressNormalAttack(GameObject obj)
+    void PressJump(GameObject obj)
     {
         //BA.SkillMgr.UseSkill(eSkillType.NormalAttack);
     }
 
-    void PressSkill1(GameObject obj)
+    void PressPickUpBox(GameObject obj)
     {
         //BA.SkillMgr.UseSkill(eSkillType.Skill1);
     }
@@ -56,24 +56,18 @@ public class UIScene_Fight : MonoBehaviour {
         cam = NGUITools.FindCameraForLayer(gameObject.layer);
 	}
 	
-	// Update is called once per frame
 	void Update () {
 #if UNITY_EDITOR
         MouseController();
 #else
         TouchController ();
 #endif
-      }
-
-    bool bpressed = false;
-    public bool PRESSED
-    {
-        get
+        if (m_oJoyFront.transform.localPosition.y > 0f)
         {
-            return bpressed;
+            m_oJoyFront.transform.localPosition = new Vector3(m_oJoyFront.transform.localPosition.x, 0f, m_oJoyFront.transform.localPosition.z);
         }
-    }
-    bool bTouchJoy = false;
+      }
+    
     Vector3 TouchPos;
     void TouchController()
     {
@@ -90,7 +84,7 @@ public class UIScene_Fight : MonoBehaviour {
                             m_bCanJoy[i] = false;
                             return;
                         }
-                        bpressed = m_bCanJoy[i] = true;
+                        m_bCanJoy[i] = true;
                         TouchPos = cam.ScreenToWorldPoint(touch.position);//获取点击起点位置
                         m_oJoyFront.transform.localPosition = Vector3.zero;
                         m_oJoyBack.transform.position = m_vJoyBackOrigPos = TouchPos;//赋值给起点游戏对象
@@ -116,7 +110,7 @@ public class UIScene_Fight : MonoBehaviour {
                     {
                         if (!m_bCanJoy[i]) return;
                         m_oJoyBack.SetActive(false);//关闭活性
-                        bpressed = false;
+                        //bpressed = false;
                         break;
                     }
                 case TouchPhase.Canceled:
@@ -144,7 +138,7 @@ public class UIScene_Fight : MonoBehaviour {
                 return;
             }
             bCanJoy = true;
-            bpressed = true;
+            //bpressed = true;
             pos = cam.ScreenToWorldPoint(Input.mousePosition);
             m_oJoyFront.transform.localPosition = Vector3.zero;
             m_oJoyBack.transform.position = m_vJoyBackOrigPos = pos;
@@ -168,7 +162,7 @@ public class UIScene_Fight : MonoBehaviour {
         {
             if (!bCanJoy) return;
             m_oJoyBack.SetActive(false);
-            bpressed = false;
+            //bpressed = false;
         }
     }
 
@@ -176,7 +170,6 @@ public class UIScene_Fight : MonoBehaviour {
     {
         Vector2 vdir = m_oJoyFront.transform.position -  m_oJoyBack.transform.position;
         dirpos = new Vector2(vdir.x / m_fRadius, vdir.y / m_fRadius);
-        //dir = Mathf.Atan2(vdir.x, vdir.y) * Mathf.Rad2Deg;
     }
 
     private Vector2 dirpos;
