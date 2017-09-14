@@ -19,10 +19,10 @@ public class PlayerManager : MonoBehaviour
         {
             if (value != PlayerNormalBehav)
             {
-                if (PlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && value == ePlayerNormalBeha.eNormalBehav_JumpDown)
-                {
-                    Debug.Log(123);
-                }
+                //if (PlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && value == ePlayerNormalBeha.eNormalBehav_JumpDown)
+                //{
+                //    Debug.Log(123);
+                //}
                             PlayerNormalBehav = value;
             }
         }
@@ -195,12 +195,12 @@ public class PlayerManager : MonoBehaviour
         {
             if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
             {
-                if (!RayCastBlock(cc.CamMoveDir))//横向阻挡
+                if (!RayCastBlock())//横向阻挡
                 {
                     //执行move操作
                     TranslatePlayer();
                 }
-                m_bIsBlocked = false;
+           
             }
         }
        
@@ -213,6 +213,9 @@ public class PlayerManager : MonoBehaviour
 
         //执行下跳操作
         JumpDownBehaviour();
+
+        //复位数据
+        ResetAllData();
 
     }
     #endregion
@@ -338,9 +341,10 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 检测碰撞
-
+    bool m_bCollisionEntered = false;
     void OnCollisionEnter(Collision other)
     {
+        m_bCollisionEntered = true;
         if (other.contacts.Length > 0)
         {
             if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了ground, brick or box
@@ -352,41 +356,56 @@ public class PlayerManager : MonoBehaviour
                         SetJumpDownState(other);
                     }
                 }
+                else if (other.contacts[0].otherCollider.gameObject.layer == BrickMaskGlossy)                                           //如果判定接触到的是brick
+                {
+                    OperateGround(other, BrickMask);
+                }
+                else if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy)                              //如果判定碰到的是box
+                {
+                    OperateGround(other, BoxMask);
+                }
             }
         }
     }
 
     void OnCollisionStay(Collision other)
     {
-
-        if (other.contacts.Length > 0)
-        {
-            if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了ground, brick or box
-            {
-               
-                if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy)                              //如果判定碰到的是box
-                {
-                    OperateGround(other, BoxMask);
-                }
-                else if (other.contacts[0].otherCollider.gameObject.layer == BrickMaskGlossy)                                           //如果判定接触到的是brick
-                {
-                    OperateGround(other, BrickMask);
-                }
-                //else if (other.contacts[0].otherCollider.gameObject.layer == MaskGlossy)
-                //{
-                //    if (m_bIsDescent)
-                //    {
-                //        //if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)
-                //        //{
-                //        //    Debug.Log("Jump down grounded");
-                //        //}
-                            
-                //        SetJumpDownState(other);
-                //    }
-                //}
-            }
-        }
+        if (m_bCollisionEntered == false)
+            OnCollisionEnter(other);
     }
+
+
+    //void OnCollisionStay(Collision other)
+    //{
+
+    //    if (other.contacts.Length > 0)
+    //    {
+    //        if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了ground, brick or box
+    //        {
+               
+    //            if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy)                              //如果判定碰到的是box
+    //            {
+    //                OperateGround(other, BoxMask);
+    //            }
+    //            else if (other.contacts[0].otherCollider.gameObject.layer == BrickMaskGlossy)                                           //如果判定接触到的是brick
+    //            {
+    //                OperateGround(other, BrickMask);
+    //            }
+    //            //else if (other.contacts[0].otherCollider.gameObject.layer == MaskGlossy)
+    //            //{
+    //            //    if (m_bIsDescent)
+    //            //    {
+    //            //        //if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)
+    //            //        //{
+    //            //        //    Debug.Log("Jump down grounded");
+    //            //        //}
+                            
+    //            //        SetJumpDownState(other);
+    //            //    }
+    //            //}
+    //        }
+    //    }
+    //}
 
     void OperateGround(Collision other, int layer)                                //处理落地逻辑
     {
@@ -423,20 +442,25 @@ public class PlayerManager : MonoBehaviour
     }
 
     #endregion
-
+ 
     #region Jump
 
     bool CheckJumpDown()                                                 //解决在下跳的时候，下一层有很多的盒子，导致角色不能完全跳下去，而卡在两个层中间
     {
 
         //检测到了下面有box
-        if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down, out m_rayCheckJumpBrick, Quaternion.identity
+        if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.4f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down, out m_rayCheckJumpBrick, Quaternion.identity
             , m_curJumpData.m_fJumpHeight - GlobalHelper.SBoxSize + 0.1f, BoxMask))
         {
             return false;
         }
         else
         {
+
+            RayCastBlock();
+
+            if (m_bIsBlocked)
+                return true;
             if(m_vInputMove.x == 0f)
             {
                 tmpx = 0f;
@@ -459,10 +483,10 @@ public class PlayerManager : MonoBehaviour
 
     void FreeFall()
     {
-        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && m_bIsDescent == false && Owner.RB.velocity.y < -0.1f && m_vInputMove.x != 0f && Owner.ActorTrans.position.y > 0.2f)
-        {
-            DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, Owner.RB.velocity.y, true);
-        }
+        //if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && m_bIsDescent == false && Owner.RB.velocity.y < -0.1f && m_vInputMove.x != 0f && Owner.ActorTrans.position.y > 0.2f)
+        //{
+        //    DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, Owner.RB.velocity.y, true);
+        //}
     }
 
     void JumpDownBehaviour()                                                                                      //处理角色下跳行为
@@ -507,6 +531,9 @@ public class PlayerManager : MonoBehaviour
 
     void SetJumpDownState(Collision other)                                                                      //设置角色下跳权限
     {
+#if UNITY_EDITOR
+        Debug.Log("SetJumpDownState -> name : " + other.transform.name);
+#endif
         m_bGounded = true;
         m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
         Owner.RB.velocity = Vector3.zero;
@@ -727,9 +754,9 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region Translate
-    bool RayCastBlock(eCamMoveDir side)
+    bool RayCastBlock()
     {
-        if (Physics.BoxCast(Owner.ActorTrans.position + Owner.BC.center, new Vector3(Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.5f, 0.1f),
+        if (Physics.BoxCast(Owner.ActorTrans.position + Owner.BC.center, new Vector3(Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.4f, 0.1f),
                                         Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f, BoxMask
             ))
         {
@@ -821,6 +848,15 @@ public class PlayerManager : MonoBehaviour
     }
 
 
+    #endregion
+
+    #region 通用接口
+
+    void ResetAllData()
+    {
+        m_bIsBlocked = false;
+        m_bCollisionEntered = false;
+    }
     #endregion
 
 }
