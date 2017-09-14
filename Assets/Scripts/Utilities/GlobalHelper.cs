@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using AttTypeDefine;
 public class GlobalHelper
 {
@@ -11,6 +9,19 @@ public class GlobalHelper
     public static float SBoxSize = 0.6f;
     public static float SBrickDis = 0.4f;
     public static float SJumpDownVertical = -0.5f;
+    #endregion
+
+    #region 场景加载
+    public static void LoadLevel(string name)
+    {
+        Debug.Log(name);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(name);
+    }
+
+    public static AsyncOperation LoadLevelAsync(string name)
+    {
+        return UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(name);
+    }
     #endregion
 
 
@@ -28,7 +39,7 @@ public class GlobalHelper
 
     }
 
-    
+
 
     //确定相机的四个边界
     public static CamBorderPosition GetCamBorder(Vector3 middle)

@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 namespace AttTypeDefine
 {
-
     #region UI
 
     public enum LoadingState
@@ -11,10 +10,27 @@ namespace AttTypeDefine
         e_LoadSelect,
         e_Null,
     }
+    //通过不同的场景，预加载不同的资源
     public enum SceneType
     {
         SelecteLoading,
+        Null,
         FightLoading,
+    }
+
+    //任务选择界面的，拖动，滑动
+    public  enum StateUI
+    {
+        State_Move,
+        State_Stay,
+    }
+    //动画的状态，用于loading界面
+    public enum AnimState
+    {
+        Start_null,
+        Start_BgAnim,
+        Start_PicAnim,
+        Start_ProgressBar,
     }
     #endregion
 

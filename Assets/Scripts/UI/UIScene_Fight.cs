@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+<<<<<<< HEAD
 using AttTypeDefine;
 public class UIScene_Fight : MonoBehaviour {
 
@@ -54,8 +55,19 @@ public class UIScene_Fight : MonoBehaviour {
         m_vJoyBackOrigPos = m_oJoyBack.transform.position;
 
         cam = NGUITools.FindCameraForLayer(gameObject.layer);
+=======
+
+public class UIScene_Fight : UIScene {
+    public GameObject button;
+	// Use this for initialization
+	void Start () {
+        UIEventListener.Get(button).onClick = GoBegin;
+>>>>>>> Alla_Branch
 	}
-	
+	void GoBegin(GameObject obj)
+    {
+        GlobalHelper.LoadLevel("Begin");
+    }
 	// Update is called once per frame
 	void Update () {
 #if UNITY_EDITOR

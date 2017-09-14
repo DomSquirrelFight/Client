@@ -14,7 +14,7 @@ public class UIScene_ResetPwd : UIScene {
 	//登录成功，切换到selected loading
     void Loading(GameObject obj)
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Loading");
+        GlobalHelper.LoadLevel("Loading");
     }
 	// Update is called once per frame
 	void Update () {
