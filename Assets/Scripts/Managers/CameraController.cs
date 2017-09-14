@@ -343,7 +343,7 @@ public class CameraController : MonoBehaviour {
             return m_vMiddlePoint;
         }
 
-        void FixedUpdate()
+        void Update()
         {
 
             if (!Owner)
