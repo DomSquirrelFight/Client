@@ -141,13 +141,11 @@ public class PlayerManager : MonoBehaviour
 
     float m_fInitSpeed = 0f;
 
-    float PI = 3.1415926f;
-
-    
-
+    Vector2 m_vInputMove;                                                   //发送平移输入
+  
     #endregion
 
-    #region 外部接口
+    #region 外部接口 / 系统接口
     public void OnStart(BaseActor owner)
     {
 
@@ -185,13 +183,15 @@ public class PlayerManager : MonoBehaviour
 
     }
 
-    public void PlayerMove()
+    void FixedUpdate()
     {
+        if (!Owner)
+            return;
         //执行旋转操作
         RotatePlayer();
         //播放位移动画
         PlayMoveAnim();
-        if(0f != m_vInputMove.x) 
+        if (0f != m_vInputMove.x)
         {
             if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
             {
@@ -200,10 +200,10 @@ public class PlayerManager : MonoBehaviour
                     //执行move操作
                     TranslatePlayer();
                 }
-           
+
             }
         }
-       
+
 
         //角色自由下落
         FreeFall();
@@ -216,25 +216,47 @@ public class PlayerManager : MonoBehaviour
 
         //复位数据
         ResetAllData();
-
     }
+  
+    void LateUpdate()
+    {
+        if (!Owner)
+            return;
+
+        CalMoveInput();
+
+        if (Application.platform == RuntimePlatform.WindowsEditor/*摇杆ui为空 || 摇杆不为空 && 摇杆没有输入*/)
+        {
+            CalJumpInput();
+            CalJumpDown();
+            CalPickUpBox();
+        }
+    }
+
     #endregion
 
     #region 检测输入
-    Vector2 m_vInputMove;                                                   //发送平移输入
-    
+
     public void CalMoveInput()                                              //获取平移输入
     {
-        m_vInputMove.x = Input.GetAxis("Horizontal");
-        m_vInputMove.y = Input.GetAxis("Vertical");
-        //m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;
-
-#if UNITY_EDITOR
-        if (0f != m_vInputMove.x)
+        if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
         {
-            int a = 0;
+            //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
         }
-#endif
+        else
+        {
+            //如果摇杆ui为空 or 摇杆ui不为空，但此时摇杆ui没有输入
+            m_vInputMove.x = Input.GetAxis("Horizontal");
+            m_vInputMove.y = Input.GetAxis("Vertical");
+            //否则 用摇杆数据
+        }
+
+        //如果按了下，那么将无法横向位移
+        if (m_vInputMove.y < GlobalHelper.SJumpDownVertical)
+        {
+            m_vInputMove.x = 0f;
+        }
+
     }
 
     public bool IsJump()
@@ -246,8 +268,7 @@ public class PlayerManager : MonoBehaviour
 
     public bool CalJumpInput()                                              //获取跳跃输入
     {
-        if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded)
-        //if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded)
+        if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && m_vInputMove.y > GlobalHelper.SJumpDownVertical)
         {
             if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
             {
@@ -259,10 +280,18 @@ public class PlayerManager : MonoBehaviour
         return false;
     }
 
-    
+    bool RecJumpDownInput()
+    {
+        if (m_vInputMove.y <= GlobalHelper.SJumpDownVertical)
+        {
+            if (Input.GetKeyDown(KeyCode.J))
+                return true;
+        }
+        return false;
+    }
     public bool CalJumpDown()
     {
-        if (Input.GetKeyDown(KeyCode.J))
+        if (RecJumpDownInput())
         {
 
             if (!CheckJumpDown())                   //检查下落的下方是否有盒子.
@@ -297,7 +326,6 @@ public class PlayerManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.U))
         {
-            //if (m_bIsHoldBox == false && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
             if (m_bIsHoldBox == false && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide && m_vInputMove.x != 0f && null == m_bcCurBox)
             {
 
@@ -463,7 +491,7 @@ public class PlayerManager : MonoBehaviour
                 return true;
             if(m_vInputMove.x == 0f)
             {
-                tmpx = 0f;
+                return true;
             }
             else if (m_vInputMove.x > 0f)
             {
@@ -856,6 +884,7 @@ public class PlayerManager : MonoBehaviour
     {
         m_bIsBlocked = false;
         m_bCollisionEntered = false;
+        //m_vInputMove = Vector2.zero;
     }
     #endregion
 
