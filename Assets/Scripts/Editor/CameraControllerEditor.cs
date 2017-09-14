@@ -6,89 +6,149 @@ using AttTypeDefine;
 [CustomEditor(typeof(CameraController))]
 public class CameraControllerEditor : Editor {
 
-    CameraController cc;
+    CameraController tc;
 
-    private void OnEnable()
+    void OnEnable()
     {
-        cc = target as CameraController;
+        tc = target as CameraController;
+
     }
 
-    private void OnSceneGUI()
+    public override void OnInspectorGUI()
     {
-        //获取当前相机围绕Y轴旋转的角度
-        Handles.color = Color.red;
-        if (cc.Owner)
+        base.OnInspectorGUI();
+
+        if (tc.m_tTarget)
         {
-            //和主角高度一致的相机位置坐标
-            Vector3 camMajorHeight = new Vector3(
-                   cc.transform.position.x,
-                   cc.Owner.ActorTrans.position.y,
-                   cc.transform.position.z);
 
-            Handles.color = Color.white;
+            //------------------------------------------------------------Begin : TargetPlaneNormal<目标平面法向量>-----------------------------------------------------------//
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("TargetPlaneNormal<目标平面法向量>");
+            EditorGUILayout.LabelField("x: " + tc.TargetPlaneNormal.x.ToString() + ";           " + "y: " + tc.TargetPlaneNormal.y.ToString() + ";          " + "z: " + tc.TargetPlaneNormal.z.ToString() + ";");
+            EditorGUILayout.EndHorizontal();
+            //------------------------------------------------------------End : TargetPlaneNormal<目标平面法向量>-----------------------------------------------------------//
 
-            #region 绘制一个三角形
 
-            //绘制一条直线，从相机，垂直向上一条先发射
-            Handles.DrawLine(new Vector3(
-                    cc.transform.position.x,
-                    cc.Owner.ActorTrans.position.y,
-                       cc.transform.position.z),
-                    new Vector3(
-                         cc.transform.position.x,
-                         cc.Owner.ActorTrans.position.y,
-                         cc.Owner.ActorTrans.position.z
-                        )
-                );
+            //------------------------------------------------------------Begin : m_vMiddlePoint <相机朝向和目标平面的交点坐标>-----------------------------------------------------------//
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("m_vMiddlePoint<相机朝向和目标平面的交点坐标>");
+            EditorGUILayout.LabelField("x: " + tc.m_vMiddlePoint.x.ToString() + ";           " + "y: " + tc.m_vMiddlePoint.y.ToString() + ";          " + "z: " + tc.m_vMiddlePoint.z.ToString() + ";");
+            EditorGUILayout.EndHorizontal();
+            //------------------------------------------------------------End : m_vMiddlePoint <相机朝向和目标平面的交点坐标>-----------------------------------------------------------//
 
-            Handles.DrawLine(cc.transform.position,
-                 new Vector3(
-                         cc.transform.position.x,
-                         cc.Owner.ActorTrans.position.y,
-                         cc.Owner.ActorTrans.position.z
-                        )
-                );
 
-            Handles.DrawLine(
-               cc.transform.position,
-               new Vector3(
-                   cc.transform.position.x,
-                   cc.Owner.ActorTrans.position.y,
-                   cc.transform.position.z
-                   )
-                );
+            //------------------------------------------------------------Begin : m_dCamDir <目标平面和相机视野边缘交点>-----------------------------------------------------------//
+            if (m_nSelectedIndex != -1)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.Vector3Field("m_dCamDir<相机朝向和目标平面边缘交点坐标>", tc.m_dCamDir[(eCamFourCorner)m_nSelectedIndex]);
+                EditorGUILayout.EndHorizontal();
+            }
+            //------------------------------------------------------------End : m_dCamDir <目标平面和相机视野边缘交点>-----------------------------------------------------------//
 
-            #endregion
 
-            #region 绘制相机到主角线段的线段
-            #region 经过测试，结果错误
-            ////2.1.2 获取相机的旋转角度
-            //float fDegreeCamToMajor = cc.transform.rotation.y;
-            ////2.1.3 获取相机射线长度
-            //float fZLineLength = fZCamToMajor / Mathf.Cos(fDegreeCamToMajor);
-            #endregion
-            
-            Handles.color = Color.red;
-            Vector3 vCamMiddlePoint = cc.GetCameraMajorMiddlePoint();
-            Handles.DrawLine(
-                    camMajorHeight,
-                    vCamMiddlePoint
-                );
-            #endregion
-
-            #region 绘制相机左边框和有边框线段
-            Vector3 vLeft = cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Left, cc.ZLineLength);
-            Vector3 vRight = cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Right, cc.ZLineLength);
-
-            Handles.DrawLine(camMajorHeight, vLeft);//绘制相机到leftpoint.
-            Handles.DrawLine(camMajorHeight, vRight);//绘制相机到rightPoint.
-
-            //绘制主角线段
-            Handles.color = Color.white;
-            Handles.DrawLine(vLeft, vRight);
-            #endregion
-            
+            //------------------------------------------------------------Begin : m_dTargetCornerPoints <目标的边缘坐标>-----------------------------------------------------------//
+            if (m_nSelectedTargetBorderPointIndex != -1)
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.Vector3Field("m_dTargetCornerPoints<目标的边缘坐标>", tc.m_dTargetCornerPoints[(eTargetFourCorner)m_nSelectedTargetBorderPointIndex]);
+                EditorGUILayout.EndHorizontal();
+            }
+            //------------------------------------------------------------End : m_dTargetCornerPoints <目标的边缘坐标>-----------------------------------------------------------//
         }
+    }
+
+    float size = 1f;
+    float pickSize = 2f;
+    int m_nSelectedIndex = -1;
+    int m_nSelectedTargetBorderPointIndex = -1;
+    void OnSceneGUI()
+    {
+
+        if (tc.m_tTarget)
+        {
+
+            //显示四个交点<相机边界射线和目标平面>
+            Handles.color = Handles.xAxisColor;
+            for (int i = 0; i < 4; i++)
+            {
+
+                if (Handles.Button(tc.m_vPoints[i], Quaternion.identity, size, pickSize, Handles.SphereHandleCap))
+                {
+                    m_nSelectedIndex = i;
+                    Repaint();
+                }
+
+                // Handles.SphereHandleCap(
+                //                                            0,
+                //                                            tc.m_vPoints[i],
+                //                                            Quaternion.identity,
+                //                                            1f,
+                //                                            EventType.Repaint
+                //);
+                Handles.DrawLine(tc.transform.position, tc.m_vPoints[i]);
+            }
+
+
+            if (m_nSelectedIndex != -1)
+            {
+                Handles.DoPositionHandle(tc.m_vPoints[m_nSelectedIndex], Quaternion.identity);
+            }
+
+
+
+
+
+            //绘制四个交点组成的平面
+            Handles.color = Color.white;
+            Color faceColor = new Color(1f, 1f, 1f, 0.2f);
+            Color outlineColor = new Color(1f, 1f, 1f, 0.2f);
+            Vector3[] tmp = new Vector3[] { tc.m_vPoints[2], tc.m_vPoints[3], tc.m_vPoints[1], tc.m_vPoints[0] };
+            Handles.DrawSolidRectangleWithOutline(tmp, faceColor, outlineColor);
+
+
+            //给目标位置绘制一个大的框架球体，当点中，那么绘制当前球体视野视野边界的四个顶点<上下左右>
+            Handles.color = Color.red;
+            Handles.DrawWireCube(tc.m_tTarget.position, new Vector3(1.5f, 1.5f, 1.5f));
+
+            //计算目标对应的相机上下左右边界坐标, 并完成平面绘制
+            Handles.color = Handles.zAxisColor;
+            for (int i = 0; i < tc.m_dTargetCornerPoints.Count; i++)
+            {
+
+                if (Handles.Button(tc.m_dTargetCornerPoints[(eTargetFourCorner)i], Quaternion.identity, size, pickSize, Handles.SphereHandleCap))
+                {
+                    m_nSelectedTargetBorderPointIndex = i;
+                    Repaint();
+                }
+                // Handles.SphereHandleCap(
+                //                                            0,
+                //                                            tc.m_dTargetCornerPoints[(eTargetFourCorner)i],
+                //                                            Quaternion.identity,
+                //                                            1f,
+                //                                            EventType.Repaint
+                //);
+            }
+
+            if (m_nSelectedTargetBorderPointIndex != -1)
+            {
+                Handles.DoPositionHandle(tc.m_dTargetCornerPoints[(eTargetFourCorner)m_nSelectedTargetBorderPointIndex], Quaternion.identity);
+            }
+
+
+            //绘制相机朝向和目标屏幕的焦点坐标
+            Handles.color = Handles.yAxisColor;
+            Handles.SphereHandleCap(
+                                                           0,
+                                                           tc.m_vMiddlePoint,
+                                                           Quaternion.identity,
+                                                           0.5f,
+                                                           EventType.Repaint
+               );
+
+
+        }
+
     }
 
 }

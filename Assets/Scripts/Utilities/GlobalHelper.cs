@@ -8,6 +8,9 @@ public class GlobalHelper
     #region 常量表
     public static float SMoveSpeed = 3f;
     public static float SRotSpeed = 60f;
+    public static float SBoxSize = 0.6f;
+    public static float SBrickDis = 0.4f;
+    public static float SJumpDownVertical = -0.5f;
     #endregion
 
 
@@ -40,5 +43,13 @@ public class GlobalHelper
         camPos.BottomBorderPos = middle - new Vector3(0f, area.y, 0f);
         return camPos;
     }
+
+
+    public static  Transform GetValues(RaycastHit hit)
+    {
+        return hit.transform;
+    }
+       
+
 
 }

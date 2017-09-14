@@ -28,9 +28,13 @@ namespace AttTypeDefine
 
     public enum ePlayerNormalBeha
     {
+        eNormalBehav_NULL,//
         eNormalBehav_Grounded,
         eNormalBehav_SmallJump,
         eNormalBehav_BigJump,
+        eNormalBehav_JumpDown,
+        eNormalBehav_Hide,
+
         //eNormalBehav_Move,
         //eNormalBehav_Idle,
     }
@@ -79,5 +83,26 @@ namespace AttTypeDefine
         CamMove_Down,
     }
 #endregion
-    
+
+    #region Camera
+    public enum eCamFourCorner
+    {
+        CamCorner_UpperLeft,
+        CamCorner_UpperRight,
+        CamCorner_DownLeft,
+        CamCorner_DownRight,
+        CamCorner_Size,
+    }
+
+    public enum eTargetFourCorner
+    {
+        TargetCorner_Left,
+        TargetCorner_Right,
+        TargetCorner_Up,
+        TargetCorner_Down,
+        TargetCorner_Size,
+    }
+
+    #endregion
+
 }

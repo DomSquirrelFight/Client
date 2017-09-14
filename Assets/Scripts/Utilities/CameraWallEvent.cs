@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 
-[RequireComponent(typeof(BoxCollider)), RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(BoxCollider))]
 public class CameraWallEvent : MonoBehaviour {
 
     void Reset()
     {
         BoxCollider bc = gameObject.GetComponent<BoxCollider>();
         bc.isTrigger = true;
-        Rigidbody rb = GetComponent<Rigidbody>();
-        rb.isKinematic = true;
     }
 
     public eCamMoveDir m_eCamMoveDir = eCamMoveDir.CamMove_Right;
+    public bool BIsTriggerOnce = false;
 
     void OnTriggerEnter(Collider other)
     {
@@ -29,21 +28,29 @@ public class CameraWallEvent : MonoBehaviour {
                 Debug.LogError("Fail to find CameraController");
                 return;
             }
+
             //设置新的运动方向
             cc.CamMoveDir = m_eCamMoveDir;
-            switch (m_eCamMoveDir)
-            {
-                case eCamMoveDir.CamMove_Left:
-                    {
-                        cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Right, cc.ZLineLength);
-                        break;
-                    }
-                case eCamMoveDir.CamMove_Right:
-                    {
-                        cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Left, cc.ZLineLength);
-                        break;
-                    }
-            }
+            //todo_erric
+            //switch (m_eCamMoveDir)
+            //{
+            //    case eCamMoveDir.CamMove_Left:
+            //        {
+            //            //cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Right, cc.ZLineLength);
+            //            cc.RefreshCamTargetBorderPoint();
+            //            break;
+            //        }
+            //    case eCamMoveDir.CamMove_Right:
+            //        {
+            //            cc.RefreshCamTargetBorderPoint();
+            //            break;
+            //        }
+            //}
+            cc.BRefreshCameraData = true;           //碰到转向墙
+
+            if (BIsTriggerOnce)
+                Destroy(gameObject);
+
         }
     }
 
