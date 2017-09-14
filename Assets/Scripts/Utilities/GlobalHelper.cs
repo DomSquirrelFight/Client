@@ -6,13 +6,14 @@ public class GlobalHelper
 {
 
     #region 常量表
-    public static float SMoveSpeed = 3f;
+    public static float SMoveSpeed = 4f;
+    public static float SUpSpeed = 5f;
+
     public static float SRotSpeed = 60f;
     public static float SBoxSize = 0.6f;
     public static float SBrickDis = 0.4f;
     public static float SJumpDownVertical = -0.5f;
     #endregion
-
 
     public static Vector2 GetCamArea(Vector3 middle)
     {
@@ -27,8 +28,6 @@ public class GlobalHelper
         return area;
 
     }
-
-    
 
     //确定相机的四个边界
     public static CamBorderPosition GetCamBorder(Vector3 middle)

@@ -357,7 +357,7 @@ public class CameraController : MonoBehaviour {
                     {
                         if (Owner.ActorTrans.transform.position.x > m_vMiddlePoint.x)
                         {
-                            transform.Translate(Vector3.right * 3f * Time.deltaTime, Space.World);
+                            transform.Translate(Vector3.right * GlobalHelper.SMoveSpeed * Time.deltaTime, Space.World);
                         }
                         break;
                     }
@@ -365,7 +365,7 @@ public class CameraController : MonoBehaviour {
                     {
                         if (Owner.ActorTrans.transform.position.x < m_vMiddlePoint.x)
                         {
-                            transform.Translate(Vector3.left * 3f * Time.deltaTime, Space.World);
+                            transform.Translate(Vector3.left * GlobalHelper.SMoveSpeed * Time.deltaTime, Space.World);
                         }
                         break;
                     }
@@ -373,7 +373,7 @@ public class CameraController : MonoBehaviour {
                     {
                         if (Owner.ActorTrans.transform.position.y > m_vMiddlePoint.y)
                         {
-                            transform.Translate(Vector3.up * 4f * Time.deltaTime, Space.World);
+                            transform.Translate(Vector3.up * GlobalHelper.SUpSpeed * Time.deltaTime, Space.World);
                         }
                         break;
                     }

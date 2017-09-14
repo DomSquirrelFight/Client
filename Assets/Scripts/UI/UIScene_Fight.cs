@@ -37,12 +37,13 @@ public class UIScene_Fight : MonoBehaviour {
 
     void PressJump(GameObject obj)
     {
-        //BA.SkillMgr.UseSkill(eSkillType.NormalAttack);
+        BA.PlayerMgr.CalJump();
+        
     }
 
     void PressPickUpBox(GameObject obj)
     {
-        //BA.SkillMgr.UseSkill(eSkillType.Skill1);
+        BA.PlayerMgr.CalPickUpBox();
     }
 
     //认为最多不会超过10个
@@ -94,6 +95,7 @@ public class UIScene_Fight : MonoBehaviour {
                 case TouchPhase.Moved:
                     {
                         if (!m_bCanJoy[i]) return;
+                        Debug.Log("TouchController :: TouchPhase.Moved");
                         TouchPos = cam.ScreenToWorldPoint(touch.position);
                         CalculateDir();
                         if (Vector3.Distance(TouchPos, m_oJoyBack.transform.position) >= m_fRadius)
@@ -110,17 +112,24 @@ public class UIScene_Fight : MonoBehaviour {
                     {
                         if (!m_bCanJoy[i]) return;
                         m_oJoyBack.SetActive(false);//关闭活性
+                        Debug.Log("TouchController :: TouchPhase.Ended");
+                        dirpos = Vector2.zero;
                         //bpressed = false;
                         break;
                     }
                 case TouchPhase.Canceled:
                     {
+                      
                         if (!m_bCanJoy[i]) return;
+                        Debug.Log("TouchController :: TouchPhase.Canceled");
+                        dirpos = Vector2.zero;
                         break;
                     }
                 case TouchPhase.Stationary:
                     {
                         if (!m_bCanJoy[i]) return;
+                        Debug.Log("TouchController :: TouchPhase.Stationary");
+                        //dirpos = Vector2.zero;
                         break;
                     }
             }
@@ -163,6 +172,7 @@ public class UIScene_Fight : MonoBehaviour {
             if (!bCanJoy) return;
             m_oJoyBack.SetActive(false);
             //bpressed = false;
+            dirpos = Vector2.zero;
         }
     }
 
