@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 using System.Linq;
+using Assets.Scripts.Helper;
 public class PlayerManager : MonoBehaviour
 {
 
@@ -19,11 +20,7 @@ public class PlayerManager : MonoBehaviour
         {
             if (value != PlayerNormalBehav)
             {
-                //if (PlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && value == ePlayerNormalBeha.eNormalBehav_JumpDown)
-                //{
-                //    Debug.Log(123);
-                //}
-                            PlayerNormalBehav = value;
+                PlayerNormalBehav = value;
             }
         }
     }
@@ -142,13 +139,16 @@ public class PlayerManager : MonoBehaviour
     float m_fInitSpeed = 0f;
 
     Vector2 m_vInputMove;                                                   //发送平移输入
-  
+
+    UIScene_Fight m_UISceneFight;
+
     #endregion
 
     #region 外部接口 / 系统接口
     public void OnStart(BaseActor owner)
     {
 
+      
         NpcMaskGlossy = LayerMask.NameToLayer("NPC");
         NpcMask = 1 << NpcMaskGlossy;
 
@@ -170,6 +170,8 @@ public class PlayerManager : MonoBehaviour
         HoldBoxMask = 1 << HoldBoxMaskGlossy;
 
         Owner = owner;
+        m_UISceneFight = Helpers.UIScene<UIScene_Fight>();
+        m_UISceneFight.OnStart(Owner);
         cc = Owner.CameraContrl;
         m_curJumpData = Owner.SmallJumpDataStore;
 
@@ -204,10 +206,6 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-
-        //角色自由下落
-        FreeFall();
-
         //执行小跳跃
         JumpBehaviour();
 
@@ -225,74 +223,59 @@ public class PlayerManager : MonoBehaviour
 
         CalMoveInput();
 
-        if (Application.platform == RuntimePlatform.WindowsEditor/*摇杆ui为空 || 摇杆不为空 && 摇杆没有输入*/)
+        if (Application.platform == RuntimePlatform.WindowsEditor)
         {
-            CalJumpInput();
-            CalJumpDown();
-            CalPickUpBox();
+            if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
+                CalJump();
+
+            if (Input.GetKeyDown(KeyCode.U)) 
+                CalPickUpBox();
         }
     }
 
     #endregion
 
     #region 检测输入
-
+    float he, ve;
     public void CalMoveInput()                                              //获取平移输入
     {
         if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
         {
-            //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
+            m_vInputMove = m_UISceneFight.DirPos; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
         }
         else
         {
-            //如果摇杆ui为空 or 摇杆ui不为空，但此时摇杆ui没有输入
-            m_vInputMove.x = Input.GetAxis("Horizontal");
-            m_vInputMove.y = Input.GetAxis("Vertical");
-            //否则 用摇杆数据
+            he = Input.GetAxis("Horizontal");
+            ve = Input.GetAxis("Vertical");
+            if (0f == he && 0f == ve && (m_UISceneFight))
+            {
+                m_vInputMove = m_UISceneFight.DirPos; //否则 用摇杆数据
+            }
+            else if (0f != he || 0f != ve)
+            {
+                m_vInputMove.x = he;
+                m_vInputMove.y = ve;
+            }
         }
 
-        //如果按了下，那么将无法横向位移
-        if (m_vInputMove.y < GlobalHelper.SJumpDownVertical)
+        if (m_vInputMove.y < GlobalHelper.SJumpDownVertical) //如果按了下，那么将无法横向位移
         {
             m_vInputMove.x = 0f;
         }
-
     }
 
-    public bool IsJump()
-    {
-        if (m_ePlayerNormalBehav > ePlayerNormalBeha.eNormalBehav_Grounded)
-            return true;
-        return false;
-    }
-
-    public bool CalJumpInput()                                              //获取跳跃输入
+    bool CalJumpUp()                                              //获取跳跃输入
     {
         if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && m_vInputMove.y > GlobalHelper.SJumpDownVertical)
         {
-            if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
-            {
                 DoBeforeJump(ePlayerNormalBeha.eNormalBehav_SmallJump, m_curJumpData.m_fJumpInitSpeed, false);
                 return true;
-            }
-
         }
         return false;
     }
 
-    bool RecJumpDownInput()
+    bool CalJumpDown()
     {
-        if (m_vInputMove.y <= GlobalHelper.SJumpDownVertical)
-        {
-            if (Input.GetKeyDown(KeyCode.J))
-                return true;
-        }
-        return false;
-    }
-    public bool CalJumpDown()
-    {
-        if (RecJumpDownInput())
-        {
 
             if (!CheckJumpDown())                   //检查下落的下方是否有盒子.
             {
@@ -315,8 +298,17 @@ public class PlayerManager : MonoBehaviour
                 Debug.Log("Can't jump down");
 #endif
             }
-        }
         return false;
+    }
+
+    public void CalJump()
+    {
+        if (m_vInputMove.y <= GlobalHelper.SJumpDownVertical)
+        {
+            CalJumpDown();
+        }
+        else
+            CalJumpUp();
     }
 
     RaycastHit m_HitInfo;
@@ -324,8 +316,7 @@ public class PlayerManager : MonoBehaviour
 
     public bool CalPickUpBox()
     {
-        if (Input.GetKeyDown(KeyCode.U))
-        {
+
             if (m_bIsHoldBox == false && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide && m_vInputMove.x != 0f && null == m_bcCurBox)
             {
 
@@ -362,7 +353,6 @@ public class PlayerManager : MonoBehaviour
                 m_bcCurBox = null;                  //这样接下来就可以在举箱子
                 return true;
             }
-        }
         return false;
     }
 
@@ -508,15 +498,6 @@ public class PlayerManager : MonoBehaviour
         return true;
     }
 
-
-    void FreeFall()
-    {
-        //if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && m_bIsDescent == false && Owner.RB.velocity.y < -0.1f && m_vInputMove.x != 0f && Owner.ActorTrans.position.y > 0.2f)
-        //{
-        //    DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, Owner.RB.velocity.y, true);
-        //}
-    }
-
     void JumpDownBehaviour()                                                                                      //处理角色下跳行为
     {
         if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)
@@ -550,7 +531,6 @@ public class PlayerManager : MonoBehaviour
                 return;
             else
             {
-
                 SetPlayerKinematic(); //设置玩家是否可以穿越障碍.
                 CalCharacterJump();
             }
@@ -573,7 +553,6 @@ public class PlayerManager : MonoBehaviour
             BCanJumpDown = false;
     }
     
-
     bool bUp = false;
     bool bUpForward = false;
     RaycastHit m_rayCheckJumpBrick;//用来检测开始上跳时，上方是否有brick
@@ -637,8 +616,6 @@ public class PlayerManager : MonoBehaviour
         lastTmpx = tmpx;
 
     }
-
-
 
     void DoBeforeJump(ePlayerNormalBeha type, float InitSpeed, bool isDescent)                   //jump前的数据准备
     {
