@@ -181,8 +181,10 @@ public class PlayerManager : MonoBehaviour
         if (Application.platform == RuntimePlatform.WindowsEditor)
         {
             if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
-                CalJump();
-
+                CalJumpUp();
+            else if (Input.GetKeyDown(KeyCode.J))
+                CalJumpDown();
+            
             if (Input.GetKeyDown(KeyCode.U))
                 CalPickUpBox();
         }
@@ -259,27 +261,21 @@ public class PlayerManager : MonoBehaviour
         else
         {
             he = Input.GetAxis("Horizontal");
-            ve = Input.GetAxis("Vertical");
-            if (0f == he && 0f == ve && (m_UISceneFight))
+            //ve = Input.GetAxis("Vertical");
+            if (0f == he && (m_UISceneFight))
             {
                 m_vInputMove = m_UISceneFight.DirPos; //否则 用摇杆数据
             }
-            else if (0f != he || 0f != ve)
+            else if (0f != he)
             {
                 m_vInputMove.x = he;
-                m_vInputMove.y = ve;
             }
-        }
-
-        if (m_vInputMove.y < GlobalHelper.SJumpDownVertical) //如果按了下，那么将无法横向位移
-        {
-            m_vInputMove.x = 0f;
         }
     }
 
-    bool CalJumpUp()                                              //获取跳跃输入
+    public bool CalJumpUp()                                              //获取跳跃输入
     {
-        if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && m_vInputMove.y > GlobalHelper.SJumpDownVertical)
+        if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded )
         {
                 DoBeforeJump(ePlayerNormalBeha.eNormalBehav_SmallJump, m_curJumpData.m_fJumpInitSpeed, false);
                 return true;
@@ -287,7 +283,7 @@ public class PlayerManager : MonoBehaviour
         return false;
     }
 
-    bool CalJumpDown()
+    public bool CalJumpDown()
     {
 
             if (!CheckJumpDown())                   //检查下落的下方是否有盒子.
@@ -313,17 +309,6 @@ public class PlayerManager : MonoBehaviour
             }
         return false;
     }
-
-    public void CalJump()
-    {
-        if (m_vInputMove.y <= GlobalHelper.SJumpDownVertical)
-        {
-            CalJumpDown();
-        }
-        else
-            CalJumpUp();
-    }
-
     Vector3 pos;
 
     public bool CalPickUpBox()
@@ -456,20 +441,20 @@ public class PlayerManager : MonoBehaviour
 
             if (m_bIsBlocked)
                 return true;
-            if(m_vInputMove.x == 0f)
-            {
-                return true;
-            }
-            else if (m_vInputMove.x > 0f)
-            {
-                tmpx = 1f;
-            }
-            else  if (Owner.ActorTrans.forward.x < 0f)
-                tmpx = -1;
-            if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down + Vector3.right * tmpx, out hitInfo, Quaternion.LookRotation((new Vector3(tmpx * -1, -1, 0)).normalized), m_fBiasDisForBrick, BoxMask))
-            {
-                return false;
-            }
+            //if(m_vInputMove.x == 0f)
+            //{
+            //    return true;
+            //}
+            //else if (m_vInputMove.x > 0f)
+            //{
+            //    tmpx = 1f;
+            //}
+            //else  if (Owner.ActorTrans.forward.x < 0f)
+            //    tmpx = -1;
+            //if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down + Vector3.right * tmpx, out hitInfo, Quaternion.LookRotation((new Vector3(tmpx * -1, -1, 0)).normalized), m_fBiasDisForBrick, BoxMask))
+            //{
+            //    return false;
+            //}
         }
 
         return true;

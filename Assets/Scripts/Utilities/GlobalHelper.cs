@@ -12,7 +12,6 @@ public class GlobalHelper
     public static float SRotSpeed = 60f;
     public static float SBoxSize = 0.6f;
     public static float SBrickDis = 0.4f;
-    public static float SJumpDownVertical = -0.5f;
     #endregion
 
     public static Vector2 GetCamArea(Vector3 middle)

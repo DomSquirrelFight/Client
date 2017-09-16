@@ -14,20 +14,22 @@ public class UIScene_Fight : MonoBehaviour
     public GameObject m_oJump;                                                                                     //跳跃
     public GameObject m_oPickUpBox;                                                                             //捡箱子
     Camera cam;
-    bool m_bPressedJump = false;
+    bool m_bPressedJumpUp = false;                                                                                //判定是否按下了上跳
+    bool m_bPressedJumpDown = false;                                                                           //判定是否按下了下跳
+
     public void OnStart(BaseActor _owner)
     {
         ba = _owner;
     }
     void Awake()
     {
-        UIEventListener.Get(m_oJump).onPress = PressJump;
+        UIEventListener.Get(m_oJump).onPress = PressJumpUp;
         UIEventListener.Get(m_oPickUpBox).onClick = PressPickUpBox;
     }
 
-    void PressJump(GameObject obj, bool pressed)
+    void PressJumpUp(GameObject obj, bool pressed)
     {
-        m_bPressedJump = pressed;
+        m_bPressedJumpUp = pressed;
     }
 
     void PressPickUpBox(GameObject obj)
@@ -49,8 +51,8 @@ public class UIScene_Fight : MonoBehaviour
 
     void Update()
     {
-        if(m_bPressedJump)
-            ba.PlayerMgr.CalJump();
+        if (m_bPressedJumpUp)
+            ba.PlayerMgr.CalJumpUp();
 
 #if UNITY_EDITOR
         MouseController();
