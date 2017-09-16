@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 namespace AttTypeDefine
 {
+
     #region UI
 
     public enum LoadingState
@@ -35,12 +36,6 @@ namespace AttTypeDefine
     #endregion
 
     #region Character Behaviour
-    public enum ePlayerBehaviour
-    {
-        eBehav_Normal,//平移，待机，小跳跃，大跳跃，仍箱子，捡箱子
-        eBehav_Hide,//隐藏
-        eBehav_JumpDown,//往下跳
-    }
 
     public enum ePlayerNormalBeha
     {
@@ -55,6 +50,12 @@ namespace AttTypeDefine
         //eNormalBehav_Idle,
     }
 
+    public enum ePlayerJumpDownState
+    {
+        CanJumpDown_NULL,
+        CanJumpDown_YES,
+        CanJumpDown_NO,
+    }
 
     public enum eRoleID
     {
@@ -70,25 +71,6 @@ namespace AttTypeDefine
         public Vector3 TopBorderPos;
         public Vector3 BottomBorderPos;
     }
-    public enum ePlayerState
-    {
-        PlayerState_Idle,//待机
-        PlayerState_Run,//奔跑
-        PlayerState_SmallJump,//小跳
-        PlayerState_BigJump,//大跳  
-    }
-
-    public enum eCameEventType
-    {
-        CamEvent_ChangeDir,//改变运动方向
-    }
-    
-    public enum eCameraBorderSide
-    {
-        CameraSide_Left,
-        CameraSide_Right,
-    }
-
 
     public enum eCamMoveDir
     {
@@ -119,6 +101,9 @@ namespace AttTypeDefine
         TargetCorner_Size,
     }
 
+    #endregion
+
+    #region Delegate    
     #endregion
 
 }

@@ -99,25 +99,36 @@ public class PlayerManager : MonoBehaviour
             return fOrigHeight;
         }
     }
-
-    bool m_bCanJumpDown = false;
-    bool BCanJumpDown
+    ePlayerJumpDownState bCanJumpDown = ePlayerJumpDownState.CanJumpDown_NULL;
+    ePlayerJumpDownState BCanJumpDown
     {
         get
         {
-            return m_bCanJumpDown;
+            return bCanJumpDown;
         }
         set
         {
-            if (value != m_bCanJumpDown)
-                m_bCanJumpDown = value;
+            if (value != bCanJumpDown)
+            {
+                if (value == ePlayerJumpDownState.CanJumpDown_YES && (bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NULL || bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NO))                     //ui fight 下跳按钮点亮
+                {
+                    m_UISceneFight.BDisableJumpDown = false;
+                }
+                else if (value == ePlayerJumpDownState.CanJumpDown_NO && (bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NULL || bCanJumpDown == ePlayerJumpDownState.CanJumpDown_YES))               // ui fight 下跳按钮变灰
+                {
+                    m_UISceneFight.BDisableJumpDown = true;
+                }
+
+                bCanJumpDown = value;
+
+            }
         }
     }                                                                                                                                              //是否可以下跳
 
     float fOrigHeight = 0f;                                                                                                         //开始跳跃或者下降前的高度
 
     
-    bool m_bIsDescent = false;                                                                                                  //判断是否在下降
+    bool m_bIsDescent = true;                                                                                                  //判断是否在下降
     
     float m_fStartTime = 0f;                                                                                                      //跳跃开始前的计时变量
 
@@ -125,9 +136,11 @@ public class PlayerManager : MonoBehaviour
 
     float m_fInitSpeed = 0f;
 
-    Vector2 m_vInputMove;                                                   //发送平移输入
+    Vector2 m_vInputMove;                                                                                                     //发送平移输入
 
     UIScene_Fight m_UISceneFight;
+
+   // public NotifyState m_delNotifyState;                                                                                  //通知ui fight现在按钮的状态
 
     #endregion
 
@@ -207,6 +220,9 @@ public class PlayerManager : MonoBehaviour
 
         //执行小跳跃
         JumpBehaviour();
+
+        //自由下落
+        FreeFall();
 
         //执行下跳操作
         JumpDownBehaviour();
@@ -289,9 +305,9 @@ public class PlayerManager : MonoBehaviour
             if (!CheckJumpDown())                   //检查下落的下方是否有盒子.
             {
                 return false;
-            }
-
-            if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && BCanJumpDown == true)
+            }   
+            
+            if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && BCanJumpDown == ePlayerJumpDownState.CanJumpDown_YES)
             {
 #if UNITY_EDITOR
                 Debug.Log("Can jump down");
@@ -518,9 +534,9 @@ public class PlayerManager : MonoBehaviour
         Owner.Velocity = Vector3.zero;
         m_bIsDescent = false;
         if (other.gameObject.layer == BrickMaskGlossy)
-            BCanJumpDown = true;
+            BCanJumpDown = ePlayerJumpDownState.CanJumpDown_YES;
         else if (other.gameObject.layer == MaskGlossy || other.gameObject.layer == BoxMaskGlossy)
-            BCanJumpDown = false;
+            BCanJumpDown = ePlayerJumpDownState.CanJumpDown_NO;
     }
     
     bool bUp = false;
@@ -613,14 +629,25 @@ public class PlayerManager : MonoBehaviour
 
     }
 
+    void FreeFall()
+    {
+        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && Owner.Velocity.y < -0.2f)
+        {
+            DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, -1f, true);
+        }
+    }
     void DoBeforeJump(ePlayerNormalBeha type, float InitSpeed, bool isDescent)                   //jump前的数据准备
     {
         m_tDescent = null;
-        Owner.Velocity = new Vector3(0f, InitSpeed, 0f);
+        if (type == ePlayerNormalBeha.eNormalBehav_SmallJump)
+        {
+            m_fStartTime = Time.time;
+            Owner.Velocity = new Vector3(0f, InitSpeed, 0f);
+        }
         m_ePlayerNormalBehav = type;
         fOrigHeight  = Owner.ActorTrans.transform.position.y;
         m_bIsDescent = isDescent;
-        m_fStartTime = Time.time;
+       
     }
 
     float tmpx = 1f;
