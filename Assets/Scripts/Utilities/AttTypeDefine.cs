@@ -37,6 +37,30 @@ namespace AttTypeDefine
 
     #region Character Behaviour
 
+    public enum eCharacType
+    {
+        Type_Major,
+        Type_NormalNpc,
+        Type_Boss,
+    }
+
+    public enum eCharacSide
+    {
+        Side_Player,
+        Side_Enemy,
+        Side_Neutral,
+    }
+
+    public enum eMonsterType
+    {
+        MonType_Null = -1,
+        MonType_Rock,
+        MonType_FlyBat,
+        MonType_Pig,
+        MonType_FakeBox,
+        MonType_Size,
+    }
+
     public enum ePlayerNormalBeha
     {
         eNormalBehav_NULL,//

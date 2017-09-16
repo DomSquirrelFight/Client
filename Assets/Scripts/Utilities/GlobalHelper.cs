@@ -61,5 +61,10 @@ public class GlobalHelper
     }
     #endregion
 
+    //获取父亲层对象，判定是否是角色
+    public static BaseActor GetBaseActorOnChild(Transform t)
+    {
+        return null;
+    }
 
 }

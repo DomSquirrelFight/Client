@@ -44,12 +44,26 @@ public class BaseActor : MonoBehaviour
     }
     #endregion
 
+    #region 角色属性
+    private BaseAttr baseattr;
+    public BaseAttr BaseAtt
+    {
+        get
+        {
+            return baseattr;
+        }
+    }
+
+    #endregion
+
     #region 加载角色
     /// <summary>
     /// 创建角色，并将角色实例返回
     /// </summary>
     /// <returns></returns>
-    static public BaseActor CreatePlayer(string name/*角色名称*/, eRoleID roldid/*角色ID*/, Vector3 pos = default(Vector3)/*模型出生位置*/, Quaternion rot = default(Quaternion)/*模型出生朝向*/, bool bCanJump = true)
+    static public BaseActor CreatePlayer(string name/*角色名称*/, eRoleID roldid/*角色ID*/, Vector3 pos = default(Vector3)/*模型出生位置*/, Quaternion rot = default(Quaternion)/*模型出生朝向*/, bool bCanJump = true,
+        eCharacSide side = eCharacSide.Side_Player, eCharacType type = eCharacType.Type_Major
+        )
     {
 
         #region 创建外层对象
@@ -58,13 +72,14 @@ public class BaseActor : MonoBehaviour
         Player.transform.rotation = Quaternion.identity;
         Player.transform.localScale = Vector3.one;
         #endregion
-        
-        
+
+        #region 创建模型
         BaseActor ba = Player.AddComponent<BaseActor>();//加载BaseActor脚本
 
         CreateActor(roldid, ba, pos, rot);//加载模型
+        #endregion
 
-        //获取跳跃数据
+        #region 获取跳跃数据
         if (bCanJump)
         {
             //获取小跳数据
@@ -73,23 +88,42 @@ public class BaseActor : MonoBehaviour
             ba.m_cSmallJumpDataStore = obj.GetComponent<JumpDataStore>();
             ba.m_cSmallJumpDataStore.transform.parent = ba.transform;//设置小跳的父类
         }
-     
-        if (
-            null != ba.PlayerMgr/*读取角色管理器*/ ||
-            null != ba.CameraContrl/*相机实例对象*/ ||
-            null != ba.RB/*加载刚体*/ 
-            //null != ba.PlayerInputMgr
-            ) {
-            ba.PlayerMgr.OnStart(ba);//启动角色管理器
-            ba.CameraContrl.OnStart(ba);//启动相机
-            //ba.PlayerInputMgr.OnStart(ba);//启动角色输入管理器
-            //ba.RB.isKinematic = true;
+        #endregion
+
+        #region 角色属性
+        switch (type)
+        {
+            case eCharacType.Type_Major:
+                {
+                    if (
+                      null != ba.PlayerMgr/*读取角色管理器*/ ||
+                      null != ba.CameraContrl/*相机实例对象*/ ||
+                      null != ba.RB/*加载刚体*/
+                      )
+                    {
+                        ba.PlayerMgr.OnStart(ba);//启动角色管理器
+                        ba.CameraContrl.OnStart(ba);//启动相机
+                    }
+                    ba.baseattr = (BaseAttr)ba.gameObject.GetOrAddComponent<PlayerAttr>();
+                    break;
+                }
+            case eCharacType.Type_NormalNpc:
+            case eCharacType.Type_Boss:
+                {
+                    if (
+                     null != ba.PlayerMgr/*读取角色管理器*/ ||
+                     null != ba.RB/*加载刚体*/
+                     )
+                    {
+                        ba.PlayerMgr.OnStart(ba);//启动角色管理器
+                    }
+                    ba.baseattr = (BaseAttr)ba.gameObject.GetOrAddComponent<NpcAttr>();
+                    break;
+                }
         }
-        
-        //初始化角色身体数据
-        double radius = Mathf.Sqrt(ba.ActorHeight * ba.ActorHeight * 0.5f);
-        double tmp =  Math.Round(radius, 1);
-        ba.m_fSphereCastRadius = (float)tmp - 0.1f;
+        ba.BaseAtt.InitAttr(side, type);
+        #endregion
+
         return ba;
     }
 
@@ -226,23 +260,9 @@ public class BaseActor : MonoBehaviour
         }
     }
 
-    //根据角色的身体大小，来计算角色的运动球体半径
-    private float m_fSphereCastRadius;
-    public float SphereCastRadius
-    {
-        get
-        {
-            return m_fSphereCastRadius;
-        }
-    }
 
-    public float SphereCastRayLength
-    {
-        get
-        {
-            return SphereCastRadius + 0.1f;
-        }
-    }
+
+
 
 
     #endregion
@@ -261,20 +281,5 @@ public class BaseActor : MonoBehaviour
     #region 玩家状态
 
     #endregion
-
-    //#region 角色控制管理器
-    //private PlayerInputManager playerinputmgr;
-    //public PlayerInputManager PlayerInputMgr
-    //{
-    //    get
-    //    {
-    //        if(null == playerinputmgr)
-    //            playerinputmgr = Actor.GetOrAddComponent<PlayerInputManager>();
-    //        return playerinputmgr;
-    //    }
-    //}
-    //#endregion
-
-
 
 }
