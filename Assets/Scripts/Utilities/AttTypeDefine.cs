@@ -37,6 +37,14 @@ namespace AttTypeDefine
 
     #region Character Behaviour
 
+    public enum eRockBehaviour
+    {
+        Rock_Fire,//沿指定路径发射
+        Rock_Track,//追踪
+        Rock_TriggerAround,//在出生地四周发射
+        Rock_Popup,//弹射
+    }
+
     public enum eCharacType
     {
         Type_Major,
