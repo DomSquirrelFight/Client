@@ -17,6 +17,20 @@ public class BaseActor : MonoBehaviour
             return rb;
         }
     }
+
+    public Vector3 Velocity
+    {
+        get
+        {
+            return RB.velocity;
+        }
+        set
+        {
+            if (value != RB.velocity)
+                RB.velocity = value;
+        }
+    }
+
     #endregion
 
     #region 模型实例
