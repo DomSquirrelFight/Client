@@ -118,7 +118,7 @@ public class UIScene_Loading : UIScene {
         //异步加载新的场景
         if(type==SceneType.FightLoading)
         {
-            asyn =GlobalHelper.LoadLevelAsync("FightTest");
+            asyn =GlobalHelper.LoadLevelAsync("Fight");
            // type = SceneType.Null;
         }
         if(type==SceneType.SelecteLoading)
