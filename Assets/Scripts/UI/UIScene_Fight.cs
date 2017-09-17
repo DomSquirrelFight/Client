@@ -6,45 +6,75 @@ public class UIScene_Fight : MonoBehaviour
 {
 
     BaseActor ba;
-    BaseActor BA
-    {
-        get
-        {
-            if (null == ba)
-            {
-                //ba = GlobalHelper.g_GlobalLevel.Major;
-            }
-            return ba;
-        }
-    }
     //摇杆处理
     public GameObject m_oJoyBack;                                                                                  //摇杆背景对象
     public GameObject m_oJoyFront;                                                                                 //摇杆方向对象
     private Vector3 m_vJoyBackOrigPos;                                                                            //摇杆原始位置
-    public float m_fRadius = 0.2f;                                                                                      //摇杆移动半径
-    public GameObject m_oJump;                                                                                     //跳跃
+    public float m_fRadius = 0.1f;                                                                                      //摇杆移动半径
+    public GameObject m_oJumpUp;                                                                                     //上跳
+    public GameObject m_oJumpDown;
     public GameObject m_oPickUpBox;                                                                             //捡箱子
     Camera cam;
+    bool m_bPressedJumpUp = false;                                                                                //判定是否按下了上跳
+    bool m_bPressedJumpDown = false;                                                                           //判定是否按下了下跳
+    
+    public UIButtonColor JumpDownBtnColor;
+    public BoxCollider JumpDownBC;
+
+    private bool bdisablejumpdown = false;
+    public bool BDisableJumpDown
+    {
+        get
+        {
+            return bdisablejumpdown;
+        }
+        set
+        {
+
+            if(value == true)
+            {
+                JumpDownBtnColor.SetState(UIButtonColor.State.Disabled, true);
+            }
+            else
+            {
+                JumpDownBtnColor.SetState(UIButtonColor.State.Normal, true);
+            }
+            JumpDownBC.enabled = value;
+
+            if (value != bdisablejumpdown)
+            {
+                bdisablejumpdown = value;
+            }
+               
+        }
+    }
 
     public void OnStart(BaseActor _owner)
     {
         ba = _owner;
+       
     }
     void Awake()
     {
-        UIEventListener.Get(m_oJump).onClick = PressJump;
+        UIEventListener.Get(m_oJumpUp).onPress = PressJumpUp;
         UIEventListener.Get(m_oPickUpBox).onClick = PressPickUpBox;
+        UIEventListener.Get(m_oJumpDown).onPress = PressJumpDown;
     }
 
-    void PressJump(GameObject obj)
+    void PressJumpUp(GameObject obj, bool pressed)
     {
-        BA.PlayerMgr.CalJump();
+        m_bPressedJumpUp = pressed;
+    }
 
+    void PressJumpDown(GameObject obj, bool pressed)
+    {
+        if (!BDisableJumpDown)
+                m_bPressedJumpDown = pressed;
     }
 
     void PressPickUpBox(GameObject obj)
     {
-        BA.PlayerMgr.CalPickUpBox();
+        ba.PlayerMgr.CalPickUpBox();
     }
 
     //认为最多不会超过10个
@@ -61,6 +91,11 @@ public class UIScene_Fight : MonoBehaviour
 
     void Update()
     {
+        if (m_bPressedJumpUp)
+            ba.PlayerMgr.CalJumpUp();       //上跳
+        else if (m_bPressedJumpDown)
+            ba.PlayerMgr.CalJumpDown();  // 下跳
+
 #if UNITY_EDITOR
         MouseController();
 #else
@@ -191,6 +226,13 @@ public class UIScene_Fight : MonoBehaviour
     {
         get
         {
+            float x = dirpos.x;
+            if (x < 0f)
+                dirpos.x = -1f;
+            else if (x > 0)
+                dirpos.x = 1f;
+            else
+                dirpos.x = 0f;
             return dirpos;
         }
     }

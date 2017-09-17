@@ -99,56 +99,54 @@ public class PlayerManager : MonoBehaviour
             return fOrigHeight;
         }
     }
-
-    bool m_bCanJumpDown = false;
-    bool BCanJumpDown
+    ePlayerJumpDownState bCanJumpDown = ePlayerJumpDownState.CanJumpDown_NULL;
+    ePlayerJumpDownState BCanJumpDown
     {
         get
         {
-            return m_bCanJumpDown;
+            return bCanJumpDown;
         }
         set
         {
-            if (value != m_bCanJumpDown)
-                m_bCanJumpDown = value;
+            if (value != bCanJumpDown)
+            {
+                if (value == ePlayerJumpDownState.CanJumpDown_YES && (bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NULL || bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NO))                     //ui fight 下跳按钮点亮
+                {
+                    m_UISceneFight.BDisableJumpDown = false;
+                }
+                else if (value == ePlayerJumpDownState.CanJumpDown_NO && (bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NULL || bCanJumpDown == ePlayerJumpDownState.CanJumpDown_YES))               // ui fight 下跳按钮变灰
+                {
+                    m_UISceneFight.BDisableJumpDown = true;
+                }
+
+                bCanJumpDown = value;
+
+            }
         }
     }                                                                                                                                              //是否可以下跳
 
     float fOrigHeight = 0f;                                                                                                         //开始跳跃或者下降前的高度
 
-    float m_curHeight = 0f;                                                                                                       //保存角色当前高度
-
-    bool m_bIsDescent = false;                                                                                                  //判断是否在下降
     
-    float curspeed = 0f;
-    float m_fCurSpeed                                                                                                     //获取当前的速度
-    {
-        get {
-            return curspeed;
-        }
-        set
-        {
-            if (value != curspeed)
-                curspeed = value;
-        }
-    }
+    bool m_bIsDescent = true;                                                                                                  //判断是否在下降
+    
     float m_fStartTime = 0f;                                                                                                      //跳跃开始前的计时变量
 
     float m_fDuration = 0;                                                                                                        //保存跳跃的时长
 
     float m_fInitSpeed = 0f;
 
-    Vector2 m_vInputMove;                                                   //发送平移输入
+    Vector2 m_vInputMove;                                                                                                     //发送平移输入
 
     UIScene_Fight m_UISceneFight;
+
+   // public NotifyState m_delNotifyState;                                                                                  //通知ui fight现在按钮的状态
 
     #endregion
 
     #region 外部接口 / 系统接口
     public void OnStart(BaseActor owner)
     {
-
-      
         NpcMaskGlossy = LayerMask.NameToLayer("NPC");
         NpcMask = 1 << NpcMaskGlossy;
 
@@ -182,13 +180,28 @@ public class PlayerManager : MonoBehaviour
         float dis = Mathf.Sqrt(tmp * tmp * 2);
         //float halfDiagonal = Mathf.Sqrt(Owner.ActorHeight * Owner.ActorHeight * 2) * 0.5f;
         m_fBiasDisForBrick = dis;// -halfDiagonal + 0.1f;
-
+        //CalculateSlideDis();
     }
 
-    void FixedUpdate()
+
+    void Update()
     {
         if (!Owner)
             return;
+
+        CalMoveInput();
+
+        if (Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
+                CalJumpUp();
+            else if (Input.GetKeyDown(KeyCode.J))
+                CalJumpDown();
+            
+            if (Input.GetKeyDown(KeyCode.U))
+                CalPickUpBox();
+        }
+
         //执行旋转操作
         RotatePlayer();
         //播放位移动画
@@ -202,36 +215,54 @@ public class PlayerManager : MonoBehaviour
                     //执行move操作
                     TranslatePlayer();
                 }
-
             }
         }
 
         //执行小跳跃
         JumpBehaviour();
 
+        //自由下落
+        FreeFall();
+
         //执行下跳操作
         JumpDownBehaviour();
 
         //复位数据
         ResetAllData();
+
     }
+
+    //void FixedUpdate()
+    //{
+    //    if (!Owner)
+    //        return;
+
+    //    //执行旋转操作
+    //    RotatePlayer();
+    //    //播放位移动画
+    //    PlayMoveAnim();
+    //    if (0f != m_vInputMove.x)
+    //    {
+    //        if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
+    //        {
+    //            if (!RayCastBlock())//横向阻挡
+    //            {
+    //                //执行move操作
+    //                TranslatePlayer();
+    //            }
+    //        }
+    //    }
+
+    //    //执行小跳跃
+    //    JumpBehaviour();
+
+    //    //执行下跳操作
+    //    JumpDownBehaviour();
+
+    //    //复位数据
+    //    ResetAllData();
+    //}
   
-    void LateUpdate()
-    {
-        if (!Owner)
-            return;
-
-        CalMoveInput();
-
-        if (Application.platform == RuntimePlatform.WindowsEditor)
-        {
-            if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
-                CalJump();
-
-            if (Input.GetKeyDown(KeyCode.U)) 
-                CalPickUpBox();
-        }
-    }
 
     #endregion
 
@@ -246,27 +277,21 @@ public class PlayerManager : MonoBehaviour
         else
         {
             he = Input.GetAxis("Horizontal");
-            ve = Input.GetAxis("Vertical");
-            if (0f == he && 0f == ve && (m_UISceneFight))
+            //ve = Input.GetAxis("Vertical");
+            if (0f == he && (m_UISceneFight))
             {
                 m_vInputMove = m_UISceneFight.DirPos; //否则 用摇杆数据
             }
-            else if (0f != he || 0f != ve)
+            else if (0f != he)
             {
                 m_vInputMove.x = he;
-                m_vInputMove.y = ve;
             }
-        }
-
-        if (m_vInputMove.y < GlobalHelper.SJumpDownVertical) //如果按了下，那么将无法横向位移
-        {
-            m_vInputMove.x = 0f;
         }
     }
 
-    bool CalJumpUp()                                              //获取跳跃输入
+    public bool CalJumpUp()                                              //获取跳跃输入
     {
-        if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && m_vInputMove.y > GlobalHelper.SJumpDownVertical)
+        if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded )
         {
                 DoBeforeJump(ePlayerNormalBeha.eNormalBehav_SmallJump, m_curJumpData.m_fJumpInitSpeed, false);
                 return true;
@@ -274,21 +299,21 @@ public class PlayerManager : MonoBehaviour
         return false;
     }
 
-    bool CalJumpDown()
+    public bool CalJumpDown()
     {
 
             if (!CheckJumpDown())                   //检查下落的下方是否有盒子.
             {
                 return false;
-            }
-
-            if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && BCanJumpDown == true)
+            }   
+            
+            if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && BCanJumpDown == ePlayerJumpDownState.CanJumpDown_YES)
             {
 #if UNITY_EDITOR
                 Debug.Log("Can jump down");
 #endif
     
-                Owner.RB.isKinematic = true;
+                JumpThroughState = true;
                 DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, 0f, true);
                 return true;
             }
@@ -300,18 +325,6 @@ public class PlayerManager : MonoBehaviour
             }
         return false;
     }
-
-    public void CalJump()
-    {
-        if (m_vInputMove.y <= GlobalHelper.SJumpDownVertical)
-        {
-            CalJumpDown();
-        }
-        else
-            CalJumpUp();
-    }
-
-    RaycastHit m_HitInfo;
     Vector3 pos;
 
     public bool CalPickUpBox()
@@ -324,7 +337,7 @@ public class PlayerManager : MonoBehaviour
                 pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
 
                 //拿到所有的盒子，然后判定盒子位置最低的
-                RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3 (0.1f, Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.5f), Owner.ActorTrans.forward, Quaternion.Euler (Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BoxMask);
+                RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3 (0.1f, Owner.ActorHeight * 0.4f, Owner.ActorHeight * 0.5f), Owner.ActorTrans.forward, Quaternion.Euler (Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BoxMask);
                 if (hits.Length > 0)
                 {
                     if (hits.Length > 1)
@@ -392,39 +405,6 @@ public class PlayerManager : MonoBehaviour
             OnCollisionEnter(other);
     }
 
-
-    //void OnCollisionStay(Collision other)
-    //{
-
-    //    if (other.contacts.Length > 0)
-    //    {
-    //        if (other.contacts[0].thisCollider.gameObject.layer == NpcMaskGlossy)                                    //角色碰到了ground, brick or box
-    //        {
-               
-    //            if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy)                              //如果判定碰到的是box
-    //            {
-    //                OperateGround(other, BoxMask);
-    //            }
-    //            else if (other.contacts[0].otherCollider.gameObject.layer == BrickMaskGlossy)                                           //如果判定接触到的是brick
-    //            {
-    //                OperateGround(other, BrickMask);
-    //            }
-    //            //else if (other.contacts[0].otherCollider.gameObject.layer == MaskGlossy)
-    //            //{
-    //            //    if (m_bIsDescent)
-    //            //    {
-    //            //        //if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)
-    //            //        //{
-    //            //        //    Debug.Log("Jump down grounded");
-    //            //        //}
-                            
-    //            //        SetJumpDownState(other);
-    //            //    }
-    //            //}
-    //        }
-    //    }
-    //}
-
     void OperateGround(Collision other, int layer)                                //处理落地逻辑
     {
         float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;//ActorHeight = 0.6f;
@@ -452,8 +432,7 @@ public class PlayerManager : MonoBehaviour
                 if(layer == mask)
                     Debug.Log(1);
 #endif
-                Owner.RB.velocity = Vector3.zero;
-                m_fCurSpeed = 0f;
+                Owner.Velocity= Vector3.zero;
             }
 
         }
@@ -462,37 +441,36 @@ public class PlayerManager : MonoBehaviour
     #endregion
  
     #region Jump
-
+    Transform m_tDescent;
     bool CheckJumpDown()                                                 //解决在下跳的时候，下一层有很多的盒子，导致角色不能完全跳下去，而卡在两个层中间
     {
 
         //检测到了下面有box
-        if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.4f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down, out m_rayCheckJumpBrick, Quaternion.identity
+        if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.4f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down, out hitInfo, Quaternion.identity
             , m_curJumpData.m_fJumpHeight - GlobalHelper.SBoxSize + 0.1f, BoxMask))
         {
             return false;
         }
         else
         {
-
             RayCastBlock();
 
             if (m_bIsBlocked)
                 return true;
-            if(m_vInputMove.x == 0f)
-            {
-                return true;
-            }
-            else if (m_vInputMove.x > 0f)
-            {
-                tmpx = 1f;
-            }
-            else  if (Owner.ActorTrans.forward.x < 0f)
-                tmpx = -1;
-            if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down + Vector3.right * tmpx, out m_rayCheckJumpBrick, Quaternion.LookRotation((new Vector3(tmpx * -1, -1, 0)).normalized), m_fBiasDisForBrick, BoxMask))
-            {
-                return false;
-            }
+            //if(m_vInputMove.x == 0f)
+            //{
+            //    return true;
+            //}
+            //else if (m_vInputMove.x > 0f)
+            //{
+            //    tmpx = 1f;
+            //}
+            //else  if (Owner.ActorTrans.forward.x < 0f)
+            //    tmpx = -1;
+            //if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down + Vector3.right * tmpx, out hitInfo, Quaternion.LookRotation((new Vector3(tmpx * -1, -1, 0)).normalized), m_fBiasDisForBrick, BoxMask))
+            //{
+            //    return false;
+            //}
         }
 
         return true;
@@ -502,15 +480,11 @@ public class PlayerManager : MonoBehaviour
     {
         if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_JumpDown)
         {
-            //if (fOrigHeight - m_curHeight >= Owner.BC.size.y && m_bIsDescent == true)
-            //todo_erric
-            if (fOrigHeight - m_curHeight >= Owner.ActorHeight && m_bIsDescent == true && Owner.RB.isKinematic == true)
+            if (fOrigHeight - Owner.ActorTrans.position.y >= Owner.ActorHeight && m_bIsDescent == true && JumpThroughState == true)
             {
-                Owner.RB.isKinematic = false;
-                Owner.RB.velocity = new Vector3(0f, m_fCurSpeed, 0f);
+                JumpThroughState = false;
                 return;
             }
-            CalCharacterJump();
         }
     }
 
@@ -518,22 +492,35 @@ public class PlayerManager : MonoBehaviour
     {
         if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_SmallJump)
         {
-            if (m_fCurSpeed <= 0f && m_bIsDescent == false)
+            //if (m_fCurSpeed <= 0f && m_bIsDescent == false)
+            if (Owner.Velocity.y <= 0f && m_bIsDescent == false)
             {
                 m_bIsDescent = true;
-                Owner.RB.isKinematic = false;
-                Owner.RB.velocity = new Vector3(0f, -1f, 0f);//将物体速度归0。
-                //Debug.Log("Jump to the top already");
-                return;
+                JumpThroughState = false;
             }
-            //如果在下降，则直接返回
-            if (m_bIsDescent)
-                return;
-            else
+            //如果在下降，需要判断玩家是否在空中会撞到brick。如果撞到，那么需要将他变成运动学刚体
+            if (m_bIsDescent && JumpThroughState == false)
             {
-                SetPlayerKinematic(); //设置玩家是否可以穿越障碍.
-                CalCharacterJump();
+                if (Physics.BoxCast(Owner.ActorTrans.position + Owner.BC.center, new Vector3(Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.5f, 0.1f),
+                                      Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BrickMask)) {
+                                              m_tDescent = hitInfo.transform;
+                                              JumpThroughState = true;
+                }
             }
+            else if (m_bIsDescent && JumpThroughState == true && null != m_tDescent)
+            {
+                if (m_tDescent.position.y - Owner.ActorTrans.position.y >= Owner.ActorHeight)
+                 {
+                    JumpThroughState = false;
+                 }
+            }
+            else if (!m_bIsDescent)
+            {
+                SetPlayerUpKinematic(); //设置玩家是否可以向上穿越障碍.
+            }
+
+            //CalCharacterJump();
+
         }
     }
 
@@ -544,21 +531,18 @@ public class PlayerManager : MonoBehaviour
 #endif
         m_bGounded = true;
         m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
-        Owner.RB.velocity = Vector3.zero;
-        m_fCurSpeed = 0f;
+        Owner.Velocity = Vector3.zero;
         m_bIsDescent = false;
         if (other.gameObject.layer == BrickMaskGlossy)
-            BCanJumpDown = true;
+            BCanJumpDown = ePlayerJumpDownState.CanJumpDown_YES;
         else if (other.gameObject.layer == MaskGlossy || other.gameObject.layer == BoxMaskGlossy)
-            BCanJumpDown = false;
+            BCanJumpDown = ePlayerJumpDownState.CanJumpDown_NO;
     }
     
     bool bUp = false;
     bool bUpForward = false;
-    RaycastHit m_rayCheckJumpBrick;//用来检测开始上跳时，上方是否有brick
     float m_fUpDisForBrick;
     float m_fBiasDisForBrick;//
- 
    
     void OnDrawGizmos()
     {
@@ -575,195 +559,164 @@ public class PlayerManager : MonoBehaviour
         }
         else if (m_vInputMove.x < 0f)
             tmpx = -1;
-        ExtDebug.DrawBoxCastBox(
-        Owner.ActorTrans.position + Vector3.up * 0.44f,
-        new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),
-        Quaternion.identity, new Vector3(0f, 1f, 0f), m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f, Color.green
-        );
-
-        if (Physics.BoxCast(Owner.ActorTrans.position + Vector3.up * 0.44f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up),
-            m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f, BoxMask))
-        {
-            Gizmos.color = Color.green;
-            Gizmos.DrawCube(m_rayCheckJumpBrick.point, 0.1f * Vector3.one);
-        }
-
-        Debug.DrawLine(Owner.ActorTrans.position + Vector3.up * 0.44f, 
-                                   Owner.ActorTrans.position + Vector3.up * 0.44f + Vector3.up * (m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f), Color.green);
 
 
-        if (m_vInputMove.x == 0f)
-            return;
+        //RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3(0.1f, Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.5f), Owner.ActorTrans.forward, Quaternion.Euler(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BoxMask);
+
 
         ExtDebug.DrawBoxCastBox(
-        Owner.ActorTrans.position - Owner.BC.size.x * 0.5f * Vector3.right * tmpx + Vector3.up * 0.44f,
-        new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),
-        Quaternion.LookRotation((new Vector3(tmpx * -1f, 1f, 0f)).normalized), new Vector3(tmpx * 1f, 1f, 0f), m_fBiasDisForBrick * 2f, Color.red
+        Owner.ActorTrans.position + Owner.BC.center,
+        new Vector3(Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.5f, 0.1f),
+        Quaternion.LookRotation(Owner.ActorTrans.forward), Owner.ActorTrans.forward, Owner.ActorHeight * 0.5f + 0.2f, Color.green
         );
 
-        Gizmos.color = Color.red;
-        RaycastHit[] hits = Physics.BoxCastAll(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),
-                                                                                    Vector3.up + Vector3.right * tmpx, Quaternion.LookRotation((new Vector3(tmpx * -1, 1, 0)).normalized), m_fBiasDisForBrick * 2f, BoxMask);
+        //if (Physics.BoxCast(Owner.ActorTrans.position + Owner.BC.center, new Vector3(Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.5f, 0.1f),
+        //                          Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BrickMask))
+        //{
+        //    m_tDescent = hitInfo.transform;
+        //    Owner.BC.isTrigger = true;
+        //}
 
-        for (int i = 0; i < hits.Length; i++)
-        {
-            Gizmos.DrawSphere(hits[i].point, 0.1f);
-        }
-        Debug.DrawLine(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f,
-            Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f + (Vector3.up + Vector3.right * tmpx) * (2*m_fBiasDisForBrick),
-            Color.red);
 
-        lastTmpx = tmpx;
+        //tmpx = 1;
+        //if (m_vInputMove.x == 0f)
+        //{
+        //    tmpx = lastTmpx;
+        //}
+        //else if (m_vInputMove.x < 0f)
+        //    tmpx = -1;
+
+
+        //ExtDebug.DrawBoxCastBox(
+        //Owner.ActorTrans.position + Vector3.up * 0.44f,
+        //new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),
+        //Quaternion.identity, new Vector3(0f, 1f, 0f), m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f, Color.green
+        //);
+
+        //if (Physics.BoxCast(Owner.ActorTrans.position + Vector3.up * 0.44f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out hitInfo, Quaternion.Euler(Vector3.up),
+        //    m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f, BoxMask))
+        //{
+        //    Gizmos.color = Color.green;
+        //    Gizmos.DrawCube(hitInfo.point, 0.1f * Vector3.one);
+        //}
+
+        //Debug.DrawLine(Owner.ActorTrans.position + Vector3.up * 0.44f, 
+        //                           Owner.ActorTrans.position + Vector3.up * 0.44f + Vector3.up * (m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f), Color.green);
+
+
+        //if (m_vInputMove.x == 0f)
+        //    return;
+
+        //ExtDebug.DrawBoxCastBox(
+        //Owner.ActorTrans.position - Owner.BC.size.x * 0.5f * Vector3.right * tmpx + Vector3.up * 0.44f,
+        //new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),
+        //Quaternion.LookRotation((new Vector3(tmpx * -1f, 1f, 0f)).normalized), new Vector3(tmpx * 1f, 1f, 0f), m_fBiasDisForBrick * 2f, Color.red
+        //);
+
+        //Gizmos.color = Color.red;
+        //RaycastHit[] hits = Physics.BoxCastAll(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f),
+        //                                                                            Vector3.up + Vector3.right * tmpx, Quaternion.LookRotation((new Vector3(tmpx * -1, 1, 0)).normalized), m_fBiasDisForBrick * 2f, BoxMask);
+
+        //for (int i = 0; i < hits.Length; i++)
+        //{
+        //    Gizmos.DrawSphere(hits[i].point, 0.1f);
+        //}
+        //Debug.DrawLine(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f,
+        //    Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f + (Vector3.up + Vector3.right * tmpx) * (2*m_fBiasDisForBrick),
+        //    Color.red);
+
+        //lastTmpx = tmpx;
 
     }
 
+    void FreeFall()
+    {
+        if (m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded && Owner.Velocity.y < -0.2f)
+        {
+            DoBeforeJump(ePlayerNormalBeha.eNormalBehav_JumpDown, -1f, true);
+        }
+    }
     void DoBeforeJump(ePlayerNormalBeha type, float InitSpeed, bool isDescent)                   //jump前的数据准备
     {
-        //float t = 0.04f;
-        //float a = 12f * t - 20f * t * t;
-
-        Owner.RB.velocity = new Vector3(0f, InitSpeed, 0f);
+        m_tDescent = null;
+        if (type == ePlayerNormalBeha.eNormalBehav_SmallJump)
+        {
+            m_fStartTime = Time.time;
+            Owner.Velocity = new Vector3(0f, InitSpeed, 0f);
+        }
         m_ePlayerNormalBehav = type;
-        fOrigHeight = m_curHeight = Owner.ActorTrans.transform.position.y;
+        fOrigHeight  = Owner.ActorTrans.transform.position.y;
         m_bIsDescent = isDescent;
-        m_fCurSpeed = m_fInitSpeed = InitSpeed;
-        m_fStartTime = Time.time;
-
-        //找到brick，然后计算fCheckJumpTime
-
-        //检测上方，前后和后方是否有brick, 
+       
     }
 
     float tmpx = 1f;
     float lastTmpx = 1f;
     readonly float fCheckJumpTime = 0.04f;
-    void SetPlayerKinematic()
-    {
-        if (Owner.RB.isKinematic == false && Time.time - m_fStartTime >= fCheckJumpTime) //0.04 通过计算可以让角色跳跃0.44米高度, 角色头顶和brick的距离是0.5f。
-        {
-            if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up), 0.1f + Owner.ActorHeight, BrickMask))                               
-            {
+    //float m_fSlideDis = 0f;
+    //void CalculateSlideDis () {
+    //                            float v0 = m_curJumpData.m_fJumpInitSpeed + 0.5f * m_curJumpData.m_fJumpAccel * fCheckJumpTime;
+    //                            float a = 0.5f * m_curJumpData.m_fJumpAccel;
+    //                            float b = v0;
+    //                            float c = 0f - 0.26f;
 
+    //                            float upright = Mathf.Sqrt(b * b - 4f * a * c);
+    //                            float upleft = 0 - b;
+    //                            float down = 2f * a;
+
+
+    //                            float t1 = (upleft - upright) / down;
+    //                            float t2 = (upleft + upright) / down;
+
+    //                            float t = t1 < t2 ? t1 : t2;
+    //                            if (t < 0f)
+    //                            {
+    //                                Debug.LogErrorFormat("t1 = {0}, t2 = {1}", t1, t2);
+    //                                return;
+    //                            }
+    //                            m_fSlideDis = GlobalHelper.SMoveSpeed * t;
+    //}
+
+
+    bool JumpThroughState
+    {
+        get
+        {
+            return Owner.BC.isTrigger;
+        }
+        set
+        {
+            if (value != Owner.BC.isTrigger)
+                Owner.BC.isTrigger = value;
+        }
+    }
+
+    void SetPlayerUpKinematic()
+    {
+        if (JumpThroughState == false && Time.time - m_fStartTime >= fCheckJumpTime) //0.04 通过计算可以让角色跳跃0.44米高度, 角色头顶和brick的距离是0.5f。
+        {
+            if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out hitInfo, Quaternion.Euler(Vector3.up), 0.1f + Owner.ActorHeight, BrickMask))                               
+            {
                 //检测上方是否有box
-                if (!Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out m_rayCheckJumpBrick, Quaternion.Euler(Vector3.up), 
+                if (!Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out hitInfo, Quaternion.Euler(Vector3.up), 
                     m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f,
                     BoxMask))                                  
                     {
-
-                        if (m_vInputMove.x == 0f)
-                        {
-                            Owner.RB.isKinematic = true;
-                            return;
-                        }
-                        
-                        tmpx = 1f;
-                        if (Owner.ActorTrans.forward.x < 0f)
-                            tmpx = -1;
-                        //if (Physics.BoxCast(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f + Vector3.up * 0.44f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up + Vector3.right * tmpx, out m_rayCheckJumpBrick, Quaternion.LookRotation((new Vector3(tmpx * -1, 1, 0)).normalized), m_fBiasDisForBrick, BoxMask))
-                            
-                            //检测全部的box，
-                            /*
-                             * if(length <= 0) {iskinematic = true}
-                             * else {
-                             *          
-                             * }
-                             * 
-                             * */
-                            RaycastHit[] hits = Physics.BoxCastAll(Owner.ActorTrans.position - tmpx * Vector3.right * Owner.ActorHeight * 0.5f, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), 
-                                                                                      Vector3.up+Vector3.right * tmpx, Quaternion.LookRotation((new Vector3(tmpx * -1, 1, 0)).normalized), m_fBiasDisForBrick * 2f, BoxMask);
-                            
-                            if(hits.Length <= 0)
-                                Owner.RB.isKinematic = true;
-                            else
-                            {
-                                /*
-                         * dis = 0.5 - 0.44 + 0.2f; -> 0.26f
-                         * v0 * t + 0.5f * a * t * t = 0.26f
-                         * 
-                         * a = 0.5f * a;
-                         * b = v0
-                         * c = -0.26;
-                         * 
-                         * */
-                                float v0 = m_curJumpData.m_fJumpInitSpeed + 0.5f * m_curJumpData.m_fJumpAccel * fCheckJumpTime;
-                                float a = 0.5f * m_curJumpData.m_fJumpAccel;
-                                float b = v0;
-                                float c = 0f - 0.26f;
-
-                                float upright = Mathf.Sqrt(b * b - 4f * a * c);
-                                float upleft = 0 - b;
-                                float down = 2f * a;
-
-
-                                float t1 = (upleft - upright) / down;
-                                float t2 = (upleft + upright) / down;
-
-                                float t = t1 < t2 ? t1 : t2;
-                                if (t < 0f)
-                                {
-                                    Debug.LogErrorFormat("t1 = {0}, t2 = {1}", t1, t2);
-                                    return;
-                                }
-
-                                //bool test = false;
-
-                                float s = GlobalHelper.SMoveSpeed * t;
-                                int i = 0;
-                                for (i = 0; i < hits.Length; i++)
-                                {
-                                    float s1 = Mathf.Abs(hits[i].transform.position.x - Owner.ActorTrans.position.x) - Owner.ActorHeight * 0.5f - GlobalHelper.SBoxSize * 0.5f;
-                                    if (s1 <= s + 0.2f)
-                                    {
-                                        //Owner.RB.isKinematic = true;
-                                        //test = true;
-                                        break;
-                                    }
-                                }
-                                //if (test)
-                                //    Debug.Log(i + "hits.length = " + hits.Length);
-                                //else
-                                //{
-
-                                //    Debug.Log("cur index = " + i + "hits.length = " + hits.Length);
-                                //}
-                                if(i == hits.Length) {
-                                    Owner.RB.isKinematic = true;
-                                }
-
-                            }  
+                        JumpThroughState = true;
                     }
             }
         }
     }
 
-    void CalCharacterJump()                                                                         //计算角色位移<运动学刚体>
-    {
-        Owner.ActorTrans.transform.position = new Vector3(
-               Owner.ActorTrans.transform.position.x,
-               m_curHeight,
-               Owner.ActorTrans.transform.position.z
-               );
-        m_fDuration = Time.time - m_fStartTime;
-        if(Owner.RB.isKinematic == false) {
-              Owner.RB.velocity = new Vector3(0f, m_fInitSpeed + (m_curJumpData.m_fJumpAccel * m_fDuration), 0f);
-              m_fCurSpeed = Owner.RB.velocity.y;
-        }
-        else {
-            m_fCurSpeed = m_fInitSpeed + (m_curJumpData.m_fJumpAccel * m_fDuration);
-        }
-        
-      
-        m_curHeight = fOrigHeight + (m_fInitSpeed * m_fDuration + 0.5f * m_curJumpData.m_fJumpAccel * m_fDuration * m_fDuration);
-    }
-   
     #endregion
 
     #region Translate
     bool RayCastBlock()
     {
         if (Physics.BoxCast(Owner.ActorTrans.position + Owner.BC.center, new Vector3(Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.4f, 0.1f),
-                                        Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f, BoxMask
-            ))
+                                        Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f, BoxMask + WallMask
+            )
+         )
         {
             m_bIsBlocked = true;
         }
@@ -861,7 +814,6 @@ public class PlayerManager : MonoBehaviour
     {
         m_bIsBlocked = false;
         m_bCollisionEntered = false;
-        //m_vInputMove = Vector2.zero;
     }
     #endregion
 
