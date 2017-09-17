@@ -46,7 +46,7 @@ public class UIScene_Start : MonoBehaviour {
         //加载button和屏幕中的pic的时候，运动bouchin，加载完毕，把状态置空
         if (anim==AnimState.Start_PicAnim)
         {
-           TweenPosition.Begin(m_panel, 2f, new Vector3(0, 0, 0)).method = UITweener.Method.BounceIn;
+           TweenPosition.Begin(m_panel, m_fPlaySpeed, new Vector3(0, 0, 0)).method = UITweener.Method.BounceIn;
             Destroy(m_btn.GetComponent<TweenPosition>());
             anim = AnimState.Start_null;
         }
