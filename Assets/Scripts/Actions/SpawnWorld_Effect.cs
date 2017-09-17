@@ -35,8 +35,12 @@ namespace Assets.Scripts.Action
             {
                 Transform tmp = socket.transform;
                 effect.transform.parent = null;
-                effect.transform.position = RelativePos;
-                effect.transform.localRotation = Quaternion.Euler(RelativeRot);
+                effect.transform.rotation = tmp.rotation;
+                effect.transform.Rotate(RelativeRot, Space.World);
+                effect.transform.position = tmp.position;
+                effect.transform.Translate(RelativePos, Space.World);
+
+              
             }
             else
             {

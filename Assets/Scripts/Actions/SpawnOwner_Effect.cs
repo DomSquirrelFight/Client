@@ -37,7 +37,7 @@ namespace Assets.Scripts.Action {
             }
             else
             {
-                Debug.LogErrorFormat("Fail to find socket{0} in SourceOwner {1}", SocketName, DataStore.SourceOwner);
+                Debug.LogErrorFormat("Fail to find socket {0} in SourceOwner {1}", SocketName, DataStore.SourceOwner);
             }
         }
 

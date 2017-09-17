@@ -35,13 +35,13 @@ public class NpcType :  BaseAction{
 
     public override void TrigAction()
     {
-        GameObject tmp = Instantiate(obj, transform.position, transform.rotation) as GameObject;
-
-        ActionInfos ai = tmp.GetComponent<ActionInfos>();
-
-        ai.SetOwner(gameObject);
-     
-        //Destroy(gameObject);
+        switch (MonsterType) {
+            case eMonsterType.MonType_Rock:             //怪兽类型是陨石 -> 相当于直接释放技能
+                {
+                    Instantiate(obj, transform.position, transform.rotation);         
+                    break;
+                }
+        }
     }
 
 }

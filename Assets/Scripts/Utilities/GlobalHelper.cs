@@ -83,6 +83,8 @@ public class GlobalHelper
             else
             {
                 target = FindGameObjectWithName(obj.transform.GetChild(i).gameObject, name);
+                if (null != target)
+                    return target;
             }
         }
 

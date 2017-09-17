@@ -14,7 +14,7 @@ namespace Assets.Scripts.Action
 
         public Vector3 RelativeRot;
 
-        public float ParticleScale;
+        public float ParticleScale = 1f;
 
         protected GameObject InstantiateMyEffect()
         {
