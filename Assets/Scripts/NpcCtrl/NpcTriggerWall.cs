@@ -1,11 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 [RequireComponent(typeof(BoxCollider))]
 public class NpcTriggerWall : MonoBehaviour {
 
-    public bool BTriggerOnce = true;
     void Reset()
     {
         BoxCollider bc = gameObject.GetComponent<BoxCollider>();
@@ -29,14 +27,12 @@ public class NpcTriggerWall : MonoBehaviour {
                         case AttTypeDefine.eMonsterType.MonType_Rock:
                             {
                                 UnityEngine.Object obj = Resources.Load("Prefabs/Character/Npcs/Rocks/" + nt.PrefabName);
-                                Instantiate(obj, nt.transform.position, nt.transform.rotation);
+                                nt.OnLoad(obj);
                                 break;
                             }
                     }
                 }
             }
-            if (BTriggerOnce)
-                Destroy(gameObject);
         }
      
     }

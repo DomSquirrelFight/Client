@@ -67,4 +67,26 @@ public class GlobalHelper
         return null;
     }
 
+
+    public static GameObject FindGameObjectWithName(GameObject obj, string name)
+    {
+
+        if (null == obj)
+            return null;
+
+        GameObject target = null;
+
+        for (int i = 0; i < obj.transform.childCount; i++)
+        {
+            if (obj.transform.GetChild(i).name == name)
+                return obj.transform.GetChild(i).gameObject;
+            else
+            {
+                target = FindGameObjectWithName(obj.transform.GetChild(i).gameObject, name);
+            }
+        }
+
+        return target;
+    }
+
 }

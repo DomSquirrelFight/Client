@@ -154,6 +154,7 @@ public class CameraController : MonoBehaviour {
 
             vLastRot = transform.rotation.eulerAngles;
 
+            BRefreshCameraData = true;
         }
 
         Vector3 vLastPos;

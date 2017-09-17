@@ -37,6 +37,11 @@ namespace AttTypeDefine
 
     #region Character Behaviour
 
+    public enum eCoutTimeType
+    {
+        CountType_Auto,
+        CountType_Condition,
+    }
     public enum eRockBehaviour
     {
         Rock_Fire,//沿指定路径发射
