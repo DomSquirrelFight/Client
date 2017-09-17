@@ -10,7 +10,10 @@ public class PlayerState_Injure : FSMState_InjureBase {
     public override void DoBeforeEntering(BaseActor target)
     {
         base.DoBeforeEntering(target);
+        Owner.RB.isKinematic = true;
+        Owner.BC.enabled = false;
         Owner.AM.SetTrigger(NameToHashScript.InjuredId);
+        Owner.StartChangingAlpha();
     }
 
     public override void Reason(BaseActor target)
@@ -19,6 +22,9 @@ public class PlayerState_Injure : FSMState_InjureBase {
         Owner.ActorTrans.Translate(Owner.ActorTrans.forward * (-1f) * GlobalHelper.SBackSpeed * Time.deltaTime, Space.World);
         if (bLastInTransition && !intransition)
         {
+            Owner.RB.isKinematic = false;
+            Owner.BC.enabled = true;
+            Owner.EndChangingAlpha();
             Owner.FSM.SetTransition(StateID.Idle);
         }
         bLastInTransition = intransition;

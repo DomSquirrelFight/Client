@@ -106,6 +106,7 @@ public class BaseActor : MonoBehaviour
                     }
                     ba.baseattr = (BaseAttr)ba.gameObject.GetOrAddComponent<PlayerAttr>();
                     ba.fsm = (FSMBehaviour)ba.gameObject.GetOrAddComponent<PlayerFSM>();
+                    ba.InitShaderProperties();
                     break;
                 }
             case eCharacType.Type_NormalNpc:
@@ -123,6 +124,7 @@ public class BaseActor : MonoBehaviour
                 }
         }
         ba.BaseAtt.InitAttr(side, type);
+    
         #endregion
 
         return ba;
@@ -293,5 +295,59 @@ public class BaseActor : MonoBehaviour
         }
     }
     #endregion
+
+    #region 受伤改变透明度
+    Shader m_sOrig;
+    SkinnedMeshRenderer m_smr;
+    Shader m_sDeadShader = null;
+    float m_alpha = 0.6f;
+    float m_aplhaStep = 0.5f;
+    void InitShaderProperties()
+    {
+        m_smr = gameObject.GetComponentInChildren<SkinnedMeshRenderer>();
+        m_sOrig = m_smr.materials[0].shader;
+    }
+
+    public void StartChangingAlpha()
+    {
+        m_alpha = 0.6f;
+        m_aplhaStep = 0.5f;
+        m_sDeadShader = null;
+        StartCoroutine(ChangingAlpha());
+    }
+
+    IEnumerator ChangingAlpha()
+    {
+
+        if (null == m_sDeadShader)
+        {
+            m_sDeadShader = Shader.Find("Custom/Alpha");
+            m_smr.materials[0].shader = m_sDeadShader;
+        }
+        while (true)
+        {
+            if (m_alpha <= 0)
+            {
+                m_aplhaStep = 0 - m_aplhaStep;
+            }
+            m_smr.materials[0].SetFloat("_AlphaScale", m_alpha);
+            m_alpha -= Time.deltaTime * 0.5f;
+            yield return null;
+        }
+      
+    }
+
+
+    public void EndChangingAlpha()
+    {
+        m_smr.materials[0].shader = m_sOrig;
+
+
+        StopCoroutine(ChangingAlpha());
+    }
+
+
+    #endregion
+
 
 }
