@@ -597,9 +597,10 @@ public class FXMakerControls : MonoBehaviour
 
 	void CreateInstanceEffect()
 	{
+        //todo_erric
 //		Debug.Log("CreateInstanceEffect");
-		if (FXMakerMain.inst.IsCurrentEffectObject())
-			FXMakerMain.inst.CreateCurrentInstanceEffect(true);
+        //if (FXMakerMain.inst.IsCurrentEffectObject())
+        //    FXMakerMain.inst.CreateCurrentInstanceEffect(true);
 	}
 
 	// -------------------------------------------------------------------------------------------

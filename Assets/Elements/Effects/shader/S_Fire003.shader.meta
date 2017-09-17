@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: c4673df938b756c4c97c8332a6e7194c
+timeCreated: 1490667889
+licenseType: Pro
+ShaderImporter:
+  defaultTextures:
+  - _Main: {fileID: 2800000, guid: 6a6cca3a6a092734895cb6574b52e52d, type: 3}
+  - _Wenli: {fileID: 2800000, guid: 7d1ec91c34ed2064483b76cfe2851d1a, type: 3}
+  - _Rongjie: {fileID: 2800000, guid: c87b1f9cd67cc874c97483c110978c9e, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

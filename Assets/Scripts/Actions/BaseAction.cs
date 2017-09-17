@@ -27,7 +27,15 @@ namespace Assets.Scripts.Action
                 m_fConStartTime = Time.time;
         }
 
-        public virtual void Update()
+        protected void Reset()
+        {
+            m_fConStartTime = 0f;
+            m_fStartTime = 0f;
+            m_bSend = false;
+        }
+
+
+        protected virtual void Update()
         {
             if (m_bSend)
                 return;

@@ -9,6 +9,8 @@ public class NpcType :  BaseAction{
 
     public string PrefabName;
 
+    public bool TriggerOnce = false;
+
     void OnDrawGizmos()
     {
         switch (MonsterType)
@@ -25,6 +27,8 @@ public class NpcType :  BaseAction{
     UnityEngine.Object obj;
     public void OnLoad(Object _obj)
     {
+        if (!TriggerOnce)
+            Reset();
         obj = _obj;
         OnStart();
     }
@@ -36,7 +40,7 @@ public class NpcType :  BaseAction{
         ActionInfos ai = tmp.GetComponent<ActionInfos>();
 
         ai.SetOwner(gameObject);
-
+     
         //Destroy(gameObject);
     }
 

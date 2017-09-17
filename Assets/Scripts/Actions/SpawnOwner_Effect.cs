@@ -19,6 +19,10 @@ namespace Assets.Scripts.Action {
                 {
                     socket = DataStore.SourceOwner;
                 }
+                else
+                {
+                    socket = transform.gameObject;
+                }
             }
             else
             {
@@ -33,9 +37,7 @@ namespace Assets.Scripts.Action {
             }
             else
             {
-                effect.transform.parent = null;
-                effect.transform.Rotate(RelativeRot, Space.Self);
-                effect.transform.Translate(RelativePos, Space.Self);
+                Debug.LogErrorFormat("Fail to find socket{0} in SourceOwner {1}", SocketName, DataStore.SourceOwner);
             }
         }
 

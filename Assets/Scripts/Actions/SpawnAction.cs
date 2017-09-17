@@ -14,6 +14,8 @@ namespace Assets.Scripts.Action
 
         public Vector3 RelativeRot;
 
+        public float ParticleScale;
+
         protected GameObject InstantiateMyEffect()
         {
             if (null == SpawnObj)
@@ -22,6 +24,9 @@ namespace Assets.Scripts.Action
                 return null;
             }
             GameObject obj = Instantiate<GameObject>(SpawnObj);
+            ScaleParticle sp = obj.GetComponent<ScaleParticle>();
+            if(null != sp)
+                sp.TryScale(ParticleScale, 1);
             return obj;
         }
 

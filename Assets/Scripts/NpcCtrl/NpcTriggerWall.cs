@@ -26,8 +26,9 @@ public class NpcTriggerWall : MonoBehaviour {
                     {
                         case AttTypeDefine.eMonsterType.MonType_Rock:
                             {
-                                UnityEngine.Object obj = Resources.Load("Prefabs/Character/Npcs/Rocks/" + nt.PrefabName);
+                                UnityEngine.Object obj = Resources.Load("IGSoft_Projects/Rocks/RockSkill/" + nt.PrefabName);
                                 nt.OnLoad(obj);
+                                Debug.Log(1);
                                 break;
                             }
                     }

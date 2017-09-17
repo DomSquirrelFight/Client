@@ -327,7 +327,7 @@ public class NgSerialized
 		{
 			SerializedObject sysSo = new SerializedObject(srcTrans.GetComponent<ParticleSystem>());
 // 			GetPropertis(sysSo, "ShapeModule");
-			return ((bool)GetPropertyValue(sysSo, "moveWithTransform") == false);
+			return ((bool)(GetPropertyValue(sysSo, "moveWithTransform") == null));
 		}
 		if (srcTrans.GetComponent<ParticleEmitter>() != null)
 			return srcTrans.GetComponent<ParticleEmitter>().useWorldSpace;

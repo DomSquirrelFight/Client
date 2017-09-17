@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 692f90924106a7c4e9353d65065145f4
+timeCreated: 1484314204
+licenseType: Pro
+ShaderImporter:
+  defaultTextures:
+  - _Fengwo: {fileID: 2800000, guid: 536788ef0ab79ac438982dbf1fb738da, type: 3}
+  - _Glow: {fileID: 2800000, guid: 5cc9b46c85cb11f4098a953ce23742b0, type: 3}
+  - _Wenli: {fileID: 2800000, guid: 105eea34bd918da43a3e6be4b95417af, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

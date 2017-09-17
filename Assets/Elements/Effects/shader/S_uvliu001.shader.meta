@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: ce9e02e64dd2a254a80bffc7590fc599
+timeCreated: 1481695221
+licenseType: Pro
+ShaderImporter:
+  defaultTextures:
+  - _smalltex: {fileID: 2800000, guid: c88a85fdd259b9d4e90bdc7d01621ac8, type: 3}
+  - _bigtex: {fileID: 2800000, guid: c88a85fdd259b9d4e90bdc7d01621ac8, type: 3}
+  - _xiantiao: {fileID: 2800000, guid: 620e7195976a9744c8ec1a9bc7fb3ffd, type: 3}
+  - _niuqu: {fileID: 2800000, guid: 4c7714aa765ad684f9e2bbe936230b6c, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

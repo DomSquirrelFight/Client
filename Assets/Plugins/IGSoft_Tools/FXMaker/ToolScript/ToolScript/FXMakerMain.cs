@@ -755,11 +755,11 @@ public class FXMakerMain : MonoBehaviour
 	// -------------------------------------------------------------------------------------------
 	public void CreateCurrentInstanceEffect(bool bRunAction)
 	{
-		NgUtil.LogDevelop("CreateCurrentInstanceEffect() - bRunAction - " + bRunAction);
+        NgUtil.LogDevelop("CreateCurrentInstanceEffect() - bRunAction - " + bRunAction);
 
- 		bool bTrue = CreateCurrentInstanceEffect((GetFXMakerHierarchy() != null) ? GetFXMakerHierarchy().GetShowGameObject() : m_OriginalEffectObject);
-		if (bTrue && bRunAction)
-			m_FXMakerControls.RunActionControl();
+        bool bTrue = CreateCurrentInstanceEffect((GetFXMakerHierarchy() != null) ? GetFXMakerHierarchy().GetShowGameObject() : m_OriginalEffectObject);
+        if (bTrue && bRunAction)
+            m_FXMakerControls.RunActionControl();
 	}
 
 	public GameObject GetInstanceRoot()
