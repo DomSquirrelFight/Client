@@ -189,6 +189,12 @@ public class PlayerManager : MonoBehaviour
         if (!Owner)
             return;
 
+        if (Owner.FSM.IsInState(StateID.Injured))
+            return;
+
+        //if (Owner.AM.IsInTransition(0))
+        //    return;
+
         CalMoveInput();
 
         if (Application.platform == RuntimePlatform.WindowsEditor)

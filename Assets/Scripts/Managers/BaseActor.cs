@@ -105,6 +105,7 @@ public class BaseActor : MonoBehaviour
                         ba.CameraContrl.OnStart(ba);//启动相机
                     }
                     ba.baseattr = (BaseAttr)ba.gameObject.GetOrAddComponent<PlayerAttr>();
+                    ba.fsm = (FSMBehaviour)ba.gameObject.GetOrAddComponent<PlayerFSM>();
                     break;
                 }
             case eCharacType.Type_NormalNpc:
@@ -280,6 +281,17 @@ public class BaseActor : MonoBehaviour
 
     #region 玩家状态
 
+    #endregion
+
+    #region 状态机
+    private FSMBehaviour fsm;
+    public FSMBehaviour FSM
+    {
+        get
+        {
+            return fsm;
+        }
+    }
     #endregion
 
 }

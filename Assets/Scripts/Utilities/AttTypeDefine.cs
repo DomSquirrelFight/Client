@@ -4,6 +4,13 @@ namespace AttTypeDefine
 
     #region UI
 
+    public enum eAudioType
+    {
+        Audio_Skill,
+        Audio_BackGround,
+        Audio_UI,
+    }
+
     public enum LoadingState
     {
         e_LoadLevel,
@@ -11,6 +18,7 @@ namespace AttTypeDefine
         e_LoadSelect,
         e_Null,
     }
+
     //通过不同的场景，预加载不同的资源
     public enum SceneType
     {
@@ -36,6 +44,7 @@ namespace AttTypeDefine
     #endregion
 
     #region Character Behaviour
+
 
     public enum eCoutTimeType
     {
