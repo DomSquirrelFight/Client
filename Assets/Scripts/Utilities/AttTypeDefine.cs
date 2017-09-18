@@ -45,7 +45,12 @@ namespace AttTypeDefine
 
     #region Character Behaviour
 
-
+    public enum eMoveType
+    {
+        eMove_Straight,
+        eMove_Track,
+    }
+    
     public enum eCoutTimeType
     {
         CountType_Auto,

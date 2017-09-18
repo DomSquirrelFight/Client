@@ -61,7 +61,7 @@ public class BaseActor : MonoBehaviour
     /// 创建角色，并将角色实例返回
     /// </summary>
     /// <returns></returns>
-    static public BaseActor CreatePlayer(string name/*角色名称*/, eRoleID roldid/*角色ID*/, Vector3 pos = default(Vector3)/*模型出生位置*/, Quaternion rot = default(Quaternion)/*模型出生朝向*/, bool bCanJump = true,
+    static public BaseActor CreatePlayer(string name/*角色名称*/, eRoleID roldid/*角色ID*/, Vector3 pos = default(Vector3)/*模型出生位置*/, Quaternion rot = default(Quaternion)/*模型出生朝向*/, 
         eCharacSide side = eCharacSide.Side_Player, eCharacType type = eCharacType.Type_Major
         )
     {
@@ -80,7 +80,7 @@ public class BaseActor : MonoBehaviour
         #endregion
 
         #region 获取跳跃数据
-        if (bCanJump)
+       // if (bCanJump)
         {
             //获取小跳数据
             UnityEngine.Object _obj = Resources.Load("Prefabs/Maps/FightTest/SmallJumpDataStore");
