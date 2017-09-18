@@ -8,7 +8,10 @@ public class CameraController : MonoBehaviour {
         [SerializeField]
         private eCamMoveDir BirthMoveDir = eCamMoveDir.CamMove_Right;
 
-        public  float SUpSpeed = 5f;
+        public float SUpSpeed = 5f;
+
+        float SMoveSpeed = 4f;
+
         private Vector3 cammovevector = Vector3.zero;
         public Vector3 m_vCamMoveVector
         {
@@ -359,7 +362,7 @@ public class CameraController : MonoBehaviour {
                     {
                         if (Owner.ActorTrans.transform.position.x > m_vMiddlePoint.x)
                         {
-                            transform.Translate(Vector3.right * Owner.BaseAtt.RoleInfo.RoleMoveSpeed * Time.deltaTime, Space.World);
+                            transform.Translate(Vector3.right * SMoveSpeed * Time.deltaTime, Space.World);
                         }
                         break;
                     }
@@ -367,7 +370,7 @@ public class CameraController : MonoBehaviour {
                     {
                         if (Owner.ActorTrans.transform.position.x < m_vMiddlePoint.x)
                         {
-                            transform.Translate(Vector3.left * Owner.BaseAtt.RoleInfo.RoleMoveSpeed * Time.deltaTime, Space.World);
+                            transform.Translate(Vector3.left * SMoveSpeed * Time.deltaTime, Space.World);
                         }
                         break;
                     }
@@ -386,6 +389,8 @@ public class CameraController : MonoBehaviour {
         public void OnStart(BaseActor _owner)
         {
             owner = _owner;
+
+            SMoveSpeed = owner.BaseAtt.RoleInfo.RoleMoveSpeed;
 
             CamMoveDir = BirthMoveDir;
 

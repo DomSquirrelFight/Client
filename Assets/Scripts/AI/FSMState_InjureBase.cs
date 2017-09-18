@@ -9,18 +9,4 @@ public class FSMState_InjureBase : FSMState {
         stateID = id;
         Owner = owner;
     }
-
-    public override void DoBeforeEntering(BaseActor target)
-    {
-       //调用SkillManager中的StopSkill
-        //Owner.SkillMgr.StopSkill();
-    }
-
-
-
-
-
-
-
-  
 }

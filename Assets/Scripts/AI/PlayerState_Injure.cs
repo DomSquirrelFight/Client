@@ -7,11 +7,12 @@ public class PlayerState_Injure : FSMState_InjureBase {
     {
     }
     bool bLastInTransition = false;
+    float RoleBackSpeed = 0f;
     public override void DoBeforeEntering(BaseActor target)
     {
-        base.DoBeforeEntering(target);
         Owner.RB.isKinematic = true;
         Owner.BC.enabled = false;
+        RoleBackSpeed = Owner.BaseAtt.RoleInfo.RoleBackSpeed;
         Owner.AM.SetTrigger(NameToHashScript.InjuredId);
         Owner.StartChangingAlpha();
     }
@@ -19,7 +20,7 @@ public class PlayerState_Injure : FSMState_InjureBase {
     public override void Reason(BaseActor target)
     {
         bool intransition = Owner.AM.IsInTransition(0);
-        Owner.ActorTrans.Translate(Owner.ActorTrans.forward * (-1f) * Owner.BaseAtt.RoleInfo.RoleBackSpeed * Time.deltaTime, Space.World);
+        Owner.ActorTrans.Translate(Owner.ActorTrans.forward * (-1f) * RoleBackSpeed * Time.deltaTime, Space.World);
         if (bLastInTransition && !intransition)
         {
             Owner.RB.isKinematic = false;

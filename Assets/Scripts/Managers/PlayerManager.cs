@@ -188,11 +188,9 @@ public class PlayerManager : MonoBehaviour
         //float halfDiagonal = Mathf.Sqrt(Owner.ActorHeight * Owner.ActorHeight * 2) * 0.5f;
         m_fBiasDisForBrick = dis;// -halfDiagonal + 0.1f;
         //CalculateSlideDis();
-
         SMoveSpeed = Owner.BaseAtt.RoleInfo.RoleMoveSpeed;
         SBackSpeed = Owner.BaseAtt.RoleInfo.RoleBackSpeed;
         SRotSpeed = Owner.BaseAtt.RoleInfo.RoleRotSpeed;
-
     }
 
 
