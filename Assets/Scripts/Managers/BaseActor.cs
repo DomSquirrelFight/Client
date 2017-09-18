@@ -62,7 +62,7 @@ public class BaseActor : MonoBehaviour
     /// 创建角色，并将角色实例返回
     /// </summary>
     /// <returns></returns>
-    static public BaseActor CreatePlayer(int roldid/*角色ID*/, Vector3 pos = default(Vector3)/*模型出生位置*/, Quaternion rot = default(Quaternion)/*模型出生朝向*/)
+    static public BaseActor CreatePlayer(int roldid/*角色ID*/, Vector3 pos, Quaternion rot , Vector3 scale )
     {
 
         #region 加载Asset文件
@@ -85,7 +85,7 @@ public class BaseActor : MonoBehaviour
         #region 创建模型
         BaseActor ba = Player.AddComponent<BaseActor>();//加载BaseActor脚本
 
-        CreateActor(roldid, roleInfos.strRolePath, ba, pos, rot);//加载模型
+        CreateActor(roldid, roleInfos.strRolePath, ba, pos, rot, scale);//加载模型
         #endregion
 
         #region 角色属性
@@ -122,7 +122,8 @@ public class BaseActor : MonoBehaviour
                     {
                         ba.PlayerMgr.OnStart(ba);//启动角色管理器
                     }
-                  
+                    ba.fsm = (FSMBehaviour)ba.gameObject.GetOrAddComponent<AIEnemy>();
+                    ba.InitShaderProperties();
                     break;
                 }
         }
@@ -137,7 +138,7 @@ public class BaseActor : MonoBehaviour
     /// 创建角色模型实例对象，并返回
     /// </summary>
     /// <returns></returns>
-    static public GameObject CreateActor(int roleId, string path, BaseActor baparent, Vector3 pos = default(Vector3)/*模型出生位置*/, Quaternion rot = default(Quaternion)/*模型出生朝向*/)
+    static public GameObject CreateActor(int roleId, string path, BaseActor baparent, Vector3 pos , Quaternion rot , Vector3 scale)
     {
 
         UnityEngine.Object obj = Resources.Load(path);
@@ -146,7 +147,7 @@ public class BaseActor : MonoBehaviour
         actor.transform.parent = baparent.transform;
         actor.transform.localPosition = pos;
         actor.transform.localRotation = rot;
-        actor.transform.localScale = Vector3.one;
+        actor.transform.localScale = scale;
         baparent.m_oActor = actor;
 
         return actor;

@@ -83,7 +83,7 @@ namespace AttTypeDefine
         MonType_Null = -1,
         MonType_Rock,
         MonType_FlyBat,
-        MonType_Pig,
+        MonType_GroundNpc,
         MonType_FakeBox,
         MonType_Size,
     }

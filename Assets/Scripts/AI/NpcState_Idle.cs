@@ -2,17 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerState_SelfControl : FSMState {
+public class NpcState_Idle : FSMState
+{
 
-    public PlayerState_SelfControl(BaseActor owner)
+    public NpcState_Idle(BaseActor owner)
     {
         Owner = owner;
         stateID = StateID.Idle;
     }
-
-
-
-
-
-
 }

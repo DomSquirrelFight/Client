@@ -9,7 +9,7 @@ public class NpcTriggerWall : MonoBehaviour {
         BoxCollider bc = gameObject.GetComponent<BoxCollider>();
         bc.isTrigger = true;
     }
-
+    UnityEngine.Object obj;
     void OnTriggerEnter(Collider other)
     {
         BaseActor ba = null;
@@ -26,12 +26,11 @@ public class NpcTriggerWall : MonoBehaviour {
                     {
                         case AttTypeDefine.eMonsterType.MonType_Rock:
                             {
-                                UnityEngine.Object obj = Resources.Load("IGSoft_Projects/Rocks/RockSkill/" + nt.PrefabName);
-                                nt.OnLoad(obj);
-                                Debug.Log(1);
+                               obj = Resources.Load("IGSoft_Projects/Rocks/RockSkill/" + nt.PrefabName);
                                 break;
                             }
                     }
+                    nt.OnLoad(obj);
                 }
             }
         }

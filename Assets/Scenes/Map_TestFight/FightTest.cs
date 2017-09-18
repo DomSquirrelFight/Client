@@ -13,7 +13,7 @@ public class FightTest : MonoBehaviour {
 	// Use this for initialization
 	void Awake () {
         //加载主角
-        m_Player = BaseActor.CreatePlayer(m_eRoleId, m_sp.transform.position, m_sp.transform.rotation);
+        m_Player = BaseActor.CreatePlayer(m_eRoleId, m_sp.transform.position, m_sp.transform.rotation, Vector3.one);
 	}
 	
 

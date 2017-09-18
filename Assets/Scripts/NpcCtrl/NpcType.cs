@@ -9,6 +9,8 @@ public class NpcType :  BaseAction{
 
     public string PrefabName;
 
+    public int RoleId;
+    
     public bool TriggerOnce = false;
 
     void OnDrawGizmos()
@@ -21,6 +23,12 @@ public class NpcType :  BaseAction{
                     Gizmos.DrawWireCube(transform.position, Vector3.one * 0.5f);
                     break;
                 }
+            case eMonsterType.MonType_GroundNpc:
+                {
+                    Gizmos.color = Color.yellow;
+                    Gizmos.DrawSphere(transform.position,  0.5f);
+                    break;
+                }
         }
     }
 
@@ -29,7 +37,18 @@ public class NpcType :  BaseAction{
     {
         if (!TriggerOnce)
             Reset();
-        obj = _obj;
+        switch (MonsterType)
+        {
+            case eMonsterType.MonType_Rock:
+                {
+                    obj = _obj;
+                    break;
+                }
+            //case eMonsterType.MonType_GroundPig:
+            //    {
+            //        break;
+            //    }
+        }
         OnStart();
     }
 
@@ -39,6 +58,11 @@ public class NpcType :  BaseAction{
             case eMonsterType.MonType_Rock:             //怪兽类型是陨石 -> 相当于直接释放技能
                 {
                     Instantiate(obj, transform.position, transform.rotation);         
+                    break;
+                }
+            case eMonsterType.MonType_GroundNpc:
+                {
+                    BaseActor.CreatePlayer(RoleId, transform.position, transform.rotation, Vector3.one*0.5f);
                     break;
                 }
         }
