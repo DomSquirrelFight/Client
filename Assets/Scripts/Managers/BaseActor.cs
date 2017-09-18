@@ -66,7 +66,7 @@ public class BaseActor : MonoBehaviour
     {
 
         #region 加载Asset文件
-        string assetpath = GlobalHelper.SResAssetRoute + roldid.ToString();
+        string assetpath = "Assets/RoleInfos/" + roldid.ToString();
         RoleInfos roleInfos = (Resources.Load(assetpath)) as RoleInfos;
         if (null == roleInfos)
         {

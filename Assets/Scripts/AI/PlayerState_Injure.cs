@@ -19,7 +19,7 @@ public class PlayerState_Injure : FSMState_InjureBase {
     public override void Reason(BaseActor target)
     {
         bool intransition = Owner.AM.IsInTransition(0);
-        Owner.ActorTrans.Translate(Owner.ActorTrans.forward * (-1f) * GlobalHelper.SBackSpeed * Time.deltaTime, Space.World);
+        Owner.ActorTrans.Translate(Owner.ActorTrans.forward * (-1f) * Owner.BaseAtt.RoleInfo.RoleBackSpeed * Time.deltaTime, Space.World);
         if (bLastInTransition && !intransition)
         {
             Owner.RB.isKinematic = false;

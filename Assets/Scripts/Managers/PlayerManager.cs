@@ -140,7 +140,14 @@ public class PlayerManager : MonoBehaviour
 
     UIScene_Fight m_UISceneFight;
 
+    public  float SBoxSize = 0.6f;
+
    // public NotifyState m_delNotifyState;                                                                                  //通知ui fight现在按钮的状态
+
+    public float SMoveSpeed = 4f;
+
+    public float SBackSpeed = 5f;
+    public float SRotSpeed = 60f;
 
     #endregion
 
@@ -181,6 +188,11 @@ public class PlayerManager : MonoBehaviour
         //float halfDiagonal = Mathf.Sqrt(Owner.ActorHeight * Owner.ActorHeight * 2) * 0.5f;
         m_fBiasDisForBrick = dis;// -halfDiagonal + 0.1f;
         //CalculateSlideDis();
+
+        SMoveSpeed = Owner.BaseAtt.RoleInfo.RoleMoveSpeed;
+        SBackSpeed = Owner.BaseAtt.RoleInfo.RoleBackSpeed;
+        SRotSpeed = Owner.BaseAtt.RoleInfo.RoleRotSpeed;
+
     }
 
 
@@ -385,7 +397,7 @@ public class PlayerManager : MonoBehaviour
 
         pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
 
-        if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Vector3.down, out hitInfo, Owner.ActorHeight * 0.5f + 0.1f, layer))     //如果在角色垂直向下方向射到了box，那么处理落地逻辑
+        if (Physics.SphereCast(pos, SBoxSize * 0.5f, Vector3.down, out hitInfo, Owner.ActorHeight * 0.5f + 0.1f, layer))     //如果在角色垂直向下方向射到了box，那么处理落地逻辑
         {
             if (hitInfo.collider.gameObject == other.collider.gameObject && m_bIsDescent == true)//在下降过程中
             {
@@ -398,7 +410,7 @@ public class PlayerManager : MonoBehaviour
                 SetJumpDownState(other);
             }
         }
-        else if (Physics.SphereCast(pos, GlobalHelper.SBoxSize * 0.5f, Vector3.up, out hitInfo, Owner.ActorHeight * 0.5f + 0.1f, layer))
+        else if (Physics.SphereCast(pos, SBoxSize * 0.5f, Vector3.up, out hitInfo, Owner.ActorHeight * 0.5f + 0.1f, layer))
         {
             if (hitInfo.collider.gameObject == other.collider.gameObject && m_bIsDescent == false)//在上升过程中
             {
@@ -421,7 +433,7 @@ public class PlayerManager : MonoBehaviour
 
         //检测到了下面有box
         if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.4f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down, out hitInfo, Quaternion.identity
-            , Owner.BaseAtt.RoleInfo.fJumpHeight - GlobalHelper.SBoxSize + 0.1f, BoxMask))
+            , Owner.BaseAtt.RoleInfo.fJumpHeight - SBoxSize + 0.1f, BoxMask))
         {
             return false;
         }
@@ -659,7 +671,7 @@ public class PlayerManager : MonoBehaviour
             {
                 //检测上方是否有box
                 if (!Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out hitInfo, Quaternion.Euler(Vector3.up),
-                   Owner.BaseAtt.RoleInfo.fJumpHeight + GlobalHelper.SBoxSize + 0.1f,
+                   Owner.BaseAtt.RoleInfo.fJumpHeight + SBoxSize + 0.1f,
                     BoxMask))                                  
                     {
                         JumpThroughState = true;
@@ -688,14 +700,14 @@ public class PlayerManager : MonoBehaviour
         if (m_vInputMove.x != 0f)
         {
             m_vCurForward = new Vector3(m_vInputMove.x, 0f, 0f);
-            Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, GlobalHelper.SRotSpeed * Time.deltaTime);
+            Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, SRotSpeed * Time.deltaTime);
         }
     }
 
     void TranslatePlayer()
     {
         if(m_vInputMove.x != 0f)
-            Owner.ActorTrans.Translate(new Vector3(0f, 0f,  Mathf.Abs(m_vInputMove.x) * GlobalHelper.SMoveSpeed * Time.deltaTime));
+            Owner.ActorTrans.Translate(new Vector3(0f, 0f,  Mathf.Abs(m_vInputMove.x) * SMoveSpeed * Time.deltaTime));
     }
 
     bool CheckMoveBoundaryBlock() 

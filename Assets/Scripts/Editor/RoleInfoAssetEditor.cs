@@ -8,8 +8,8 @@ namespace Assets.Scripts.RoleInfoEditor
     public class RoleInfoAssetEditor : EditorWindow
     {
 
+        #region 变量
         public RoleInfos _data;
-
 
         [MenuItem ("Window/Setting_RoleInfos")]
         public static void ShowWindow()
@@ -40,6 +40,7 @@ namespace Assets.Scripts.RoleInfoEditor
 
         string[] arrCharacterType = new string[] { "主角", "NPC", "BOSS" };
         int[] arrNCharacterType = new int[] { 0, 1, 2 };
+        #endregion
 
         void CalculateInitSpeed()
         {
@@ -174,6 +175,39 @@ namespace Assets.Scripts.RoleInfoEditor
             EditorGUILayout.EndHorizontal();
             #endregion
 
+            #region 角色移动速度
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("角色移动速度");
+            fValue = EditorGUILayout.FloatField(_data.RoleMoveSpeed);
+            if (fValue != _data.RoleMoveSpeed)
+            {
+                _data.RoleMoveSpeed = fValue;
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
+
+            #region 角色后退速度
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("角色后退速度");
+            fValue = EditorGUILayout.FloatField(_data.RoleBackSpeed);
+            if (fValue != _data.RoleBackSpeed)
+            {
+                _data.RoleBackSpeed = fValue;
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
+
+            #region 角色旋转速度
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("角色旋转速度");
+            fValue = EditorGUILayout.FloatField(_data.RoleRotSpeed);
+            if (fValue != _data.RoleRotSpeed)
+            {
+                _data.RoleRotSpeed = fValue;
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
+
             #region 提交数据
             GUI.color = Color.green;
             if (GUILayout.Button("提交数据", GUILayout.Width(80)))
@@ -194,7 +228,6 @@ namespace Assets.Scripts.RoleInfoEditor
               
             }
             #endregion
-
 
         }
 

@@ -5,17 +5,6 @@ using AttTypeDefine;
 public class GlobalHelper
 {
 
-    #region 常量表
-    public static float SMoveSpeed = 4f;
-    public static float SUpSpeed = 5f;
-    public static float SBackSpeed = 5f;
-    public static float SRotSpeed = 60f;
-    public static float SBoxSize = 0.6f;
-    public static float SBrickDis = 0.4f;
-    public static string SAssetRoute = "Assets/Resources/Assets/RoleInfos/";
-    public static string SResAssetRoute = "Assets/RoleInfos/";
-    #endregion
-
     public static Vector2 GetCamArea(Vector3 middle)
     {
         Vector2 area = new Vector2();
@@ -43,7 +32,6 @@ public class GlobalHelper
         camPos.BottomBorderPos = middle - new Vector3(0f, area.y, 0f);
         return camPos;
     }
-
 
     public static  Transform GetValues(RaycastHit hit)
     {
