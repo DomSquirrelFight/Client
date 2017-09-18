@@ -202,20 +202,20 @@ public class PlayerManager : MonoBehaviour
         if (Owner.FSM.IsInState(StateID.Injured))
             return;
 
-        //if (Owner.AM.IsInTransition(0))
-        //    return;
-
         CalMoveInput();
 
         if (Application.platform == RuntimePlatform.WindowsEditor)
         {
-            if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
-                CalJumpUp();
-            else if (Input.GetKeyDown(KeyCode.J))
-                CalJumpDown();
-            
-            if (Input.GetKeyDown(KeyCode.U))
-                CalPickUpBox();
+            if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
+            {
+                if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
+                    CalJumpUp();
+                else if (Input.GetKeyDown(KeyCode.J))
+                    CalJumpDown();
+
+                if (Input.GetKeyDown(KeyCode.U))
+                    CalPickUpBox();
+            }
         }
 
         //执行旋转操作
@@ -254,6 +254,10 @@ public class PlayerManager : MonoBehaviour
     float he, ve;
     public void CalMoveInput()                                              //获取平移输入
     {
+
+        if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major)
+            return;
+
         if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
         {
             m_vInputMove = m_UISceneFight.DirPos; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
