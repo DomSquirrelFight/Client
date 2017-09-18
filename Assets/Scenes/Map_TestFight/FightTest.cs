@@ -5,20 +5,15 @@ using AttTypeDefine;
 
 public class FightTest : MonoBehaviour {
 
-    public eRoleID m_eRoleId = eRoleID.Role_Major;
+    public int m_eRoleId = 101;
 
     public StartPoint m_sp;
 
     BaseActor m_Player;
 	// Use this for initialization
-	void Start () {
-
+	void Awake () {
         //加载主角
-        m_Player = BaseActor.CreatePlayer("LocalMajor", m_eRoleId, m_sp.transform.position, m_sp.transform.rotation);
-
-        int a = 0;
-
-		
+        m_Player = BaseActor.CreatePlayer(m_eRoleId, m_sp.transform.position, m_sp.transform.rotation);
 	}
 	
 

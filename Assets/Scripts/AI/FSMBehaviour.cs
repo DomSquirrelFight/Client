@@ -33,7 +33,7 @@ public class FSMBehaviour : MonoBehaviour {
                 return target;
             else
             {
-                if (null != ba && ba.BaseAtt.CharacSide == AttTypeDefine.eCharacSide.Side_Enemy)
+                if (null != ba && ba.BaseAtt.RoleInfo.CharacSide == AttTypeDefine.eCharacSide.Side_Enemy)
                 {
                     //target = GlobalHelper.g_GlobalLevel.Major;
                 }

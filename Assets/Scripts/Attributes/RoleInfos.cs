@@ -11,6 +11,8 @@ namespace Assets.Scripts.RoleInfoEditor
 
         public string strRoleName;
 
+        public string strRolePath;
+
         public eCharacSide CharacSide;
 
         public eCharacType CharacType;

@@ -16,7 +16,7 @@ public class NpcTriggerWall : MonoBehaviour {
         //找到major baseactor
         if (null != (ba = (other.transform.parent.GetComponent<BaseActor>())))
         {
-            if (ba.Actor.layer == LayerMask.NameToLayer("NPC") && ba.BaseAtt.CharacType == AttTypeDefine.eCharacType.Type_Major && ba.BaseAtt.CharacSide == AttTypeDefine.eCharacSide.Side_Player)
+            if (ba.Actor.layer == LayerMask.NameToLayer("NPC") && ba.BaseAtt.RoleInfo.CharacType == AttTypeDefine.eCharacType.Type_Major && ba.BaseAtt.RoleInfo.CharacSide == AttTypeDefine.eCharacSide.Side_Player)
             {
                 //遍历所有的孩子，然后实例化指定的对象
                 for (int i = 0; i < transform.childCount; i++)

@@ -85,6 +85,11 @@ namespace Assets.Scripts.RoleInfoEditor
             _data.strRoleName = EditorGUILayout.TextField ("角色名称", _data.strRoleName);
             #endregion
 
+            #region 角色资源路径
+            _data.strRolePath = EditorGUILayout.TextField("角色资源路径", _data.strRolePath);
+            #endregion
+
+
             #region  玩家阵营
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("玩家阵营");

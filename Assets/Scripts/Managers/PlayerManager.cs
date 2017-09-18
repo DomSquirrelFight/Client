@@ -77,7 +77,7 @@ public class PlayerManager : MonoBehaviour
 
     int HoldBoxMask;
 
-    JumpDataStore m_curJumpData;                                                                                                                                 //跳跃数据
+    //JumpDataStore m_curJumpData;                                                                                                                                 //跳跃数据
 
     float TmpDis;                                                                                                                                                               //保存临时变量
 
@@ -171,12 +171,12 @@ public class PlayerManager : MonoBehaviour
         m_UISceneFight = Helpers.UIScene<UIScene_Fight>();
         m_UISceneFight.OnStart(Owner);
         cc = Owner.CameraContrl;
-        m_curJumpData = Owner.SmallJumpDataStore;
+        //m_curJumpData = Owner.SmallJumpDataStore;
 
         //角色垂直上跳，碰到brick的距离
-        m_fUpDisForBrick = m_curJumpData.m_fJumpHeight - 0.2f - Owner.ActorHeight + 0.1f;
+        m_fUpDisForBrick = Owner.BaseAtt.RoleInfo.fJumpHeight - 0.2f - Owner.ActorHeight + 0.1f;
 
-        float tmp = m_curJumpData.m_fJumpHeight + 0.1f;
+        float tmp = Owner.BaseAtt.RoleInfo.fJumpHeight + 0.1f;
         float dis = Mathf.Sqrt(tmp * tmp * 2);
         //float halfDiagonal = Mathf.Sqrt(Owner.ActorHeight * Owner.ActorHeight * 2) * 0.5f;
         m_fBiasDisForBrick = dis;// -halfDiagonal + 0.1f;
@@ -238,38 +238,6 @@ public class PlayerManager : MonoBehaviour
 
     }
 
-    //void FixedUpdate()
-    //{
-    //    if (!Owner)
-    //        return;
-
-    //    //执行旋转操作
-    //    RotatePlayer();
-    //    //播放位移动画
-    //    PlayMoveAnim();
-    //    if (0f != m_vInputMove.x)
-    //    {
-    //        if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
-    //        {
-    //            if (!RayCastBlock())//横向阻挡
-    //            {
-    //                //执行move操作
-    //                TranslatePlayer();
-    //            }
-    //        }
-    //    }
-
-    //    //执行小跳跃
-    //    JumpBehaviour();
-
-    //    //执行下跳操作
-    //    JumpDownBehaviour();
-
-    //    //复位数据
-    //    ResetAllData();
-    //}
-  
-
     #endregion
 
     #region 检测输入
@@ -299,7 +267,7 @@ public class PlayerManager : MonoBehaviour
     {
         if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded )
         {
-                DoBeforeJump(ePlayerNormalBeha.eNormalBehav_SmallJump, m_curJumpData.m_fJumpInitSpeed, false);
+            DoBeforeJump(ePlayerNormalBeha.eNormalBehav_SmallJump, Owner.BaseAtt.RoleInfo.fInitJumpSpeed, false);
                 return true;
         }
         return false;
@@ -453,7 +421,7 @@ public class PlayerManager : MonoBehaviour
 
         //检测到了下面有box
         if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.4f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down, out hitInfo, Quaternion.identity
-            , m_curJumpData.m_fJumpHeight - GlobalHelper.SBoxSize + 0.1f, BoxMask))
+            , Owner.BaseAtt.RoleInfo.fJumpHeight - GlobalHelper.SBoxSize + 0.1f, BoxMask))
         {
             return false;
         }
@@ -463,20 +431,6 @@ public class PlayerManager : MonoBehaviour
 
             if (m_bIsBlocked)
                 return true;
-            //if(m_vInputMove.x == 0f)
-            //{
-            //    return true;
-            //}
-            //else if (m_vInputMove.x > 0f)
-            //{
-            //    tmpx = 1f;
-            //}
-            //else  if (Owner.ActorTrans.forward.x < 0f)
-            //    tmpx = -1;
-            //if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down + Vector3.right * tmpx, out hitInfo, Quaternion.LookRotation((new Vector3(tmpx * -1, -1, 0)).normalized), m_fBiasDisForBrick, BoxMask))
-            //{
-            //    return false;
-            //}
         }
 
         return true;
@@ -701,11 +655,11 @@ public class PlayerManager : MonoBehaviour
     {
         if (JumpThroughState == false && Time.time - m_fStartTime >= fCheckJumpTime) //0.04 通过计算可以让角色跳跃0.44米高度, 角色头顶和brick的距离是0.5f。
         {
-            if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out hitInfo, Quaternion.Euler(Vector3.up), 0.1f + Owner.ActorHeight, BrickMask))                               
+            if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out hitInfo, Quaternion.Euler(Vector3.up), 0.1f + Owner.ActorHeight, BrickMask))                            
             {
                 //检测上方是否有box
-                if (!Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out hitInfo, Quaternion.Euler(Vector3.up), 
-                    m_curJumpData.m_fJumpHeight + GlobalHelper.SBoxSize + 0.1f,
+                if (!Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out hitInfo, Quaternion.Euler(Vector3.up),
+                   Owner.BaseAtt.RoleInfo.fJumpHeight + GlobalHelper.SBoxSize + 0.1f,
                     BoxMask))                                  
                     {
                         JumpThroughState = true;

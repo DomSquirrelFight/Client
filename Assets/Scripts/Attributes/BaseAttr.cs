@@ -2,36 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
-
+using Assets.Scripts.RoleInfoEditor;
 public class BaseAttr : MonoBehaviour
 {
 
-    #region 角色阵营
-    eCharacSide characSide;
-    public eCharacSide CharacSide
-    {
-        get
-        {
-            return characSide;
+    private RoleInfos roleinfos;
+    public RoleInfos RoleInfo {
+        get {
+            return roleinfos;
         }
     }
-    #endregion
 
-    #region 角色类型
-    eCharacType charactype;
-    public eCharacType CharacType
-    {
-        get
-        {
-            return charactype;
-        }
-    }
-    #endregion
 
-    public void InitAttr(eCharacSide side, eCharacType type)
+    public void InitAttr(RoleInfos _infos)
     {
-        charactype = type;
-        characSide = side;
+        roleinfos = _infos;
     }
 
 }

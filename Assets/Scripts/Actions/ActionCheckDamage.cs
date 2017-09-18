@@ -32,7 +32,7 @@ namespace Assets.Scripts.Action
             
             //判定是否是NPC
             BaseActor ba = other.transform.parent.GetComponent<BaseActor>();
-            if (null != ba && ba.BaseAtt.CharacSide == AttTypeDefine.eCharacSide.Side_Player && ba.BaseAtt.CharacType == AttTypeDefine.eCharacType.Type_Major)
+            if (null != ba && ba.BaseAtt.RoleInfo.CharacSide == AttTypeDefine.eCharacSide.Side_Player && ba.BaseAtt.RoleInfo.CharacType == AttTypeDefine.eCharacType.Type_Major)
             {
                 trigActors.Add(ba);
             }

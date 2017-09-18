@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 using System;
+using Assets.Scripts.RoleInfoEditor;
 public class BaseActor : MonoBehaviour
 {
 
@@ -61,13 +62,21 @@ public class BaseActor : MonoBehaviour
     /// 创建角色，并将角色实例返回
     /// </summary>
     /// <returns></returns>
-    static public BaseActor CreatePlayer(string name/*角色名称*/, eRoleID roldid/*角色ID*/, Vector3 pos = default(Vector3)/*模型出生位置*/, Quaternion rot = default(Quaternion)/*模型出生朝向*/, 
-        eCharacSide side = eCharacSide.Side_Player, eCharacType type = eCharacType.Type_Major
-        )
+    static public BaseActor CreatePlayer(int roldid/*角色ID*/, Vector3 pos = default(Vector3)/*模型出生位置*/, Quaternion rot = default(Quaternion)/*模型出生朝向*/)
     {
 
+        #region 加载Asset文件
+        string assetpath = GlobalHelper.SResAssetRoute + roldid.ToString();
+        RoleInfos roleInfos = (Resources.Load(assetpath)) as RoleInfos;
+        if (null == roleInfos)
+        {
+            Debug.LogErrorFormat("Fail to find asset in route ({0})", assetpath);
+            return null;
+        }
+        #endregion
+
         #region 创建外层对象
-        GameObject Player = new GameObject(name);
+        GameObject Player = new GameObject(roleInfos.strRoleName);
         Player.transform.position = Vector3.zero;
         Player.transform.rotation = Quaternion.identity;
         Player.transform.localScale = Vector3.one;
@@ -76,25 +85,17 @@ public class BaseActor : MonoBehaviour
         #region 创建模型
         BaseActor ba = Player.AddComponent<BaseActor>();//加载BaseActor脚本
 
-        CreateActor(roldid, ba, pos, rot);//加载模型
-        #endregion
-
-        #region 获取跳跃数据
-       // if (bCanJump)
-        {
-            //获取小跳数据
-            UnityEngine.Object _obj = Resources.Load("Prefabs/Maps/FightTest/SmallJumpDataStore");
-            GameObject obj = Instantiate(_obj) as GameObject;
-            ba.m_cSmallJumpDataStore = obj.GetComponent<JumpDataStore>();
-            ba.m_cSmallJumpDataStore.transform.parent = ba.transform;//设置小跳的父类
-        }
+        CreateActor(roldid, roleInfos.strRolePath, ba, pos, rot);//加载模型
         #endregion
 
         #region 角色属性
-        switch (type)
+        switch (roleInfos.CharacType)
         {
             case eCharacType.Type_Major:
                 {
+
+                    ba.baseattr = (BaseAttr)ba.gameObject.GetOrAddComponent<PlayerAttr>();
+                    ba.BaseAtt.InitAttr(roleInfos);
                     if (
                       null != ba.PlayerMgr/*读取角色管理器*/ ||
                       null != ba.CameraContrl/*相机实例对象*/ ||
@@ -104,7 +105,7 @@ public class BaseActor : MonoBehaviour
                         ba.PlayerMgr.OnStart(ba);//启动角色管理器
                         ba.CameraContrl.OnStart(ba);//启动相机
                     }
-                    ba.baseattr = (BaseAttr)ba.gameObject.GetOrAddComponent<PlayerAttr>();
+                   
                     ba.fsm = (FSMBehaviour)ba.gameObject.GetOrAddComponent<PlayerFSM>();
                     ba.InitShaderProperties();
                     break;
@@ -112,6 +113,8 @@ public class BaseActor : MonoBehaviour
             case eCharacType.Type_NormalNpc:
             case eCharacType.Type_Boss:
                 {
+                    ba.baseattr = (BaseAttr)ba.gameObject.GetOrAddComponent<NpcAttr>();
+                    ba.BaseAtt.InitAttr(roleInfos);
                     if (
                      null != ba.PlayerMgr/*读取角色管理器*/ ||
                      null != ba.RB/*加载刚体*/
@@ -119,11 +122,11 @@ public class BaseActor : MonoBehaviour
                     {
                         ba.PlayerMgr.OnStart(ba);//启动角色管理器
                     }
-                    ba.baseattr = (BaseAttr)ba.gameObject.GetOrAddComponent<NpcAttr>();
+                  
                     break;
                 }
         }
-        ba.BaseAtt.InitAttr(side, type);
+    
     
         #endregion
 
@@ -134,22 +137,10 @@ public class BaseActor : MonoBehaviour
     /// 创建角色模型实例对象，并返回
     /// </summary>
     /// <returns></returns>
-    static public GameObject CreateActor(eRoleID roleId, BaseActor baparent, Vector3 pos = default(Vector3)/*模型出生位置*/, Quaternion rot = default(Quaternion)/*模型出生朝向*/)
+    static public GameObject CreateActor(int roleId, string path, BaseActor baparent, Vector3 pos = default(Vector3)/*模型出生位置*/, Quaternion rot = default(Quaternion)/*模型出生朝向*/)
     {
-        string route = "";
-        switch (roleId)
-        {
-            case eRoleID.Role_Major:
-                {
-                    route = "Prefabs/Character/Penguins/Prefab/PenguinA";
-                    break;
-                }
-            case eRoleID.Role_SoliderV1:
-                {
-                    break;
-                }
-        }
-        UnityEngine.Object obj = Resources.Load(route);
+
+        UnityEngine.Object obj = Resources.Load(path);
         GameObject actor = Instantiate(obj) as GameObject;
         actor.name = obj.name;
         actor.transform.parent = baparent.transform;
@@ -270,16 +261,7 @@ public class BaseActor : MonoBehaviour
 
     #endregion
 
-    #region 小跳类
-    private JumpDataStore m_cSmallJumpDataStore;
-    public JumpDataStore SmallJumpDataStore
-    {
-        get
-        {
-            return m_cSmallJumpDataStore;
-        }
-    }
-    #endregion
+
 
     #region 玩家状态
 

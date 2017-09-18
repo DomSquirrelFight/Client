@@ -12,6 +12,8 @@ public class GlobalHelper
     public static float SRotSpeed = 60f;
     public static float SBoxSize = 0.6f;
     public static float SBrickDis = 0.4f;
+    public static string SAssetRoute = "Assets/Resources/Assets/RoleInfos/";
+    public static string SResAssetRoute = "Assets/RoleInfos/";
     #endregion
 
     public static Vector2 GetCamArea(Vector3 middle)
