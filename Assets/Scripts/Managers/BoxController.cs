@@ -8,17 +8,35 @@ public class BoxController : MonoBehaviour {
 
     public float FDuration;
 
+    public float FDownDis;                                              //盒子下降的距离
+
+    public float FDownDuration;                                    //盒子下降的时间
+
+    public AnimationCurve curve = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(0.5f, 0.5f), new Keyframe(1f, 1f));
+
+
     Vector3 m_vDir;
-    float m_fStartTime;
+    float m_fStartTime;                                                 //记录何时销毁盒子
+
+    float m_fStartDownTime;                                        //记录何时盒子开始下降
+
+    float m_fOrigHeight;                                              //记录盒子开始的高度
     void Awake()
     {
         m_fStartTime = 0f;
+     
         m_vDir = Vector3.zero;
     }
+
     public void OnStart() {
         m_fStartTime = Time.time;
+        m_fStartDownTime = Time.time;
+        m_fOrigHeight = transform.position.y;
+        AbsDis = Mathf.Abs(FDownDis);
     }
-	
+    float AbsDis;
+    float tmp;
+    Vector3 vTmp;
 	// Update is called once per frame
 	void Update () {
 
@@ -30,8 +48,19 @@ public class BoxController : MonoBehaviour {
             }
             else
             {
+
+                if (Time.time - m_fStartDownTime < FDownDuration && m_fOrigHeight - transform.position.y <= AbsDis)
+                {
+                    tmp = curve.Evaluate((Time.time - m_fStartDownTime) / FDownDuration) * FDownDis;
+                    vTmp = new Vector3(transform.position.x, m_fOrigHeight + tmp, transform.position.z);
+                    transform.position = Vector3.Lerp(transform.position, vTmp, FSpeed* Time.deltaTime);
+                }
+                else
+                {
+                    int a = 0;
+                }
                 transform.Translate(transform.forward * FSpeed * Time.deltaTime, Space.World);
-               // transform.position += ( );
+               
             }
         }
 	}

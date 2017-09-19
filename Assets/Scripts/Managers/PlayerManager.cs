@@ -110,15 +110,17 @@ public class PlayerManager : MonoBehaviour
         {
             if (value != bCanJumpDown)
             {
-                if (value == ePlayerJumpDownState.CanJumpDown_YES && (bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NULL || bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NO))                     //ui fight 下跳按钮点亮
+                if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
                 {
-                    m_UISceneFight.BDisableJumpDown = false;
+                    if (value == ePlayerJumpDownState.CanJumpDown_YES && (bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NULL || bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NO))                     //ui fight 下跳按钮点亮
+                    {
+                        m_UISceneFight.BDisableJumpDown = false;
+                    }
+                    else if (value == ePlayerJumpDownState.CanJumpDown_NO && (bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NULL || bCanJumpDown == ePlayerJumpDownState.CanJumpDown_YES))               // ui fight 下跳按钮变灰
+                    {
+                        m_UISceneFight.BDisableJumpDown = true;
+                    }
                 }
-                else if (value == ePlayerJumpDownState.CanJumpDown_NO && (bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NULL || bCanJumpDown == ePlayerJumpDownState.CanJumpDown_YES))               // ui fight 下跳按钮变灰
-                {
-                    m_UISceneFight.BDisableJumpDown = true;
-                }
-
                 bCanJumpDown = value;
 
             }
@@ -175,9 +177,13 @@ public class PlayerManager : MonoBehaviour
         HoldBoxMask = 1 << HoldBoxMaskGlossy;
 
         Owner = owner;
-        m_UISceneFight = Helpers.UIScene<UIScene_Fight>();
-        m_UISceneFight.OnStart(Owner);
-        cc = Owner.CameraContrl;
+        if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
+        {
+            m_UISceneFight = Helpers.UIScene<UIScene_Fight>();
+            m_UISceneFight.OnStart(Owner);
+            cc = Owner.CameraContrl;
+        }
+     
         //m_curJumpData = Owner.SmallJumpDataStore;
 
         //角色垂直上跳，碰到brick的距离
@@ -718,18 +724,25 @@ public class PlayerManager : MonoBehaviour
         if (m_vInputMove.x == 0f)
             return false;
 
+        if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major)
+            return false;
+
         if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
         {
-            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize && m_vInputMove.x < 0f) return true;//block left
+            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize && m_vInputMove.x < 0f) 
+                return true;//block left
         }
         else if (cc.CamMoveDir == eCamMoveDir.CamMove_Left)
         {
-            if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize && m_vInputMove.x > 0f) return true; //block right
+            if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize && m_vInputMove.x > 0f) 
+                return true; //block right
         }
         else if (cc.CamMoveDir == eCamMoveDir.CamMove_Up)
         {
-            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize && m_vInputMove.x < 0f) return true;//block left
-            else if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize && m_vInputMove.x > 0f) return true; //block right
+            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize && m_vInputMove.x < 0f) 
+                return true;//block left
+            else if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize && m_vInputMove.x > 0f) 
+                return true; //block right
         }
     
         return false; 
