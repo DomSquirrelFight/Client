@@ -239,21 +239,21 @@ public class BaseActor : MonoBehaviour
         }
     }
 
-    public float ActorMiddleYPos
-    {
-        get
-        {
-            return ActorTrans.position.y + ActorHeight * 0.5f;
-        }
-    }
+    //public float ActorMiddleYPos
+    //{
+    //    get
+    //    {
+    //        return ActorTrans.position.y + ActorHeight * 0.5f;
+    //    }
+    //}
 
-    public Vector3 ActorMiddlePoint
-    {
-        get
-        {
-            return new Vector3(ActorTrans.position.x, ActorMiddleYPos, ActorTrans.position.z);
-        }
-    }
+    //public Vector3 ActorMiddlePoint
+    //{
+    //    get
+    //    {
+    //        return new Vector3(ActorTrans.position.x, ActorMiddleYPos, ActorTrans.position.z);
+    //    }
+    //}
 
 
 
@@ -306,29 +306,35 @@ public class BaseActor : MonoBehaviour
         {
             m_sDeadShader = Shader.Find("Custom/Alpha");
             m_smr.materials[0].shader = m_sDeadShader;
+            m_smr.materials[0].SetFloat("_AlphaScale", 1.0f);
         }
         while (true)
         {
-            if (m_alpha <= 0)
+            if (m_alpha <= 0 || m_alpha >= 1.0f)
             {
                 m_aplhaStep = 0 - m_aplhaStep;
             }
             m_smr.materials[0].SetFloat("_AlphaScale", m_alpha);
-            m_alpha -= Time.deltaTime * 0.5f;
+            m_alpha -= Time.deltaTime * m_aplhaStep;
             yield return null;
         }
       
     }
 
 
-    public void EndChangingAlpha()
+    public void EndChangingAlpha(float wait)
     {
-        m_smr.materials[0].shader = m_sOrig;
-
-
-        StopCoroutine(ChangingAlpha());
+        Invoke("WaitingChangingBack", wait);
     }
 
+    void WaitingChangingBack()
+    {
+        m_smr.materials[0].shader = m_sOrig;
+        RB.isKinematic = false;
+        BC.enabled = true;
+        FSM.SetTransition(StateID.Idle);
+        StopCoroutine(ChangingAlpha());
+    }
 
     #endregion
 

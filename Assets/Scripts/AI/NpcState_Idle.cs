@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class NpcState_Idle : FSMState
 {
+    public NpcState_Idle(BaseActor owner, StateID id) : base(owner, id){}
 
-    public NpcState_Idle(BaseActor owner)
+    public override void Reason(BaseActor target)
     {
-        Owner = owner;
-        stateID = StateID.Idle;
+        Owner.FSM.SetTransition(StateID.Chase);
     }
+
 }

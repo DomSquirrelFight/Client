@@ -19,11 +19,11 @@ public class PlayerFSM : FSMBehaviour {
         base.MakeFSM();
         fsm = new FSMSystem();
 
-        PlayerState_SelfControl con = new PlayerState_SelfControl(ba);
+        PlayerState_SelfControl con = new PlayerState_SelfControl(ba, StateID.Idle);
         con.AddTransition(StateID.Injured);
         
-        PlayerState_Injure injure = new PlayerState_Injure(ba);
-        injure.AddTransition(StateID.Injured);
+        PlayerState_Injure injure = new PlayerState_Injure(ba, StateID.Injured);
+       // injure.AddTransition(StateID.Injured);
         injure.AddTransition(StateID.Idle);
 
         fsm.AddState(con);

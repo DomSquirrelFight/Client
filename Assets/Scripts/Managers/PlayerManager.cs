@@ -4,6 +4,7 @@ using UnityEngine;
 using AttTypeDefine;
 using System.Linq;
 using Assets.Scripts.Helper;
+using Assets.Scripts.RoleInfoEditor;
 public class PlayerManager : MonoBehaviour
 {
 
@@ -181,9 +182,8 @@ public class PlayerManager : MonoBehaviour
         {
             m_UISceneFight = Helpers.UIScene<UIScene_Fight>();
             m_UISceneFight.OnStart(Owner);
-            cc = Owner.CameraContrl;
         }
-     
+        cc = Owner.CameraContrl;
         //m_curJumpData = Owner.SmallJumpDataStore;
 
         //角色垂直上跳，碰到brick的距离
@@ -203,6 +203,9 @@ public class PlayerManager : MonoBehaviour
     void Update()
     {
         if (!Owner)
+            return;
+
+        if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major)
             return;
 
         if (Owner.FSM.IsInState(StateID.Injured))
@@ -260,9 +263,6 @@ public class PlayerManager : MonoBehaviour
     float he, ve;
     public void CalMoveInput()                                              //获取平移输入
     {
-
-        if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major)
-            return;
 
         if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
         {
@@ -388,6 +388,13 @@ public class PlayerManager : MonoBehaviour
                 else if (other.contacts[0].otherCollider.gameObject.layer == BoxMaskGlossy)                              //如果判定碰到的是box
                 {
                     OperateGround(other, BoxMask);
+                }
+                else if (other.contacts[0].otherCollider.gameObject.layer == NpcMaskGlossy)
+                {
+                    if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
+                    {
+                        Owner.FSM.SetTransition(StateID.Injured);
+                    }
                 }
             }
         }
@@ -633,30 +640,6 @@ public class PlayerManager : MonoBehaviour
     float tmpx = 1f;
     float lastTmpx = 1f;
     readonly float fCheckJumpTime = 0.04f;
-    //float m_fSlideDis = 0f;
-    //void CalculateSlideDis () {
-    //                            float v0 = m_curJumpData.m_fJumpInitSpeed + 0.5f * m_curJumpData.m_fJumpAccel * fCheckJumpTime;
-    //                            float a = 0.5f * m_curJumpData.m_fJumpAccel;
-    //                            float b = v0;
-    //                            float c = 0f - 0.26f;
-
-    //                            float upright = Mathf.Sqrt(b * b - 4f * a * c);
-    //                            float upleft = 0 - b;
-    //                            float down = 2f * a;
-
-
-    //                            float t1 = (upleft - upright) / down;
-    //                            float t2 = (upleft + upright) / down;
-
-    //                            float t = t1 < t2 ? t1 : t2;
-    //                            if (t < 0f)
-    //                            {
-    //                                Debug.LogErrorFormat("t1 = {0}, t2 = {1}", t1, t2);
-    //                                return;
-    //                            }
-    //                            m_fSlideDis = GlobalHelper.SMoveSpeed * t;
-    //}
-
 
     bool JumpThroughState
     {
@@ -691,7 +674,8 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region Translate
-    bool RayCastBlock()
+
+    public bool RayCastBlock()
     {
         if (Physics.BoxCast(Owner.ActorTrans.position + Owner.BC.center, new Vector3(Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.4f, 0.1f),
                                         Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f, BoxMask + WallMask
@@ -703,7 +687,7 @@ public class PlayerManager : MonoBehaviour
         return m_bIsBlocked;
     }
 
-    void RotatePlayer()
+    public void RotatePlayer()
     {
         if (m_vInputMove.x != 0f)
         {
@@ -718,30 +702,33 @@ public class PlayerManager : MonoBehaviour
             Owner.ActorTrans.Translate(new Vector3(0f, 0f,  Mathf.Abs(m_vInputMove.x) * SMoveSpeed * Time.deltaTime));
     }
 
-    bool CheckMoveBoundaryBlock() 
+    public bool CheckMoveBoundaryBlock(float extra = 0f) 
     {
+        if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
+        {
+            if (m_vInputMove.x == 0f)
+                return false;
+        }
+       
 
-        if (m_vInputMove.x == 0f)
-            return false;
-
-        if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major)
-            return false;
+        //if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major)
+        //    return false;
 
         if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
         {
-            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize && m_vInputMove.x < 0f) 
+            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
                 return true;//block left
         }
         else if (cc.CamMoveDir == eCamMoveDir.CamMove_Left)
         {
-            if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize && m_vInputMove.x > 0f) 
+            if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
                 return true; //block right
         }
         else if (cc.CamMoveDir == eCamMoveDir.CamMove_Up)
         {
-            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize && m_vInputMove.x < 0f) 
+            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
                 return true;//block left
-            else if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize && m_vInputMove.x > 0f) 
+            else if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
                 return true; //block right
         }
     
@@ -802,6 +789,105 @@ public class PlayerManager : MonoBehaviour
         m_bIsBlocked = false;
         m_bCollisionEntered = false;
     }
+    #endregion
+
+
+    #region 非主角NPC状态机驱动接口
+
+        RoleInfos m_RoleInfos; 
+        public void StateUpdate()           
+        {   
+            if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
+                return;
+
+            if(null == m_RoleInfos)
+                m_RoleInfos = Owner.BaseAtt.RoleInfo;
+
+            switch (m_RoleInfos.MonsterType)
+            {
+                case eMonsterType.MonType_GroundNpc:
+                    {
+                        switch (m_RoleInfos.MoveType)
+                        {
+                            case eMoveType.eMove_Straight:                          //地面怪兽，直线行走
+                                {
+                                    GoundMonsterStraight();
+                                    break;
+                                }
+                            case eMoveType.eMove_Track:                             //面怪兽，追击主角
+                                {
+                                    break;
+                                }
+                        }
+                        break;
+                    }
+                case eMonsterType.MonType_FlyBat:
+                    {
+                 
+                        break;
+                    }
+            }
+
+            //复位数据
+            ResetAllData();
+        }
+
+        int n;
+        void GoundMonsterStraight()
+        {
+            //判定是否走出了视野范围
+
+            if (CheckMoveBoundaryBlock(Owner.ActorHeight))
+            {
+                Destroy(transform.parent.gameObject);
+                return;
+            }
+
+            RotatePlayer();
+
+            m_vInputMove = transform.forward;
+
+            PlayMoveAnim();
+
+            //判断是否可以前进
+            //返回true ： 则表示前方有box
+            //返回false :   表示可以前进
+            if (Physics.BoxCast(Owner.ActorTrans.position + Owner.BC.center, new Vector3(Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.4f, 0.1f),
+                                     Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f, BoxMask + WallMask))
+            {
+                m_bIsBlocked = true;
+                /*
+                 * 怪兽有可能有三种行为
+                 * 1 : 跳过盒子
+                 * 2 : 举起盒子
+                 * 3 : 朝着反方向运动
+                 * 
+                 * 如果举着盒子，当和主角满足一定条件，那么扔掉盒子，否则一直举着盒子
+                 * 
+                 * */
+                n = Random.Range(0, 100);
+
+                //m_vInputMove.x = 0 - m_vInputMove.x;
+                //return;
+                if (n > 70)             //跳过盒子
+                {
+                    CalJumpUp();
+                }
+                else if (n <= 70 && n > 30)                     //举起盒子
+                {
+                    CalPickUpBox();
+                }
+                else                                                        //朝着反方向行走
+                {
+                    m_vInputMove.x = 0 - m_vInputMove.x;
+                }
+            }
+            else
+            {
+                TranslatePlayer();
+            }
+        }
+
     #endregion
 
 }

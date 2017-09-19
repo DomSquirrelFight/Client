@@ -21,16 +21,14 @@ public class AIEnemy : FSMBehaviour
         base.MakeFSM();
         fsm = new FSMSystem();
 
-        NpcState_Idle idle = new NpcState_Idle(ba);
+        NpcState_Idle idle = new NpcState_Idle(ba, StateID.Idle);
+        idle.AddTransition(StateID.Chase);
 
-        //PlayerState_SelfControl con = new PlayerState_SelfControl(ba);
-        //con.AddTransition(StateID.Injured);
 
-        //PlayerState_Injure injure = new PlayerState_Injure(ba);
-        //injure.AddTransition(StateID.Injured);
-        //injure.AddTransition(StateID.Idle);
-
+        NpcState_Chase chase = new NpcState_Chase(ba, StateID.Chase);
+        chase.AddTransition(StateID.Idle);
+            
         fsm.AddState(idle);
-        //fsm.AddState(injure);
+        fsm.AddState(chase);
     }
 }

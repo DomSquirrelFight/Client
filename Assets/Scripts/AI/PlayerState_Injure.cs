@@ -1,11 +1,9 @@
 ﻿using Assets.Scripts.Utilities;
 using UnityEngine;
-public class PlayerState_Injure : FSMState_InjureBase {
+public class PlayerState_Injure : FSMState {
 
-    public PlayerState_Injure(BaseActor owner)
-        : base(owner, StateID.Injured)
-    {
-    }
+    public PlayerState_Injure(BaseActor owner, StateID id) : base(owner, id){}
+
     bool bLastInTransition = false;
     float RoleBackSpeed = 0f;
     public override void DoBeforeEntering(BaseActor target)
@@ -23,10 +21,8 @@ public class PlayerState_Injure : FSMState_InjureBase {
         Owner.ActorTrans.Translate(Owner.ActorTrans.forward * (-1f) * RoleBackSpeed * Time.deltaTime, Space.World);
         if (bLastInTransition && !intransition)
         {
-            Owner.RB.isKinematic = false;
-            Owner.BC.enabled = true;
-            Owner.EndChangingAlpha();
-            Owner.FSM.SetTransition(StateID.Idle);
+            Owner.EndChangingAlpha(0.3f);
+           
         }
         bLastInTransition = intransition;
     }

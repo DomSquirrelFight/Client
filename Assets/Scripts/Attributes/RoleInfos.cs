@@ -17,9 +17,11 @@ namespace Assets.Scripts.RoleInfoEditor
 
         public eCharacType CharacType;
 
-        public float fInitAccel;
+        public eMonsterType MonsterType;
 
-        public eMonsterType MoveType;
+        public eMoveType MoveType;
+
+        public float fInitAccel;
 
         public float fJumpUpDuration;
 
@@ -37,9 +39,15 @@ namespace Assets.Scripts.RoleInfoEditor
 
         public float RoleRotSpeed;                                                                    //角色旋转速度
 
+        public void OnValidate()
+        {
+            if (CharacType == eCharacType.Type_Major)
+            {
+                MonsterType = eMonsterType.MonType_Null;
+                MoveType = eMoveType.eMove_NULL;
+            }
+        }
 
-
-        
     }
 }
 

@@ -6,7 +6,7 @@ public enum StateID {
     Birth,             //出生
     Idle,              //待机
     RandomRun,
-    ChasingPlayer,//追踪玩家
+    Chase,//追踪玩家
     Attacking,//攻击
     Injured,                //受伤
     InjuredBack,        //受伤位移-水平
@@ -15,6 +15,7 @@ public enum StateID {
 }
 
 public abstract class FSMState {
+    protected CameraController CC;
     protected List<StateID> outputStates = new List<StateID>();
     protected StateID stateID;
     protected BaseActor Owner;
@@ -22,6 +23,12 @@ public abstract class FSMState {
         get {
             return stateID;
         }
+    }
+
+    public FSMState(BaseActor owner, StateID id)
+    {
+        Owner = owner;
+        stateID = id;
     }
 
     public void AddTransition(StateID trans) {

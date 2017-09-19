@@ -62,7 +62,7 @@ public class NpcType :  BaseAction{
                 }
             case eMonsterType.MonType_GroundNpc:
                 {
-                    BaseActor.CreatePlayer(RoleId, transform.position, transform.rotation, Vector3.one*0.5f);
+                    BaseActor.CreatePlayer(RoleId, transform.position, transform.rotation, Vector3.one);
                     break;
                 }
         }

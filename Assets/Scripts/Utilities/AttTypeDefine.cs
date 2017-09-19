@@ -47,6 +47,7 @@ namespace AttTypeDefine
 
     public enum eMoveType
     {
+        eMove_NULL,
         eMove_Straight,
         eMove_Track,
     }

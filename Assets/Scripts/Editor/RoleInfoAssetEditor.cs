@@ -40,6 +40,13 @@ namespace Assets.Scripts.RoleInfoEditor
 
         string[] arrCharacterType = new string[] { "主角", "NPC", "BOSS" };
         int[] arrNCharacterType = new int[] { 0, 1, 2 };
+
+        string[] arrMonsterType = new string[] {"陨石", "飞鸟", "地面NPC", "假盒子" };
+        int[] arrNMonsterType = new int[] { 0, 1, 2, 3};
+
+        string[] arrMonsterMoveType = new string[] { "直线行走", "追击"};
+        int[] arrNMonsterMoveType = new int[] { 0, 1};
+
         #endregion
 
         void CalculateInitSpeed()
@@ -90,7 +97,6 @@ namespace Assets.Scripts.RoleInfoEditor
             _data.strRolePath = EditorGUILayout.TextField("角色资源路径", _data.strRolePath);
             #endregion
 
-
             #region  玩家阵营
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("玩家阵营");
@@ -114,7 +120,45 @@ namespace Assets.Scripts.RoleInfoEditor
             }
             EditorGUILayout.EndHorizontal();
             #endregion
-       
+
+            #region 怪兽类型
+            if (_data.CharacType == eCharacType.Type_Major)
+            {
+                _data.MonsterType = eMonsterType.MonType_Null;
+            }
+            else
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("怪兽类型");
+                nValue = EditorGUILayout.IntPopup((int)_data.MonsterType, arrMonsterType, arrNMonsterType);
+
+                if (nValue != (int)_data.MonsterType)
+                {
+                    _data.MonsterType = (eMonsterType)nValue;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            #endregion
+
+            #region 地面怪兽行为方式
+            if (_data.CharacType == eCharacType.Type_Major)
+            {
+                _data.MoveType = eMoveType.eMove_NULL;
+            }
+            else
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("地面怪兽移动行为方式");
+                nValue = EditorGUILayout.IntPopup((int)_data.MoveType, arrMonsterMoveType, arrNMonsterMoveType);
+
+                if (nValue != (int)_data.MoveType)
+                {
+                    _data.MoveType = (eMoveType)nValue;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            #endregion
+
             #region 跳跃加速度
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("跳跃加速度");
