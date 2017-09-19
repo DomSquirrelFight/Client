@@ -9,9 +9,6 @@ public class UIScene_GetNum : UIScene {
 	void Start () {
         //注册成功，点击login，登录成功，进入人物选择界面
         UIEventListener.Get(m_Login).onClick = Login;
-        //初始化深度
-        UIPanel up = gameObject.GetComponent<UIPanel>();
-        up.depth = 2;
         //当前跳转到selectedloading
         eState = LoadingState.e_LoadSelect;
         eScene = SceneType.SelecteLoading;

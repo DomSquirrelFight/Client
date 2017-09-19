@@ -11,8 +11,6 @@ public class UIScene_Loading : UIScene {
     //背景图片
     public UISprite m_uBg;
     AnimState animState;
-    //pic的实例
-    public GameObject m_oPic;
     //Bar的实例
     public GameObject m_oBar;
     #endregion
@@ -41,23 +39,23 @@ public class UIScene_Loading : UIScene {
         {
             if (m_uBg.fillAmount >= 1f)
             {
-                animState = AnimState.Start_PicAnim;
+                animState = AnimState.Start_ProgressBar;
             }
             else
             {
-                m_uBg.fillAmount += 2f;
+                m_uBg.fillAmount += 2f*Time.deltaTime;
             }
         }
         //pic的加载
-        if (animState == AnimState.Start_PicAnim)
-        {
-            TweenPosition.Begin(m_oPic, 2f, new Vector3(0, 0, 0)).method = UITweener.Method.BounceIn;
-            animState = AnimState.Start_ProgressBar;
-        }
+        //if (animState == AnimState.Start_PicAnim)
+        //{
+        //    //TweenPosition.Begin(m_oPic, 2f, new Vector3(0, 0, 0)).method = UITweener.Method.BounceIn;
+        //    animState = AnimState.Start_ProgressBar;
+        //}
         //进度条的加载
         if (animState == AnimState.Start_ProgressBar)
         {
-            TweenPosition.Begin(m_oBar, 1f, new Vector3(0, -200, 0)).method = UITweener.Method.BounceIn;
+            TweenPosition.Begin(m_oBar, 1f, new Vector3(-450, -280, 0)).method = UITweener.Method.BounceIn;
             //StartCoroutine(LaterDo());
             animState = AnimState.Start_null;
 
@@ -108,9 +106,9 @@ public class UIScene_Loading : UIScene {
             //进度条走到百分之百，资源销毁
             // StartCoroutine(LaterDo());
             //DestroyLoading();s
-            Invoke("DestroyLoading", 1f);
+            Invoke("DestroyLoading", 2f);
             //场景切换
-            DestroyLoading();
+            //DestroyLoading();
         }
     }
     #endregion

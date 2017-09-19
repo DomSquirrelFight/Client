@@ -1,23 +1,39 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using AttTypeDefine;
 
 public class UIScene_ResetPwd : UIScene {
+
+    #region 成员变量
     public GameObject m_Login;
-	// Use this for initialization
-	void Start () {
+    public GameObject m_oExit;
+    #endregion
+
+    #region 系统接口.
+    void Start()
+    {
         eState = LoadingState.e_LoadSelect;
         eScene = SceneType.SelecteLoading;
         UIEventListener.Get(m_Login).onClick = Loading;
-	}
-	//登录成功，切换到selected loading
+        UIEventListener.Get(m_oExit).onClick = Exit;
+    }
+    #endregion
+
+    #region 登陆按钮
+    //登录成功，切换到selected loading
     void Loading(GameObject obj)
     {
         GlobalHelper.LoadLevel("Loading");
     }
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    #endregion
+
+    #region 退出按钮
+    void Exit(GameObject obj)
+    {
+        Destroy(gameObject);
+    }
+    #endregion
+
+
+
+
 }

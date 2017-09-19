@@ -14,9 +14,6 @@ public class UIScene_Register : MonoBehaviour {
     {
         UIEventListener.Get(m_GetNum).onClick = GetNum;
         UIEventListener.Get(m_oBackbtn).onClick = GoBack;
-        //初始化当前的ui界面，让当前的ui界面的深度高于登陆界面
-        UIPanel panel = gameObject.GetComponent<UIPanel>();
-        panel.depth = 1;
     }
     #endregion
 

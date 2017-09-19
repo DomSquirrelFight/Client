@@ -2,18 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIScene_WrongPwd : MonoBehaviour {
+public class UIScene_WrongPwd : UIScene {
     public GameObject m_oBtn;
 	// Use this for initialization
 	void Start () {
-        UIEventListener.Get(m_oBtn).onClick = ClickOK;
+        UIEventListener.Get(m_oBtn).onClick = ClickBtn;
 	}
-	void ClickOK(GameObject obj)
+    protected override void ClickBtn(GameObject obj)
     {
-        Destroy(gameObject);
+        base.ClickBtn(obj);
     }
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
 }

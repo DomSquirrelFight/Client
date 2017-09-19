@@ -2,18 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIScene_MobileCode : MonoBehaviour {
+public class UIScene_MobileCode : UIScene {
     public GameObject m_oBtn;
 	// Use this for initialization
 	void Start () {
-        UIEventListener.Get(m_oBtn).onClick = BtnClick;
+        UIEventListener.Get(m_oBtn).onClick = ClickBtn;
 	}
-	void BtnClick(GameObject obj)
+
+    protected override void ClickBtn(GameObject obj)
     {
-        Destroy(gameObject);
+        base.ClickBtn(obj);
     }
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

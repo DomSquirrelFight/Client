@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Assets.Scripts.Helper;
 
 public class UIScene_BackPwd : MonoBehaviour {
 
@@ -37,7 +38,8 @@ public class UIScene_BackPwd : MonoBehaviour {
     void ServerBackPwd(string data)
     {
         //如果数据库信息和输入的信息相符，进入loading场景，进入select界面
-        GlobalHelper.LoadLevel("Loading");
+        //GlobalHelper.LoadLevel("Loading");
+        Helpers.UIScene<UIScene_ResetPwd>();
         //如果数据库信息和输入的信息不一致，弹出用户名和密码不一致的ui界面
         //Helpers.UIScene<UIScene_WrongPwd>();
     }
@@ -54,9 +56,4 @@ public class UIScene_BackPwd : MonoBehaviour {
     #endregion
 
 
-
-    // Update is called once per frame
-    void Update () {
-		
-	}
 }

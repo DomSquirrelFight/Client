@@ -17,9 +17,8 @@ public class IniteBtn : MakeMove {
             //Btn初始化
             GameObject button = Btn[i];
             button.transform.parent = Global.Button.transform;
-            button.transform.localScale = new Vector3(2, 0.5f, 1);
+           // button.transform.localScale = new Vector3(2, 0.5f, 1);
             Global.UI[i] = Btn[i];
-            indedx = i;
             TrigClick tc = Btn[i].GetComponent<TrigClick>();
             tc.OnStart(i);
         }
@@ -28,7 +27,7 @@ public class IniteBtn : MakeMove {
         GameObject CurButton = Instantiate(Resources.Load(path)) as GameObject;
         CurButton.transform.parent = Global.Button.transform;
         CurButton.transform.localPosition = Btn[0].transform.localPosition;
-        CurButton.transform.localScale = Vector3.one;
+        CurButton.transform.localScale = Btn[0].transform.localScale;
         Global.CurBtn = CurButton;
         //UIEventListener.Get(Btn[BtnIndex]).onClick = Click;
         //UIEventListener.Get(obj).onClick = Click;
@@ -39,23 +38,40 @@ public class IniteBtn : MakeMove {
     //执行click事件
    public  void ClickBtn(int i)
     {
-        if (Global.e_State==StateUI.State_Stay)
-        {
-            indedx = i;
-            Global.e_State = StateUI.State_Move;
-        }
-    }
-    void Update()
-    {
-        if (Global.e_State == StateUI.State_Move)
-        {
-            MoveOutDrag(indedx);
-        }
-        if ((Mathf.Abs(Global.Grid.transform.localPosition.x + (Global.Grid_CurrentIndex * Global.Grid_PerSize))) < 10f)
-        {
-            //MoveInmarginal(indedx);
-            Global.e_State = StateUI.State_Stay;
-        }
+        //if (Global.e_State == StateUI.State_Stay)
+        //{
+        //    Global.Grid_CurrentIndex = i;
+        //    Global.e_State = StateUI.State_Move;
+        //}
+        Debug.Log(Global.e_State);
+        Global.e_State = StateUI.State_Stay;
+        Global.Grid_CurrentIndex = i;
+        Global.e_State = StateUI.State_Move;
+        Debug.Log(Global.e_State);
 
+    }
+    //void Update()
+    //{
+    //if (Global.e_State == StateUI.State_Move)
+    //{
+    //    Debug.Log(Global.Grid_CurrentIndex);
+    //    Debug.Log(Global.e_State);
+    //    //MoveOutDrag(indedx);
+    //    //MoveInmarginal(indedx);
+    //    MoveByBtn(Global.Grid_CurrentIndex);
+
+    //}
+    //if ((Mathf.Abs(Global.Grid.transform.localPosition.x + (Global.Grid_CurrentIndex * Global.Grid_PerSize))) < 13f)
+    //{
+    //   // Debug.Log(Mathf.Abs(Global.Grid.transform.localPosition.x + (Global.Grid_CurrentIndex * Global.Grid_PerSize)));
+    //    //MoveInmarginal(indedx);
+    //    Global.e_State = StateUI.State_Stay;
+    //}
+    // MoveByBtn(Global.Grid_CurrentIndex);
+    // MoveOutDrag(Global.Grid_CurrentIndex);
+    //}
+    protected override void Update()
+    {
+        base.Update();
     }
 }

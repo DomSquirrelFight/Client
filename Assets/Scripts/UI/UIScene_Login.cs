@@ -1,25 +1,20 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using AttTypeDefine;
 using Assets.Scripts.Helper;
 public class UIScene_Login : UIScene {
-
-    #region 共有的成员变量
-    //公有GameObject
-    public GameObject m_Longin;
-    public GameObject m_Register;
-    public GameObject m_BackPwd;
+    #region 成员变量
+    public GameObject m_oLogin;
+    public GameObject m_oRegister;
+    public GameObject m_LostPwd;
     #endregion
 
     #region 系统接口
-    void Start()
+    private void Start()
     {
-        UIEventListener.Get(m_Longin).onClick = Login;
-        UIEventListener.Get(m_Register).onClick = Register;
-        UIEventListener.Get(m_BackPwd).onClick = BackPwd;
+        UIEventListener.Get(m_oLogin).onClick = Login;
+        UIEventListener.Get(m_oRegister).onClick = Register;
+        UIEventListener.Get(m_LostPwd).onClick = BackPwd;
         eState = LoadingState.e_LoadSelect;
-        //eScene = SceneType.SelecteLoading;
     }
     #endregion
 
@@ -40,11 +35,13 @@ public class UIScene_Login : UIScene {
     {
         //如果数据库信息和输入的信息相符，进入loading场景
         GlobalHelper.LoadLevel("Loading");
+
         //如果数据库信息和输入的信息不一致，弹出用户名和密码不一致的ui界面
         //Helpers.UIScene<UIScene_WrongPwd>();
     }
     #endregion
     #endregion
+
 
     #region 注册按钮事件
     void Register(GameObject obj)

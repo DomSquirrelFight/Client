@@ -1,7 +1,4 @@
-﻿
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using AttTypeDefine;
 
 public class MakeMove : MonoBehaviour {
@@ -12,24 +9,30 @@ public class MakeMove : MonoBehaviour {
         Global.Grid.transform.localPosition += new Vector3(((Vector3)delta).x,0,0);
         //移动curbtn
         Global.CurBtn.transform.localPosition += new Vector3(-((Vector3)delta).x / 4, 0, 0);
+        Debug.Log("delta.x="+delta.x);
+        Debug.Log("Position="+Global.Grid.transform.localPosition);
     }
     public void MoveOutDrag(int index)
     {
-        Global.Grid_CurrentIndex = index;
+ 
         //Global.Grid.transform.localPosition = Vector3.Lerp(Global.Grid.transform.localPosition, new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0), 5 * Time.deltaTime);
-        Global.Grid.transform.localPosition = Vector3.Lerp(Global.Grid.transform.localPosition, new Vector3(-(index * Global.Grid_PerSize), 0, 0), 5 * Time.deltaTime);
+        Global.Grid.transform.localPosition = Vector3.Lerp(Global.Grid.transform.localPosition, new Vector3(-(index * Global.Grid_PerSize), 0, 0), 2 * Time.deltaTime);
         //Global.CurBtn.transform.localPosition = Vector3.Lerp(Global.CurBtn.transform.localPosition, Global.UI[Global.Grid_CurrentIndex].transform.localPosition, 5 * Time.deltaTime);
-        Global.CurBtn.transform.localPosition = Vector3.Lerp(Global.CurBtn.transform.localPosition, Global.UI[index].transform.localPosition,5*Time.deltaTime);
+        Global.CurBtn.transform.localPosition = Vector3.Lerp(Global.CurBtn.transform.localPosition, Global.UI[index].transform.localPosition,2*Time.deltaTime);
     }
     public void MoveInmarginal(int index)
     {
-        Global.Grid_CurrentIndex = index;
         Global.Grid.transform.localPosition = new Vector3(-(index * Global.Grid_PerSize), 0, 0);
         Global.CurBtn.transform.localPosition = Global.UI[index].transform.localPosition;
     }
-
-    // Update is called once per frame
-    void Update () {
-		
-	}
+    protected virtual void Update () {
+        if (Global.e_State == StateUI.State_Move)
+        {
+            MoveOutDrag(Global.Grid_CurrentIndex);
+        }
+        if ((Mathf.Abs(Global.Grid.transform.localPosition.x + (Global.Grid_CurrentIndex * Global.Grid_PerSize))) < 10f)
+        {
+            Global.e_State = StateUI.State_Stay;
+        }
+    }
 }

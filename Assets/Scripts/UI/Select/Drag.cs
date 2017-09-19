@@ -78,7 +78,8 @@ public class Drag : MakeMove {
                 {
                     Global.Grid_CurrentIndex++;
                     //Global.Grid.transform.localPosition = new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0);
-                    IsFinalPos = true;
+                    //IsFinalPos = true;
+                    Global.e_State = StateUI.State_Move;
                 }
 
             }
@@ -89,7 +90,8 @@ public class Drag : MakeMove {
                 {
                     Global.Grid_CurrentIndex--;
                     // Global.Grid.transform.localPosition = new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0);
-                    IsFinalPos = true;
+                    //IsFinalPos = true;
+                    Global.e_State = StateUI.State_Move;
                 }
             }
             IsDrag = false;
@@ -98,24 +100,24 @@ public class Drag : MakeMove {
             IsTouch = false;
             IsClick = true;
         }
-
-
     }
-
     #endregion
 
-    // Update is called once per frame
-    void Update () {
-        //通过判断drag来改变ui的位置
-        if (IsFinalPos)
-        {
-            //drag结束之后移动btn和ui的位置
-            MoveOutDrag(Global.Grid_CurrentIndex);
-        }
-        if ((Mathf.Abs(Global.Grid.transform.localPosition.x + (Global.Grid_CurrentIndex * Global.Grid_PerSize)) )< 0.5f)
-        {
-            IsFinalPos = false;
-        }
+    //void Update () {
+    //    //通过判断drag来改变ui的位置
+    //    if (IsFinalPos)
+    //    {
+    //        //drag结束之后移动btn和ui的位置
+    //       // MoveOutDrag(Global.Grid_CurrentIndex);
+    //    }
+    //    if ((Mathf.Abs(Global.Grid.transform.localPosition.x + (Global.Grid_CurrentIndex * Global.Grid_PerSize)) )< 0.5f)
+    //    {
+    //        IsFinalPos = false;
+    //    }
 
+    //}
+    protected override void Update()
+    {
+        base.Update();
     }
 }
