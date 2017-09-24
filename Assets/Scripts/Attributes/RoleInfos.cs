@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
-namespace Assets.Scripts.RoleInfoEditor
+namespace Assets.Scripts.AssetInfoEditor
 {
     public class RoleInfos : ScriptableObject
     {

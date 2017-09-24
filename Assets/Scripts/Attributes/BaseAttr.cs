@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
-using Assets.Scripts.RoleInfoEditor;
+using Assets.Scripts.AssetInfoEditor;
 public class BaseAttr : MonoBehaviour
 {
 

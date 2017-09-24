@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using AttTypeDefine;
-namespace Assets.Scripts.RoleInfoEditor
+namespace Assets.Scripts.AssetInfoEditor
 {
     public class RoleInfoAssetEditor : EditorWindow
     {

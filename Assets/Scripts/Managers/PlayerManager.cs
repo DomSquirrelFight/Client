@@ -4,11 +4,13 @@ using UnityEngine;
 using AttTypeDefine;
 using System.Linq;
 using Assets.Scripts.Helper;
-using Assets.Scripts.RoleInfoEditor;
+using Assets.Scripts.AssetInfoEditor;
 public class PlayerManager : MonoBehaviour
 {
 
     #region 变量
+
+    SkillManager SkillMgr;
     //ePlayerBehaviour m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;                                                                        //角色行为
     ePlayerNormalBeha PlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;  
     ePlayerNormalBeha m_ePlayerNormalBehav                                            //角色普通行为
@@ -25,7 +27,16 @@ public class PlayerManager : MonoBehaviour
             }
         }
     }
-    
+
+    //對外開放屬性
+    public ePlayerNormalBeha PlayerBehaviour
+    {
+        get
+        {
+            return m_ePlayerNormalBehav;
+        }
+    }
+
     bool bGrounded = true;                                                                                                                                             //判定角色是否落地
     bool m_bGounded
     {
@@ -56,6 +67,14 @@ public class PlayerManager : MonoBehaviour
 
     int BoxMask;
 
+    public int NBoxMask
+    {
+        get
+        {
+            return BoxMask;
+        }
+    }
+
     int MaskGlossy;                                                                                                                                                          //层级平移位数<对比碰撞双方的层级>
 
     int BrickMaskGlossy;                                                                                                                                                 //层级平移位数<对比碰撞双方的层级>
@@ -76,6 +95,14 @@ public class PlayerManager : MonoBehaviour
 
     int HoldBoxMaskGlossy;
 
+    public int NHoldBoxMaskGlossy
+    {
+        get
+        {
+            return HoldBoxMaskGlossy;
+        }
+    }
+
     int HoldBoxMask;
 
     //JumpDataStore m_curJumpData;                                                                                                                                 //跳跃数据
@@ -90,7 +117,6 @@ public class PlayerManager : MonoBehaviour
 
     BoxCollider m_bcCurBox = null;
     bool m_bIsHoldBox = false;
-    float m_fPlayerBoxRaidus = 0f;
 
 
     public float FPlayerJumpBeginYPos                                                                                                                            //角色起跳在Y轴方向的高度值
@@ -140,6 +166,13 @@ public class PlayerManager : MonoBehaviour
     float m_fInitSpeed = 0f;
 
     Vector2 m_vInputMove;                                                                                                     //发送平移输入
+    public Vector2 VInputMove
+    {
+        get
+        {
+            return m_vInputMove;
+        }
+    }
 
     UIScene_Fight m_UISceneFight;
 
@@ -178,6 +211,9 @@ public class PlayerManager : MonoBehaviour
         HoldBoxMask = 1 << HoldBoxMaskGlossy;
 
         Owner = owner;
+
+        SkillMgr = Owner.SkillMgr;
+
         if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
         {
             m_UISceneFight = Helpers.UIScene<UIScene_Fight>();
@@ -223,7 +259,7 @@ public class PlayerManager : MonoBehaviour
                     CalJumpDown();
 
                 if (Input.GetKeyDown(KeyCode.U))
-                    CalPickUpBox();
+                    SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
             }
         }
 
@@ -321,47 +357,6 @@ public class PlayerManager : MonoBehaviour
     }
     Vector3 pos;
 
-    public bool CalPickUpBox()
-    {
-
-            if (m_bIsHoldBox == false && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide && m_vInputMove.x != 0f && null == m_bcCurBox)
-            {
-
-                float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;
-                pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-
-                //拿到所有的盒子，然后判定盒子位置最低的
-                RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3 (0.1f, Owner.ActorHeight * 0.4f, Owner.ActorHeight * 0.5f), Owner.ActorTrans.forward, Quaternion.Euler (Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BoxMask);
-                if (hits.Length > 0)
-                {
-                    if (hits.Length > 1)
-                        m_bcCurBox = (hits[0].transform.position.y > hits[1].transform.position.y ? (BoxCollider)(hits[1].collider) : (BoxCollider)(hits[0].collider));
-                    else
-                        m_bcCurBox = (BoxCollider)(hits[0].collider);
-#if UNITY_EDITOR
-                    Debug.Log("Successfully Pick up the Box");
-#endif
-                    DoBeforePickUpBox();
-                    return true;
-                }
-                else
-                {
-#if UNITY_EDITOR
-                    Debug.Log("Fail to pick up the box");
-#endif
-                }
-            }
-            else if (m_bIsHoldBox == true && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
-            {
-                m_bIsHoldBox = false;                                                                                               //复位托举状态
-                m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空
-                BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
-                boxCon.OnStart();
-                m_bcCurBox = null;                  //这样接下来就可以在举箱子
-                return true;
-            }
-        return false;
-    }
 
     #endregion
 
@@ -710,10 +705,6 @@ public class PlayerManager : MonoBehaviour
                 return false;
         }
        
-
-        //if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major)
-        //    return false;
-
         if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
         {
             if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
@@ -745,43 +736,7 @@ public class PlayerManager : MonoBehaviour
         }
     }
     #endregion
-
-    #region Pick up box, Throw box, Destroy box
-
-    void DestroyBox()
-    {
-        Destroy(m_bcCurBox);
-        m_bcCurBox = null;
-    }
-
-    void DoBeforePickUpBox()
-    {
-        m_bcCurBox.gameObject.layer = HoldBoxMaskGlossy;
-        m_bcCurBox.isTrigger = true;                                                                                            //将盒子变成触发器           
-        m_fPlayerBoxRaidus = m_bcCurBox.size.y + Owner.ActorHeight * 0.5f ;                             //确认运动半径
-        m_bcCurBox.transform.parent = Owner.ActorTrans.transform;                                          //将盒子变成主角的孩子
-        m_bIsHoldBox = true;                                                                                                       //标识当前是举着箱子的状态
-        StartCoroutine(PickUpBoxBehaviour());                                                                             //播放举箱子动画
-    }
-
-    IEnumerator PickUpBoxBehaviour()
-    {
-        //盒子繞著指定的半徑，圍繞主角做圓周運動
-
-        while (m_bcCurBox.transform.localPosition.y < m_fPlayerBoxRaidus - 0.1f)
-        {
-            m_bcCurBox.transform.localPosition = Vector3.Lerp(m_bcCurBox.transform.localPosition, new Vector3(0f, m_fPlayerBoxRaidus, 0f), 30 * Time.deltaTime);
-
-             yield return null;
-        }
-
-        m_bcCurBox.gameObject.transform.localRotation = Quaternion.identity;
-
-    }
-
-
-    #endregion
-
+  
     #region 通用接口
 
     void ResetAllData()
@@ -790,7 +745,6 @@ public class PlayerManager : MonoBehaviour
         m_bCollisionEntered = false;
     }
     #endregion
-
 
     #region 非主角NPC状态机驱动接口
 
@@ -827,6 +781,15 @@ public class PlayerManager : MonoBehaviour
                         break;
                     }
             }
+
+            //执行小跳跃
+            JumpBehaviour();
+
+            //自由下落
+            FreeFall();
+
+            //执行下跳操作
+            JumpDownBehaviour();
 
             //复位数据
             ResetAllData();
@@ -875,7 +838,7 @@ public class PlayerManager : MonoBehaviour
                 }
                 else if (n <= 70 && n > 30)                     //举起盒子
                 {
-                    CalPickUpBox();
+                    SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
                 }
                 else                                                        //朝着反方向行走
                 {
@@ -891,3 +854,77 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
 }
+
+//#region Pick up box, Throw box, Destroy box
+
+//void DestroyBox()
+//{
+//    Destroy(m_bcCurBox);
+//    m_bcCurBox = null;
+//}
+
+//void DoBeforePickUpBox()
+//{
+//    m_bcCurBox.gameObject.layer = HoldBoxMaskGlossy;
+//    m_bcCurBox.isTrigger = true;                                                                                            //将盒子变成触发器           
+//    float radius = m_bcCurBox.size.y + Owner.ActorHeight * 0.5f ;                             //确认运动半径
+//    m_bcCurBox.transform.parent = Owner.ActorTrans.transform;                                          //将盒子变成主角的孩子
+//    m_bIsHoldBox = true;                                                                                                       //标识当前是举着箱子的状态
+//    StartCoroutine(PickUpBoxBehaviour(radius));                                                                             //播放举箱子动画
+//}
+
+//IEnumerator PickUpBoxBehaviour(float radius)
+//{
+//    //盒子繞著指定的半徑，圍繞主角做圓周運動
+//    while (m_bcCurBox.transform.localPosition.y < radius - 0.1f)
+//    {
+//        m_bcCurBox.transform.localPosition = Vector3.Lerp(m_bcCurBox.transform.localPosition, new Vector3(0f, radius, 0f), 30 * Time.deltaTime);
+
+//         yield return null;
+//    }
+
+//    m_bcCurBox.gameObject.transform.localRotation = Quaternion.identity;
+
+//}
+
+//#endregion
+//    public bool CalPickUpBox()
+//    {
+
+//            if (m_bIsHoldBox == false && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide && m_vInputMove.x != 0f && null == m_bcCurBox)
+//            {
+//                float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;
+//                pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+
+//                //拿到所有的盒子，然后判定盒子位置最低的<判定的依据，做多有两个盒子> todo_erric ： 如何有多个盒子，或者尺寸出现了变化，那么就无法判定了
+//                RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3 (0.1f, Owner.ActorHeight * 0.4f, Owner.ActorHeight * 0.5f), Owner.ActorTrans.forward, Quaternion.Euler (Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BoxMask);
+//                if (hits.Length > 0)
+//                {
+//                    if (hits.Length > 1)
+//                        m_bcCurBox = (hits[0].transform.position.y > hits[1].transform.position.y ? (BoxCollider)(hits[1].collider) : (BoxCollider)(hits[0].collider));
+//                    else
+//                        m_bcCurBox = (BoxCollider)(hits[0].collider);
+//#if UNITY_EDITOR
+//                    Debug.Log("Successfully Pick up the Box");
+//#endif
+//                    DoBeforePickUpBox();
+//                    return true;
+//                }
+//                else
+//                {
+//#if UNITY_EDITOR
+//                    Debug.Log("Fail to pick up the box");
+//#endif
+//                }
+//            }
+//            else if (m_bIsHoldBox == true && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
+//            {
+//                m_bIsHoldBox = false;                                                                                               //复位托举状态
+//                m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空
+//                BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
+//                boxCon.OnStart();
+//                m_bcCurBox = null;                                                                                                  //这样接下来就可以在举箱子
+//                return true;
+//            }
+//        return false;
+//    }

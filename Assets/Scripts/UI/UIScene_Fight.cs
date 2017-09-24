@@ -74,7 +74,7 @@ public class UIScene_Fight : MonoBehaviour
 
     void PressPickUpBox(GameObject obj)
     {
-        ba.PlayerMgr.CalPickUpBox();
+        ba.SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
     }
 
     //认为最多不会超过10个

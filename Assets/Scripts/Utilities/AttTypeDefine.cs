@@ -158,4 +158,13 @@ namespace AttTypeDefine
     #region Delegate    
     #endregion
 
+    #region Skill
+    public enum eSkillType
+    {
+        SkillType_ThrowBox = 0,                                                 //扔盒子
+        SkillType_FireBullet,                                                  //发射子弹
+        SkillType_SummonMonster,                                      //召唤怪兽
+    }
+    #endregion
+
 }

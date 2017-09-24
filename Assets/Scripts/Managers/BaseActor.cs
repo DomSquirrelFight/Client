@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 using System;
-using Assets.Scripts.RoleInfoEditor;
+using Assets.Scripts.AssetInfoEditor;
 public class BaseActor : MonoBehaviour
 {
 
@@ -57,6 +57,20 @@ public class BaseActor : MonoBehaviour
 
     #endregion
 
+    #region 角色role id
+
+    int roleid;
+
+    public int RoleID
+    {
+        get
+        {
+            return roleid;
+        }
+    }
+
+    #endregion
+
     #region 加载角色
     /// <summary>
     /// 创建角色，并将角色实例返回
@@ -66,6 +80,7 @@ public class BaseActor : MonoBehaviour
     {
 
         #region 加载Asset文件
+
         string assetpath = "Assets/RoleInfos/" + roldid.ToString();
         RoleInfos roleInfos = (Resources.Load(assetpath)) as RoleInfos;
         if (null == roleInfos)
@@ -89,6 +104,7 @@ public class BaseActor : MonoBehaviour
         #endregion
 
         #region 角色属性
+        ba.roleid = roldid;
         switch (roleInfos.CharacType)
         {
             case eCharacType.Type_Major:
@@ -99,11 +115,13 @@ public class BaseActor : MonoBehaviour
                     if (
                       null != ba.PlayerMgr/*读取角色管理器*/ ||
                       null != ba.CameraContrl/*相机实例对象*/ ||
-                      null != ba.RB/*加载刚体*/
+                      null != ba.RB/*加载刚体*/ ||
+                      null != ba.SkillMgr
                       )
                     {
                         ba.PlayerMgr.OnStart(ba);//启动角色管理器
                         ba.CameraContrl.OnStart(ba);//启动相机
+                        ba.SkillMgr.OnStart(ba);
                     }
                    
                     ba.fsm = (FSMBehaviour)ba.gameObject.GetOrAddComponent<PlayerFSM>();
@@ -117,13 +135,19 @@ public class BaseActor : MonoBehaviour
                     ba.BaseAtt.InitAttr(roleInfos);
                     if (
                      null != ba.PlayerMgr/*读取角色管理器*/ ||
-                     null != ba.RB/*加载刚体*/
+                     null != ba.RB/*加载刚体*/ ||
+                     null != ba.SkillMgr
                      )
                     {
                         ba.PlayerMgr.OnStart(ba);//启动角色管理器
+                        ba.SkillMgr.OnStart(ba);
                     }
-                    ba.fsm = (FSMBehaviour)ba.gameObject.GetOrAddComponent<AIEnemy>();
-                    ba.InitShaderProperties();
+
+                    if (roleInfos.MonsterType != eMonsterType.MonType_Rock)
+                    {
+                        ba.fsm = (FSMBehaviour)ba.gameObject.GetOrAddComponent<AIEnemy>();
+                        ba.InitShaderProperties();
+                    }
                     break;
                 }
         }
@@ -262,7 +286,22 @@ public class BaseActor : MonoBehaviour
 
     #endregion
 
+    #region 技能管理器
 
+    private SkillManager skillmgr;
+    public SkillManager SkillMgr
+    {
+        get
+        {
+            if (null == skillmgr)
+            {
+                skillmgr = gameObject.GetOrAddComponent<SkillManager>();
+            }
+            return skillmgr;
+        }
+    }
+
+    #endregion
 
     #region 玩家状态
 
