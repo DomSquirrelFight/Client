@@ -13,6 +13,14 @@ public class UIScene_Loading : UIScene {
     AnimState animState;
     //Bar的实例
     public GameObject m_oBar;
+    //tipslist,共有型，可以在inspector中进行添加
+    public List<string> m_lTips;
+    //当前显示的tips的序号
+    int m_CurIndex;
+    //bool值用来控制是否是需要取加载改变随机数字
+    bool m_bIsChange = false;
+    //label用来存储要显示的tip
+    public UILabel m_Tip;
     #endregion
 
     #region 系统接口
@@ -34,6 +42,7 @@ public class UIScene_Loading : UIScene {
     // Update is called once per frame
     void Update()
     {
+        #region 场景加载
         //背景图的加载
         if (animState == AnimState.Start_BgAnim)
         {
@@ -43,7 +52,7 @@ public class UIScene_Loading : UIScene {
             }
             else
             {
-                m_uBg.fillAmount += 2f*Time.deltaTime;
+                m_uBg.fillAmount += 2f * Time.deltaTime;
             }
         }
         //pic的加载
@@ -69,7 +78,17 @@ public class UIScene_Loading : UIScene {
 
             eState = LoadingState.e_Null;
         }
+        #endregion
 
+        #region tips加载
+        if(!m_bIsChange)
+        {
+            Invoke("RandomIndex", 3f);
+            m_Tip.text = m_lTips[m_CurIndex];
+            m_bIsChange = true;
+
+        }
+#endregion
     }
     #endregion
 
@@ -157,6 +176,12 @@ public class UIScene_Loading : UIScene {
     }
     #endregion
 
-
-
-}
+    #region 随机选取list中的字符串
+    void RandomIndex()
+    {
+        int i = UnityEngine.Random.Range(0, m_lTips.Count);
+        m_CurIndex = i;
+        m_bIsChange = false;
+    }
+        #endregion
+ }
