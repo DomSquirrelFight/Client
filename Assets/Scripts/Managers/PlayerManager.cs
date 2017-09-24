@@ -509,7 +509,7 @@ public class PlayerManager : MonoBehaviour
     void SetJumpDownState(Collision other)                                                                      //设置角色下跳权限
     {
 #if UNITY_EDITOR
-        Debug.Log("SetJumpDownState -> name : " + other.transform.name);
+        //Debug.Log("SetJumpDownState -> name : " + other.transform.name);
 #endif
         m_bGounded = true;
         m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;

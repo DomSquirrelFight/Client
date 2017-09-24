@@ -18,6 +18,8 @@ public class SkillManager : MonoBehaviour
 
     int m_nCurIndex = 1;
 
+    int m_nCurSkillId = -1; 
+
     #endregion
 
     #region 通用接口
@@ -26,6 +28,9 @@ public class SkillManager : MonoBehaviour
         Owner = owner;
 
         PlayerMgr = Owner.PlayerMgr;
+
+
+        m_delNotifyEvent = FinishPickUpBox;
 
 	}
 
@@ -42,30 +47,27 @@ public class SkillManager : MonoBehaviour
     {
         if (Owner.AM.IsInTransition(0))
             return false;
-
-        int skillid = -1; 
         //通过主角roleid + type 获取技能id -> 读取asset文件内部信息。
         switch (type)
         {
             case eSkillType.SkillType_ThrowBox:
                 {
-                    skillid = Owner.RoleID * 100/*101 * 100 = 10100*/ + 10 * (int)type/*10100 + X * 10 = 101X0*/ + 1/*101X1*/;                          
+                    m_nCurSkillId = Owner.RoleID * 100/*101 * 100 = 10100*/ + 10 * (int)type/*10100 + X * 10 = 101X0*/ + 1/*101X1*/;                
                     break;
                 }
         }
 
-        return CastSkill(skillid);
+        return CastSkill();
     }
 
-    bool CastSkill(int skillid)
+    bool CastSkill()
     {
-
         //实例化技能Asset
-        CurSkillInfo = Resources.Load("Assets/SkillInfos/" + skillid.ToString()) as SkillInfos;
+        CurSkillInfo = DataRecordManager.GetDataInstance<SkillInfos>(m_nCurSkillId);
         if (null == CurSkillInfo)
         {
 #if UNITY_EDITOR
-            Debug.LogErrorFormat("Fail to find asset file. route = {0}", "Assets/SkillInfos/" + skillid.ToString());
+            Debug.LogErrorFormat("Fail to find asset file. route = {0}", "Assets/SkillInfos/" + m_nCurSkillId.ToString());
 #endif
             return false;
         }
@@ -85,8 +87,14 @@ public class SkillManager : MonoBehaviour
 
     bool IsCapableUsingSkill()
     {
+        //当前是受伤状态
         if(Owner.FSM.IsInState(StateID.Injured))
             return false;
+
+        //当前仍然是举箱子的状态，则无法释放其他技能
+        if (CurSkillInfo.SkillType != eSkillType.SkillType_ThrowBox && true == m_bIsHoldBox && null != m_bcCurBox)
+            return false;
+
         return true;
     }
 
@@ -105,6 +113,28 @@ public class SkillManager : MonoBehaviour
     BoxCollider m_bcCurBox;
     bool m_bBeginPickupBox = false;
     float m_BoxRotateRadius = 0f;
+    NotifyEvent m_delNotifyEvent;
+    void PlayerPickUpBoxAnim()
+    {
+
+        if (m_bBeginPickupBox)
+        {
+            if (m_bcCurBox.transform.localPosition.y < m_BoxRotateRadius - 0.1f)
+            {
+                m_bcCurBox.transform.localPosition = Vector3.Lerp(m_bcCurBox.transform.localPosition, new Vector3(0f, m_BoxRotateRadius, 0f), 30 * Time.deltaTime);
+            }
+            else
+            {
+                m_delNotifyEvent(gameObject);
+            }
+        }
+    }
+    void FinishPickUpBox(GameObject obj)
+    {
+        m_bcCurBox.gameObject.transform.localRotation = Quaternion.identity;
+        m_bBeginPickupBox = false;
+    }
+
     bool CalPickUpBox()
     {
 
@@ -148,22 +178,6 @@ public class SkillManager : MonoBehaviour
         m_bcCurBox = null;
     }
 
-    void  PlayerPickUpBoxAnim () {
-
-         if (m_bBeginPickupBox)
-        {
-            if (m_bcCurBox.transform.localPosition.y < m_BoxRotateRadius - 0.1f)
-            {
-                m_bcCurBox.transform.localPosition = Vector3.Lerp(m_bcCurBox.transform.localPosition, new Vector3(0f, m_BoxRotateRadius, 0f), 30 * Time.deltaTime);
-            }
-            else
-            {
-                m_bcCurBox.gameObject.transform.localRotation = Quaternion.identity;
-                m_bBeginPickupBox = false;
-            }
-        }
-    }
-
     void DoBeforePickUpBox()
     {
         m_bcCurBox.gameObject.layer = PlayerMgr.NHoldBoxMaskGlossy;
@@ -172,32 +186,23 @@ public class SkillManager : MonoBehaviour
         m_bcCurBox.transform.parent = Owner.ActorTrans.transform;                                          //将盒子变成主角的孩子
         m_bIsHoldBox = true;                                                                                                       //标识当前是举着箱子的状态
         m_bBeginPickupBox = true;
-        
+        //加载技能
+        GameObject skill = Instantiate(Resources.Load(CurSkillInfo.SkillRoute + (CurSkillInfo.SkillId).ToString())) as GameObject;
+        ActionInfos ai = skill.GetComponent<ActionInfos>();
+        ai.SetOwner(m_bcCurBox.gameObject, null, null);
     }
 
     void DoBeforeThrowBox()
     {
+        //播放动画 + 加载技能
+        Owner.AnimMgr.StartAnimation(NameToHashScript.AttackId, null, null, null);
         m_bIsHoldBox = false;                                                                                               //复位托举状态
         m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空
         BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
         boxCon.OnStart();
-        m_bcCurBox = null;                                                                                                  //这样接下来就可以在举箱子
+        m_bcCurBox = null;
+
     }
-
-    //IEnumerator PickUpBoxBehaviour(float radius)
-    //{
-    //    //盒子繞著指定的半徑，圍繞主角做圓周運動
-    //    while (m_bcCurBox.transform.localPosition.y < radius - 0.1f)
-    //    {
-    //        m_bcCurBox.transform.localPosition = Vector3.Lerp(m_bcCurBox.transform.localPosition, new Vector3(0f, radius, 0f), 30 * Time.deltaTime);
-
-    //        yield return null;
-    //    }
-
-    //    m_bcCurBox.gameObject.transform.localRotation = Quaternion.identity;
-
-    //}
-
     #endregion
 
 }

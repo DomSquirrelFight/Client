@@ -57,6 +57,21 @@ public class BaseActor : MonoBehaviour
 
     #endregion
 
+    #region 动作树行为脚本
+    private StateBehaviour statebe;
+    public StateBehaviour StateBehav
+    {
+        get
+        {
+            if (null == statebe)
+            {
+                statebe = AM.GetBehaviour<StateBehaviour>();
+            }
+            return statebe;
+        }
+    }
+    #endregion
+
     #region 角色role id
 
     int roleid;
@@ -71,6 +86,21 @@ public class BaseActor : MonoBehaviour
 
     #endregion
 
+    #region AnimatorMgr
+    private AnimatorMgr animatormgr;
+    public AnimatorMgr AnimMgr
+    {
+        get
+        {
+            if (null == animatormgr)
+            {
+                animatormgr = Actor.GetOrAddComponent<AnimatorMgr>();
+            }
+            return animatormgr;
+        }
+    }
+    #endregion
+
     #region 加载角色
     /// <summary>
     /// 创建角色，并将角色实例返回
@@ -81,11 +111,10 @@ public class BaseActor : MonoBehaviour
 
         #region 加载Asset文件
 
-        string assetpath = "Assets/RoleInfos/" + roldid.ToString();
-        RoleInfos roleInfos = (Resources.Load(assetpath)) as RoleInfos;
+        RoleInfos roleInfos = DataRecordManager.GetDataInstance<RoleInfos>(roldid);
         if (null == roleInfos)
         {
-            Debug.LogErrorFormat("Fail to find asset in route ({0})", assetpath);
+            Debug.LogErrorFormat("Fail to find asset in route ({0})", roleInfos.strRolePath);
             return null;
         }
         #endregion
@@ -116,12 +145,14 @@ public class BaseActor : MonoBehaviour
                       null != ba.PlayerMgr/*读取角色管理器*/ ||
                       null != ba.CameraContrl/*相机实例对象*/ ||
                       null != ba.RB/*加载刚体*/ ||
-                      null != ba.SkillMgr
+                      null != ba.SkillMgr ||
+                      null != ba.AnimMgr
                       )
                     {
                         ba.PlayerMgr.OnStart(ba);//启动角色管理器
                         ba.CameraContrl.OnStart(ba);//启动相机
                         ba.SkillMgr.OnStart(ba);
+                        ba.AnimMgr.OnStart(ba);
                     }
                    
                     ba.fsm = (FSMBehaviour)ba.gameObject.GetOrAddComponent<PlayerFSM>();
@@ -136,11 +167,13 @@ public class BaseActor : MonoBehaviour
                     if (
                      null != ba.PlayerMgr/*读取角色管理器*/ ||
                      null != ba.RB/*加载刚体*/ ||
-                     null != ba.SkillMgr
+                     null != ba.SkillMgr ||
+                     null != ba.AnimMgr
                      )
                     {
                         ba.PlayerMgr.OnStart(ba);//启动角色管理器
                         ba.SkillMgr.OnStart(ba);
+                        ba.AnimMgr.OnStart(ba);
                     }
 
                     if (roleInfos.MonsterType != eMonsterType.MonType_Rock)
@@ -376,6 +409,5 @@ public class BaseActor : MonoBehaviour
     }
 
     #endregion
-
 
 }

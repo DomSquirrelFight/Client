@@ -13,15 +13,15 @@ public static class UnityEngineExtention  {
         return rel;
     }
 
-    //public static void InvokeNextFrame(this MonoBehaviour _mb, DelNotifySkill callback)
-    //{
-    //    _mb.StartCoroutine(ProcessNextFrame(callback));
-    //}
+    public static void InvokeNextFrame(this MonoBehaviour _mb, DelNotifySkill callback)
+    {
+        _mb.StartCoroutine(ProcessNextFrame(callback));
+    }
 
-    //public static IEnumerator ProcessNextFrame(DelNotifySkill callback)
-    //{
-    //    yield return null;
-    //    callback();
-    //}
+    public static IEnumerator ProcessNextFrame(DelNotifySkill callback)
+    {
+        yield return null;
+        callback();
+    }
 	
 }

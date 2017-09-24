@@ -9,7 +9,7 @@ namespace Assets.Scripts.AssetInfoEditor
 
         public int SkillId;
 
-        public string AnimName;
+        //public string AnimName;
 
         public string SkillRoute;
 

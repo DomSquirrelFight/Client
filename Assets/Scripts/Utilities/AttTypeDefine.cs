@@ -156,9 +156,18 @@ namespace AttTypeDefine
     #endregion
 
     #region Delegate    
+    public delegate void NotifyEvent (GameObject obj);
+    public delegate void DelEventSkillReady();
+    public delegate void DelNotifySkill();
     #endregion
 
     #region Skill
+    public enum eStateBehaType
+    {
+        State_AnimBegin,
+        State_AnimEnd,
+    }
+
     public enum eSkillType
     {
         SkillType_ThrowBox = 0,                                                 //扔盒子
