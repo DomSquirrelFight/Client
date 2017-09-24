@@ -6,8 +6,14 @@ using Assets.Scripts.Helper;
 public class UIScene_BackPwd : MonoBehaviour {
 
     #region 成员变量
+    //按钮
     public GameObject m_BackPwd;
     public GameObject m_Back;
+    public GameObject m_oGetCode;
+    //input
+    public UILabel ui_Myusername;
+    public UILabel ui_Mypassword;
+    public UILabel ui_Phonecode;
     #endregion
 
     #region 系统接口
@@ -17,6 +23,8 @@ public class UIScene_BackPwd : MonoBehaviour {
         UIEventListener.Get(m_BackPwd).onClick = BackPwd;
         //返回按钮
         UIEventListener.Get(m_Back).onClick = Back;
+        //获得验证码
+        UIEventListener.Get(m_oGetCode).onClick = GetCode;
         UIPanel up = gameObject.GetComponent<UIPanel>();
         up.depth = 2;
     }
@@ -55,5 +63,10 @@ public class UIScene_BackPwd : MonoBehaviour {
     }
     #endregion
 
-
+    #region 获得验证码
+    void GetCode(GameObject obj)
+    {
+        //向服务器请求手机短信验证码
+    }
+#endregion
 }

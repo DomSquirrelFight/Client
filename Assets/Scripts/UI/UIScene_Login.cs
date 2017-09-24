@@ -3,9 +3,13 @@ using AttTypeDefine;
 using Assets.Scripts.Helper;
 public class UIScene_Login : UIScene {
     #region 成员变量
+    //按钮
     public GameObject m_oLogin;
     public GameObject m_oRegister;
     public GameObject m_LostPwd;
+    //uilabel
+    public UILabel username;
+    public UILabel password;
     #endregion
 
     #region 系统接口

@@ -13,7 +13,7 @@ public class Global : MonoBehaviour {
     public static GameObject[] UI;
     public static int Grid_Count;
     public static float Grid_PerSize;
-    public static int Grid_CurrentIndex;
+    public static int Grid_CurrentIndex ;
     public static string Scene_Go;
     public static StateUI e_State = StateUI.State_Stay;
 }

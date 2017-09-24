@@ -5,8 +5,15 @@ using Assets.Scripts.Helper;
 
 public class UIScene_Register : MonoBehaviour {
     #region 成员变量
+    //button
     public GameObject m_GetNum;
     public GameObject m_oBackbtn;
+    public GameObject m_GetCode;
+    //Uilabel
+    public UILabel m_password;
+    public UILabel m_Confirmpassword;
+    public UILabel m_phonenum;
+    public UILabel m_phonecode;
     #endregion
 
     #region 系统接口
@@ -14,6 +21,7 @@ public class UIScene_Register : MonoBehaviour {
     {
         UIEventListener.Get(m_GetNum).onClick = GetNum;
         UIEventListener.Get(m_oBackbtn).onClick = GoBack;
+        UIEventListener.Get(m_GetCode).onClick = GetCode;
     }
     #endregion
 
@@ -48,5 +56,11 @@ public class UIScene_Register : MonoBehaviour {
     }
     #endregion
 
+    #region 获得验证码
+    void GetCode(GameObject obj)
+    {
+        //向系统申请验证码
+    }
+#endregion
 
 }

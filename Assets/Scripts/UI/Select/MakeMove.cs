@@ -9,8 +9,6 @@ public class MakeMove : MonoBehaviour {
         Global.Grid.transform.localPosition += new Vector3(((Vector3)delta).x,0,0);
         //移动curbtn
         Global.CurBtn.transform.localPosition += new Vector3(-((Vector3)delta).x / 4, 0, 0);
-        Debug.Log("delta.x="+delta.x);
-        Debug.Log("Position="+Global.Grid.transform.localPosition);
     }
     public void MoveOutDrag(int index)
     {

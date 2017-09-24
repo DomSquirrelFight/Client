@@ -4,8 +4,12 @@ using AttTypeDefine;
 public class UIScene_ResetPwd : UIScene {
 
     #region 成员变量
+    //button
     public GameObject m_Login;
     public GameObject m_oExit;
+    //label
+    public UILabel m_password;
+    public UILabel m_confirmpassword;
     #endregion
 
     #region 系统接口.

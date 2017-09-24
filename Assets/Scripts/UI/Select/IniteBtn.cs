@@ -38,16 +38,14 @@ public class IniteBtn : MakeMove {
     //执行click事件
    public  void ClickBtn(int i)
     {
-        //if (Global.e_State == StateUI.State_Stay)
-        //{
-        //    Global.Grid_CurrentIndex = i;
-        //    Global.e_State = StateUI.State_Move;
-        //}
-        Debug.Log(Global.e_State);
-        Global.e_State = StateUI.State_Stay;
-        Global.Grid_CurrentIndex = i;
-        Global.e_State = StateUI.State_Move;
-        Debug.Log(Global.e_State);
+        if (Global.e_State == StateUI.State_Stay)
+        {
+            Global.Grid_CurrentIndex = i;
+            Global.e_State = StateUI.State_Move;
+        }
+        //Global.e_State = StateUI.State_Stay;
+        //Global.Grid_CurrentIndex = i;
+        //Global.e_State = StateUI.State_Move;
 
     }
     //void Update()
