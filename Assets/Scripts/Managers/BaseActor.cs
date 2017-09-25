@@ -376,23 +376,24 @@ public class BaseActor : MonoBehaviour
 
         if (null == m_sDeadShader)
         {
-            m_sDeadShader = Shader.Find("Custom/Alpha");
+            m_sDeadShader = Shader.Find("UnityChan/Skin - Transparent");
             m_smr.materials[0].shader = m_sDeadShader;
-            m_smr.materials[0].SetFloat("_AlphaScale", 1.0f);
+            m_smr.materials[0].SetVector("_Color", Vector4.one);
         }
-        while (true)
+        while ( RB.isKinematic == true &&  BC.enabled == false)
         {
             if (m_alpha <= 0 || m_alpha >= 1.0f)
             {
                 m_aplhaStep = 0 - m_aplhaStep;
             }
-            m_smr.materials[0].SetFloat("_AlphaScale", m_alpha);
+            m_smr.materials[0].SetVector("_Color", new Vector4(1, 1, 1, m_alpha));
             m_alpha -= Time.deltaTime * m_aplhaStep;
             yield return null;
         }
+
+        m_smr.materials[0].shader = m_sOrig;
       
     }
-
 
     public void EndChangingAlpha(float wait)
     {
@@ -401,11 +402,10 @@ public class BaseActor : MonoBehaviour
 
     void WaitingChangingBack()
     {
-        m_smr.materials[0].shader = m_sOrig;
         RB.isKinematic = false;
         BC.enabled = true;
         FSM.SetTransition(StateID.Idle);
-        StopCoroutine(ChangingAlpha());
+       // StopCoroutine(ChangingAlpha());
     }
 
     #endregion

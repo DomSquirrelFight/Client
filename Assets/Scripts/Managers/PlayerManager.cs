@@ -139,11 +139,11 @@ public class PlayerManager : MonoBehaviour
             {
                 if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
                 {
-                    if (value == ePlayerJumpDownState.CanJumpDown_YES && (bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NULL || bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NO))                     //ui fight 下跳按钮点亮
+                    if (value == ePlayerJumpDownState.CanJumpDown_YES)                     //ui fight 下跳按钮点亮
                     {
                         m_UISceneFight.BDisableJumpDown = false;
                     }
-                    else if (value == ePlayerJumpDownState.CanJumpDown_NO && (bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NULL || bCanJumpDown == ePlayerJumpDownState.CanJumpDown_YES))               // ui fight 下跳按钮变灰
+                    else if (value == ePlayerJumpDownState.CanJumpDown_NO)               // ui fight 下跳按钮变灰
                     {
                         m_UISceneFight.BDisableJumpDown = true;
                     }

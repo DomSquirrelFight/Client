@@ -39,7 +39,7 @@ public class UIScene_Fight : MonoBehaviour
             {
                 JumpDownBtnColor.SetState(UIButtonColor.State.Normal, true);
             }
-            JumpDownBC.enabled = value;
+            JumpDownBC.enabled = !value;
 
             if (value != bdisablejumpdown)
             {
@@ -148,19 +148,19 @@ public class UIScene_Fight : MonoBehaviour
                     }
                 case TouchPhase.Ended:
                     {
+                        dirpos = Vector2.zero;
                         if (!m_bCanJoy[i]) return;
                         m_oJoyBack.SetActive(false);//关闭活性
                         Debug.Log("TouchController :: TouchPhase.Ended");
-                        dirpos = Vector2.zero;
                         //bpressed = false;
                         break;
                     }
                 case TouchPhase.Canceled:
                     {
-
+                        dirpos = Vector2.zero;
                         if (!m_bCanJoy[i]) return;
                         Debug.Log("TouchController :: TouchPhase.Canceled");
-                        dirpos = Vector2.zero;
+                       
                         break;
                     }
                 case TouchPhase.Stationary:
