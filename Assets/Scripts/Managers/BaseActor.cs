@@ -410,4 +410,47 @@ public class BaseActor : MonoBehaviour
 
     #endregion
 
+    #region HoldBoxDir, HoldBoxTransform
+
+    Transform holdboxtrans;
+    public Transform HoldBoxTrans
+    {
+        get
+        {
+            return holdboxtrans;
+        }
+        set
+        {
+            if (value != holdboxtrans)
+                holdboxtrans = value;
+        }
+    }
+
+    private Vector3 holdboxdir;
+    public Vector3 HoldBoxDir
+    {
+        get
+        {
+            return holdboxdir;
+        }
+        set
+        {
+            if (value != holdboxdir)
+                holdboxdir = value;
+        }
+    }
+
+    #endregion
+
+    #region 销毁物理系统
+
+    public void DestroyPhysics()
+    {
+        Destroy(BC);
+        Destroy(RB);
+    }
+    #endregion
+
+
+
 }

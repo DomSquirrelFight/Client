@@ -114,6 +114,7 @@ public class SkillManager : MonoBehaviour
     bool m_bBeginPickupBox = false;
     float m_BoxRotateRadius = 0f;
     NotifyEvent m_delNotifyEvent;
+
     void PlayerPickUpBoxAnim()
     {
 
@@ -129,6 +130,7 @@ public class SkillManager : MonoBehaviour
             }
         }
     }
+
     void FinishPickUpBox(GameObject obj)
     {
         m_bcCurBox.gameObject.transform.localRotation = Quaternion.identity;
@@ -190,6 +192,7 @@ public class SkillManager : MonoBehaviour
         GameObject skill = Instantiate(Resources.Load(CurSkillInfo.SkillRoute + (CurSkillInfo.SkillId).ToString())) as GameObject;
         ActionInfos ai = skill.GetComponent<ActionInfos>();
         ai.SetOwner(m_bcCurBox.gameObject, null, null);
+        Owner.HoldBoxTrans = m_bcCurBox.transform;
     }
 
     void DoBeforeThrowBox()
@@ -201,7 +204,7 @@ public class SkillManager : MonoBehaviour
         BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
         boxCon.OnStart();
         m_bcCurBox = null;
-
+        Owner.HoldBoxTrans = null;
     }
     #endregion
 

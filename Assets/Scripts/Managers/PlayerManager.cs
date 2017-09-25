@@ -384,13 +384,17 @@ public class PlayerManager : MonoBehaviour
                 {
                     OperateGround(other, BoxMask);
                 }
-                else if (other.contacts[0].otherCollider.gameObject.layer == NpcMaskGlossy)
+                else if (other.contacts[0].otherCollider.gameObject.layer == NpcMaskGlossy)                             //如果碰到了npc
                 {
                     if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
                     {
-                        Owner.FSM.SetTransition(StateID.Injured);
+                        UnityEngine.Object obj = Resources.Load("IGSoft_Projects/Buffs/5010101");
+                        GameObject tmp = Instantiate(obj) as GameObject;
+                        ActionInfos acInfos = tmp.GetComponent<ActionInfos>();
+                        acInfos.SetOwner(Owner.gameObject, Owner, null);
                     }
                 }
+              
             }
         }
     }
@@ -819,30 +823,38 @@ public class PlayerManager : MonoBehaviour
                                      Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f, BoxMask + WallMask))
             {
                 m_bIsBlocked = true;
-                /*
-                 * 怪兽有可能有三种行为
-                 * 1 : 跳过盒子
-                 * 2 : 举起盒子
-                 * 3 : 朝着反方向运动
-                 * 
-                 * 如果举着盒子，当和主角满足一定条件，那么扔掉盒子，否则一直举着盒子
-                 * 
-                 * */
-                n = Random.Range(0, 100);
 
-                //m_vInputMove.x = 0 - m_vInputMove.x;
-                //return;
-                if (n > 70)             //跳过盒子
-                {
-                    CalJumpUp();
-                }
-                else if (n <= 70 && n > 30)                     //举起盒子
-                {
-                    SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
-                }
-                else                                                        //朝着反方向行走
+                if (hitInfo.collider.gameObject.layer == WallMaskGlossy)
                 {
                     m_vInputMove.x = 0 - m_vInputMove.x;
+                }
+                else
+                {
+                    /*
+              * 怪兽有可能有三种行为
+              * 1 : 跳过盒子
+              * 2 : 举起盒子
+              * 3 : 朝着反方向运动
+              * 
+              * 如果举着盒子，当和主角满足一定条件，那么扔掉盒子，否则一直举着盒子
+              * 
+              * */
+                    n = Random.Range(0, 100);
+
+                    //m_vInputMove.x = 0 - m_vInputMove.x;
+                    //return;
+                    if (n > 70 )             //跳过盒子
+                    {
+                        CalJumpUp();
+                    }
+                    else if (n <= 70 && n > 30 && m_bIsHoldBox == false && null == m_bcCurBox)                     //举起盒子
+                    {
+                        SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
+                    }
+                    else                                                        //朝着反方向行走
+                    {
+                        m_vInputMove.x = 0 - m_vInputMove.x;
+                    }
                 }
             }
             else

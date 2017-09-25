@@ -23,12 +23,16 @@ public class AIEnemy : FSMBehaviour
 
         NpcState_Idle idle = new NpcState_Idle(ba, StateID.Idle);
         idle.AddTransition(StateID.Chase);
-
+        idle.AddTransition(StateID.Death);
 
         NpcState_Chase chase = new NpcState_Chase(ba, StateID.Chase);
         chase.AddTransition(StateID.Idle);
-            
+        chase.AddTransition(StateID.Death);
+
+        NpcState_Death death = new NpcState_Death(ba, StateID.Death);
+
         fsm.AddState(idle);
         fsm.AddState(chase);
+        fsm.AddState(death);
     }
 }

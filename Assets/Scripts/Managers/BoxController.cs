@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using AttTypeDefine;
 public class BoxController : MonoBehaviour {
 
     public float FSpeed;
@@ -67,7 +67,31 @@ public class BoxController : MonoBehaviour {
 
     void OnTriggerEnter(Collider other)
     {
-
+        BaseActor Owner = null;
+                if (gameObject.layer == LayerMask.NameToLayer("HoldBox"))                      //如果是举起来的盒子
+                {
+                    if ((Owner = other.transform.parent.GetComponent<BaseActor>()) != null)
+                    {
+                        if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
+                        {
+                            TrigBuff(Owner, 5010101);
+                        }
+                        else if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major && Owner.BaseAtt.RoleInfo.CharacSide == eCharacSide.Side_Enemy)
+                        {
+                            TrigBuff(Owner, 1010101);
+                            Owner.HoldBoxDir =transform.forward;                               //确定飞过来的盒子的方向
+                        }
+                    }
+                }
     }
+
+    void TrigBuff(BaseActor Owner, int id)
+    {
+        UnityEngine.Object obj = Resources.Load("IGSoft_Projects/Buffs/" + id.ToString());
+        GameObject tmp = Instantiate(obj) as GameObject;
+        ActionInfos acInfos = tmp.GetComponent<ActionInfos>();
+        acInfos.SetOwner(Owner.gameObject, Owner, null);
+    }
+
 
 }
