@@ -93,10 +93,10 @@ public class CameraController : MonoBehaviour {
         public Vector3[] m_vPoints = new Vector3[4];                                                                                                                                           //相机和目标平面的四个交点坐标
         [HideInInspector]
         public Dictionary<eCamFourCorner, Vector3> m_dCamDir = new Dictionary<eCamFourCorner, Vector3>();                                                      //相机视野四个角的方向向量
-
+        
         [HideInInspector]
         public Dictionary<eTargetFourCorner, Vector3> m_dTargetCornerPoints = new Dictionary<eTargetFourCorner, Vector3>();                                   //目标视野边界顶点坐标          
-
+        
         private Vector3 middlepoint;
         public Vector3 m_vMiddlePoint                                                                                                                                                                //相机朝向和目标平面的焦点.
         {
@@ -157,8 +157,6 @@ public class CameraController : MonoBehaviour {
             vLastPos = transform.position;
 
             vLastRot = transform.rotation.eulerAngles;
-
-            BRefreshCameraData = true;
         }
 
         Vector3 vLastPos;
@@ -249,7 +247,7 @@ public class CameraController : MonoBehaviour {
             else
                 m_dTargetCornerPoints[type] = pos;
         }
-
+        
         Vector3 GetTargetCornerPoint(Vector3 dir)
         {
 
@@ -260,11 +258,9 @@ public class CameraController : MonoBehaviour {
              return corner;
         }
 
-
-        void CalCamFourDir()                                                                                                                                                                            //确定相机的四个视野的方向向量.                                                                                                                               
+        void CalCamFourDir()                                        //确定相机的四个视野方向                                                                                                                                                                                                                         
         {
             Vector3 tmp;
-
             //UpperLeft
             tmp = transform.position - transform.right * width;
             tmp += transform.up * height;
@@ -347,7 +343,7 @@ public class CameraController : MonoBehaviour {
             //}
             return m_vMiddlePoint;
         }
-
+        
         void Update()
         {
 
@@ -385,7 +381,7 @@ public class CameraController : MonoBehaviour {
 
             }
         }
-
+        
         public void OnStart(BaseActor _owner)
         {
             owner = _owner;
@@ -396,8 +392,10 @@ public class CameraController : MonoBehaviour {
 
             m_tTarget = owner.ActorTrans.transform;                                                                                                                                                                                //确定目标
 
+            BRefreshCameraData = true;
+
             RefreshCamTargetBorderPoint();
 
         }
-
+        
 }   

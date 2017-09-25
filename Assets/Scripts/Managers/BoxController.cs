@@ -21,18 +21,34 @@ public class BoxController : MonoBehaviour {
     float m_fStartDownTime;                                        //记录何时盒子开始下降
 
     float m_fOrigHeight;                                              //记录盒子开始的高度
+
+    CameraController cc;
+
+    BoxCollider BC;
+
+    float halfsize;
+
     void Awake()
     {
         m_fStartTime = 0f;
      
         m_vDir = Vector3.zero;
+
+        BC = GetComponent<BoxCollider>();
+
+        halfsize = BC.size.x * 0.5f;
+
     }
+
+
+
 
     public void OnStart() {
         m_fStartTime = Time.time;
         m_fStartDownTime = Time.time;
         m_fOrigHeight = transform.position.y;
         AbsDis = Mathf.Abs(FDownDis);
+        cc = Camera.main.GetComponent<CameraController>();
     }
     float AbsDis;
     float tmp;
@@ -48,16 +64,18 @@ public class BoxController : MonoBehaviour {
             }
             else
             {
+                //飞了相机视野
+                if (GlobalHelper.CheckMoveBoundaryBlock(transform.position, halfsize))
+                {
+                    Destroy(gameObject);
+                    return;
+                }
 
                 if (Time.time - m_fStartDownTime < FDownDuration && m_fOrigHeight - transform.position.y <= AbsDis)
                 {
                     tmp = curve.Evaluate((Time.time - m_fStartDownTime) / FDownDuration) * FDownDis;
                     vTmp = new Vector3(transform.position.x, m_fOrigHeight + tmp, transform.position.z);
                     transform.position = Vector3.Lerp(transform.position, vTmp, FSpeed* Time.deltaTime);
-                }
-                else
-                {
-                    int a = 0;
                 }
                 transform.Translate(transform.forward * FSpeed * Time.deltaTime, Space.World);
                

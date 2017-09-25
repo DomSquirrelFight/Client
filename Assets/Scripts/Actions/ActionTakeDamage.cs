@@ -14,9 +14,6 @@ namespace Assets.Scripts.Action
             BaseActor Defenser = DataStore.Owner;
 
             Defenser.FSM.SetTransition(InjureType);
-
-           
-
         }
         
     }
