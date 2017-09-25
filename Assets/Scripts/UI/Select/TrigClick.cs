@@ -9,17 +9,20 @@ public class TrigClick : MakeMove {
     private void Start()
     {
          ib= gameObject.transform.parent.GetComponent<IniteBtn>();
+        //Destroy(gameObject.GetComponent<TweenScale>());
     }
     int ClickIndex;
     public void OnStart(int index)
     {
 
         UIEventListener.Get(gameObject).onClick = ClickBtn;
+        
         ClickIndex = index;
         
     }
     void ClickBtn(GameObject obj)
     {
+        Debug.Log(ClickIndex);
         ib.ClickBtn(ClickIndex);
     }
 }

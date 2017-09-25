@@ -20,18 +20,12 @@ public class Drag : MakeMove {
 
     #endregion
 
+    #region 通过判断drag来改变ui的位置
     //存储delta
     Vector3 drag;
     //记录grid的原始位置
     Vector3 Pos;
-    //drag开始首先确定当前的card的index
-    void Start()
-    {
-        IsFinalPos = false;
-    }
-    //drag 的时候，让card跟随delta移动
-
-    #region 通过判断drag来改变ui的位置
+    #region 拖拽中的判定
     void OnDrag(Vector2 delta)
     {
         drag = delta;
@@ -57,6 +51,9 @@ public class Drag : MakeMove {
         ////移动curbtn
         //Global.CurBtn.transform.localPosition += new Vector3(-((Vector3)delta).x / 4, 0, 0);
     }
+    #endregion
+
+    #region 拖拽结束之后的判定
     void OnPress()
     {
         if (IsClick)
@@ -67,55 +64,49 @@ public class Drag : MakeMove {
         else
         {
             float Dis = Global.Grid.transform.localPosition.x - Pos.x;
+            Debug.Log(Dis);
             //判断当是第一个或者是最后一个ui的时候
-            if (Global.Grid_CurrentIndex == Global.Grid_Count-1 || Global.Grid_CurrentIndex == 0)
+            if (Global.Grid_CurrentIndex == Global.Grid_Count - 1 || Global.Grid_CurrentIndex == 0)
             {
                 MoveInmarginal(Global.Grid_CurrentIndex);
             }
-            if (Global.Grid_CurrentIndex < Global.Grid_Count -1&& IsLeft)
+            if (Global.Grid_CurrentIndex < Global.Grid_Count - 1 && IsLeft)
             {
-                if (drag.x > Dis)
+                //if (drag.x > Dis)
+                if (Dis < -Screen.width / 2)
                 {
                     Global.Grid_CurrentIndex++;
                     //Global.Grid.transform.localPosition = new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0);
-                    IsFinalPos = true;
+                    //IsFinalPos = true;
+                    Global.e_State = StateUI.State_Move;
                 }
 
             }
 
             if (Global.Grid_CurrentIndex > 0 && IsRight)
             {
-                if (drag.x < Dis)
+                if (Dis > Screen.width / 2)
                 {
                     Global.Grid_CurrentIndex--;
                     // Global.Grid.transform.localPosition = new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0);
-                    IsFinalPos = true;
+                    //IsFinalPos = true;
+                    Global.e_State = StateUI.State_Move;
                 }
             }
+            MoveInmarginal(Global.Grid_CurrentIndex);
             IsDrag = false;
             IsRight = false;
             IsLeft = false;
             IsTouch = false;
             IsClick = true;
         }
-
-
     }
+    #endregion
 
     #endregion
 
-    // Update is called once per frame
-    void Update () {
-        //通过判断drag来改变ui的位置
-        if (IsFinalPos)
-        {
-            //drag结束之后移动btn和ui的位置
-            MoveOutDrag(Global.Grid_CurrentIndex);
-        }
-        if ((Mathf.Abs(Global.Grid.transform.localPosition.x + (Global.Grid_CurrentIndex * Global.Grid_PerSize)) )< 0.5f)
-        {
-            IsFinalPos = false;
-        }
-
+    protected override void Update()
+    {
+        base.Update();
     }
 }
