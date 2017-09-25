@@ -14,7 +14,7 @@ public class UIScene_Start : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         //设置动画的初始状态
-        anim = AnimState.Start_BgAnim;
+        anim = AnimState.State_BgAnim;
 	}
 	//void PressBtn(GameObject obj)
  //   {

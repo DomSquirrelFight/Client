@@ -16,6 +16,7 @@ namespace AttTypeDefine
         e_LoadLevel,
         e_ProcessBar,
         e_LoadSelect,
+        e_StartTime,
         e_Null,
     }
 
@@ -36,10 +37,10 @@ namespace AttTypeDefine
     //动画的状态，用于loading界面
     public enum AnimState
     {
-        Start_null,
-        Start_BgAnim,
-        Start_PicAnim,
-        Start_ProgressBar,
+        State_null,
+        State_BgAnim,
+        State_PicAnim,
+        State_ProgressBar,
     }
     #endregion
 

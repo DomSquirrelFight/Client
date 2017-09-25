@@ -36,7 +36,7 @@ public class UIScene_Loading : UIScene {
         }
         StartCoroutine(SceneChange(eScene));
         DontDestroy();
-        animState = AnimState.Start_BgAnim;
+        animState = AnimState.State_BgAnim;
     }
 
     // Update is called once per frame
@@ -44,11 +44,11 @@ public class UIScene_Loading : UIScene {
     {
         #region 场景加载
         //背景图的加载
-        if (animState == AnimState.Start_BgAnim)
+        if (animState == AnimState.State_BgAnim)
         {
             if (m_uBg.fillAmount >= 1f)
             {
-                animState = AnimState.Start_ProgressBar;
+                animState = AnimState.State_ProgressBar;
             }
             else
             {
@@ -62,21 +62,21 @@ public class UIScene_Loading : UIScene {
         //    animState = AnimState.Start_ProgressBar;
         //}
         //进度条的加载
-        if (animState == AnimState.Start_ProgressBar)
+        if (animState == AnimState.State_ProgressBar)
         {
             TweenPosition.Begin(m_oBar, 1f, new Vector3(-450, -280, 0)).method = UITweener.Method.BounceIn;
             //StartCoroutine(LaterDo());
-            animState = AnimState.Start_null;
+            animState = AnimState.State_null;
 
         }
-        if (animState == AnimState.Start_null)
+        if (animState == AnimState.State_null)
         {
             //资源预加载
             LoadRes(eScene);
             //进度条推进
             Invoke("ProcessBar", 2f);
+            
 
-            eState = LoadingState.e_Null;
         }
         #endregion
 
@@ -102,11 +102,9 @@ public class UIScene_Loading : UIScene {
         //清理策划表实例缓存
         if (type == SceneType.SelecteLoading)
         {
-            Debug.Log("Selecte");
         }
         if (type == SceneType.FightLoading)
         {
-            Debug.Log("Fight");
         }
     }
     #endregion
@@ -167,7 +165,9 @@ public class UIScene_Loading : UIScene {
     //销毁loading
     void DestroyLoading()
     {
+        eState = LoadingState.e_StartTime;
         Destroy(gameObject);
+        
     }
     //不可销毁游戏对象
     void DontDestroy()
