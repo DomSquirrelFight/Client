@@ -197,7 +197,7 @@ public class SkillManager : MonoBehaviour
 
     void DoBeforeThrowBox()
     {
-        //播放动画 + 加载技能
+        //播放动画
         Owner.AnimMgr.StartAnimation(NameToHashScript.AttackId, null, null, null);
         m_bIsHoldBox = false;                                                                                               //复位托举状态
         m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空

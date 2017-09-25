@@ -7,7 +7,7 @@ using Assets.Scripts.AssetInfoEditor;
 public class DataRecordManager  {
 
     private static readonly Dictionary<Type, Dictionary<int, ScriptableObject>> dic = new System.Collections.Generic.Dictionary<Type, System.Collections.Generic.Dictionary<int, ScriptableObject>>();
-
+    
     public static void ClearDataInstance () {
         dic.Clear();
     }

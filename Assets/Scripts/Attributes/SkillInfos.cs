@@ -9,8 +9,6 @@ namespace Assets.Scripts.AssetInfoEditor
 
         public int SkillId;
 
-        //public string AnimName;
-
         public string SkillRoute;
 
         public bool CanBreak;
