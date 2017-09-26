@@ -10,6 +10,13 @@ public class UIScene_Login : UIScene {
     //uilabel
     public UILabel username;
     public UILabel password;
+
+    public string m_strLoginAudioName;
+    public string m_strRegisterAudioName;
+    public string m_strForgetPasswordAudioName;
+
+
+
     #endregion
 
     #region 系统接口
@@ -25,6 +32,7 @@ public class UIScene_Login : UIScene {
     #region 登陆按钮事件
     void Login(GameObject obj)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strLoginAudioName);
         //判断数据库中input的账号和密码相符，进行场景切换到loading界面
         ServerLogin("");
     }
@@ -54,6 +62,7 @@ public class UIScene_Login : UIScene {
         //GlobalHelper.LoadLevel("Register");
         //GlobalHelper.LoadLevel("Register");
         //弹出注册的场景的ui
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strRegisterAudioName);
         Helpers.UIScene<UIScene_Register>();
     }
     #endregion
@@ -61,6 +70,7 @@ public class UIScene_Login : UIScene {
     #region 找回密码按钮事件
     void BackPwd(GameObject obj)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strForgetPasswordAudioName);
         //跳转到找回密码场景
         //GlobalHelper.LoadLevel("BackPwd");
         //弹出找回密码的ui

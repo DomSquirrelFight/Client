@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using AttTypeDefine;
 using Assets.Scripts.Helper;
-
 public class UIScene_Main : UIScene {
 
 
@@ -9,6 +8,8 @@ public class UIScene_Main : UIScene {
     //公有GameObject
     public GameObject m_Longin;
     public GameObject m_oExit;
+    public string m_strLoginAudioName;
+    public string m_strExitAudioName;
     #endregion
 
     #region 系统接口
@@ -24,6 +25,7 @@ public class UIScene_Main : UIScene {
     #region 登陆按钮跳转
     void Login(GameObject obj)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strLoginAudioName);
         Helpers.UIScene<UIScene_Login>();
     }
 #endregion
@@ -31,6 +33,7 @@ public class UIScene_Main : UIScene {
     #region 退出按钮事件
     void ExitBtn(GameObject obj)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strExitAudioName);
         Application.Quit();
         Debug.Log("Exit the game");
     }
