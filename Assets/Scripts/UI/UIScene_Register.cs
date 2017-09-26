@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
 using Assets.Scripts.Helper;
+using AttTypeDefine;
 
 public class UIScene_Register : MonoBehaviour {
     #region 成员变量
@@ -14,6 +14,10 @@ public class UIScene_Register : MonoBehaviour {
     public UILabel m_Confirmpassword;
     public UILabel m_phonenum;
     public UILabel m_phonecode;
+    //音频信息
+    public string m_strGetNum;
+    public string m_strBackBtn;
+    public string m_strGetCode;
     #endregion
 
     #region 系统接口
@@ -28,6 +32,7 @@ public class UIScene_Register : MonoBehaviour {
     #region 注册成功按钮事件
     void GetNum(GameObject obj)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strGetNum);
         ServerRegister("");
 
     }
@@ -52,6 +57,7 @@ public class UIScene_Register : MonoBehaviour {
     #region 返回按钮事件
     void GoBack(GameObject obj)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strBackBtn);
         Destroy(gameObject);
     }
     #endregion
@@ -59,6 +65,7 @@ public class UIScene_Register : MonoBehaviour {
     #region 获得验证码
     void GetCode(GameObject obj)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strGetCode);
         //向系统申请验证码
     }
 #endregion

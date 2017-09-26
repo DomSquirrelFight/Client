@@ -10,6 +10,9 @@ public class UIScene_ResetPwd : UIScene {
     //label
     public UILabel m_password;
     public UILabel m_confirmpassword;
+    //audio
+    public string m_strLogin;
+    public string m_strExit;
     #endregion
 
     #region 系统接口.
@@ -26,6 +29,7 @@ public class UIScene_ResetPwd : UIScene {
     //登录成功，切换到selected loading
     void Loading(GameObject obj)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strLogin);
         GlobalHelper.LoadLevel("Loading");
     }
     #endregion
@@ -33,6 +37,7 @@ public class UIScene_ResetPwd : UIScene {
     #region 退出按钮
     void Exit(GameObject obj)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strExit);
         Destroy(gameObject);
     }
     #endregion

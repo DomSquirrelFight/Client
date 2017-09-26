@@ -22,7 +22,6 @@ public class TrigClick : MakeMove {
     }
     void ClickBtn(GameObject obj)
     {
-        Debug.Log(ClickIndex);
         ib.ClickBtn(ClickIndex);
     }
 }

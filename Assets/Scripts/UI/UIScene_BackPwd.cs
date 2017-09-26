@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Assets.Scripts.Helper;
+using AttTypeDefine;
 
 public class UIScene_BackPwd : MonoBehaviour {
 
@@ -14,6 +13,10 @@ public class UIScene_BackPwd : MonoBehaviour {
     public UILabel ui_Myusername;
     public UILabel ui_Mypassword;
     public UILabel ui_Phonecode;
+
+    public string m_strGetCode;
+    public string m_strBackPwd;
+    public string m_strBack;
     #endregion
 
     #region 系统接口
@@ -33,6 +36,7 @@ public class UIScene_BackPwd : MonoBehaviour {
     #region 找回密码按钮事件
     void BackPwd(GameObject obj)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strBackPwd);
         ServerBackPwd("");
 
     }
@@ -57,6 +61,7 @@ public class UIScene_BackPwd : MonoBehaviour {
     #region 返回按钮事件
     void Back(GameObject obj)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strBack);
         //返回到登录场景
         //GlobalHelper.LoadLevel("Login");
         Destroy(gameObject);
@@ -66,6 +71,7 @@ public class UIScene_BackPwd : MonoBehaviour {
     #region 获得验证码
     void GetCode(GameObject obj)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strGetCode);
         //向服务器请求手机短信验证码
     }
 #endregion

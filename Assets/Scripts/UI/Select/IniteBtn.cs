@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
 using AttTypeDefine;
 
@@ -7,6 +6,8 @@ public class IniteBtn : MakeMove {
 
     public GameObject[] Btn;
     public string path;
+    //音频路径
+    public string m_strBtnClick;
     int indedx;
     void Start()
     {
@@ -38,6 +39,7 @@ public class IniteBtn : MakeMove {
     //执行click事件
    public  void ClickBtn(int i)
     {
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strBtnClick);
         if (Global.e_State == StateUI.State_Stay)
         {
             Global.Grid_CurrentIndex = i;
