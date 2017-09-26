@@ -28,6 +28,8 @@ public class BoxController : MonoBehaviour {
 
     float halfsize;
 
+    BaseActor PlayerThrowBox;                               //获取扔盒子的角色
+
     void Awake()
     {
         m_fStartTime = 0f;
@@ -43,12 +45,13 @@ public class BoxController : MonoBehaviour {
 
 
 
-    public void OnStart() {
+    public void OnStart(BaseActor thrower) {
         m_fStartTime = Time.time;
         m_fStartDownTime = Time.time;
         m_fOrigHeight = transform.position.y;
         AbsDis = Mathf.Abs(FDownDis);
         cc = Camera.main.GetComponent<CameraController>();
+        PlayerThrowBox = thrower;
     }
     float AbsDis;
     float tmp;
@@ -86,21 +89,22 @@ public class BoxController : MonoBehaviour {
     void OnTriggerEnter(Collider other)
     {
         BaseActor Owner = null;
-                if (gameObject.layer == LayerMask.NameToLayer("HoldBox"))                      //如果是举起来的盒子
+        if (gameObject.layer == LayerMask.NameToLayer("HoldBox"))                      //如果是举起来的盒子
+        {
+            if ((Owner = other.transform.parent.GetComponent<BaseActor>()) != null)
+            {
+                //if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
+                //{
+                //    TrigBuff(Owner, 5010101);
+                //}
+                //else 
+                if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major && Owner.BaseAtt.RoleInfo.CharacSide == eCharacSide.Side_Enemy)
                 {
-                    if ((Owner = other.transform.parent.GetComponent<BaseActor>()) != null)
-                    {
-                        if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
-                        {
-                            TrigBuff(Owner, 5010101);
-                        }
-                        else if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major && Owner.BaseAtt.RoleInfo.CharacSide == eCharacSide.Side_Enemy)
-                        {
-                            TrigBuff(Owner, 1010101);
-                            Owner.HoldBoxDir =transform.forward;                               //确定飞过来的盒子的方向
-                        }
-                    }
+                    TrigBuff(Owner, 1010101);
+                    Owner.HoldBoxDir =transform.forward;                               //确定飞过来的盒子的方向
                 }
+            }
+        }
     }
 
     void TrigBuff(BaseActor Owner, int id)
@@ -108,7 +112,7 @@ public class BoxController : MonoBehaviour {
         UnityEngine.Object obj = Resources.Load("IGSoft_Projects/Buffs/" + id.ToString());
         GameObject tmp = Instantiate(obj) as GameObject;
         ActionInfos acInfos = tmp.GetComponent<ActionInfos>();
-        acInfos.SetOwner(Owner.gameObject, Owner, null);
+        acInfos.SetOwner(Owner.gameObject, Owner, PlayerThrowBox);
     }
 
 

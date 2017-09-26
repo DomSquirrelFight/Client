@@ -177,4 +177,16 @@ namespace AttTypeDefine
     }
     #endregion
 
+#region Attribute
+
+    public enum eAttInfo
+    {
+        AttInfo_HP = 0,
+        AttInfo_Mp,
+        AttInfo_Size,
+    }
+
+#endregion
+
+
 }

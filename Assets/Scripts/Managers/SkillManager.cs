@@ -202,7 +202,7 @@ public class SkillManager : MonoBehaviour
         m_bIsHoldBox = false;                                                                                               //复位托举状态
         m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空
         BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
-        boxCon.OnStart();
+        boxCon.OnStart(Owner);
         m_bcCurBox = null;
         Owner.HoldBoxTrans = null;
     }

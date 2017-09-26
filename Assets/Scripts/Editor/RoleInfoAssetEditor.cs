@@ -211,10 +211,10 @@ namespace Assets.Scripts.AssetInfoEditor
 
             #region 总血量
             EditorGUILayout.BeginHorizontal();
-            nValue = EditorGUILayout.IntField("角色总血量", _data.nTotalAP);
-            if (nValue != _data.nTotalAP)
+            nValue = EditorGUILayout.IntField("角色总血量", _data.nTotalHP);
+            if (nValue != _data.nTotalHP)
             {
-                _data.nTotalAP = nValue;
+                _data.nTotalHP = nValue;
             }
             EditorGUILayout.EndHorizontal();
             #endregion

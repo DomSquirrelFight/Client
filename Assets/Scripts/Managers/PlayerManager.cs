@@ -175,6 +175,13 @@ public class PlayerManager : MonoBehaviour
     }
 
     UIScene_Fight m_UISceneFight;
+    public UIScene_Fight UISceneFight
+    {
+        get
+        {
+            return m_UISceneFight;
+        }
+    }
 
     public  float SBoxSize = 0.6f;
 

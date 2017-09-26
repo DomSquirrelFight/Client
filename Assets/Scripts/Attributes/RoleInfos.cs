@@ -31,7 +31,7 @@ namespace Assets.Scripts.AssetInfoEditor
 
         public bool bFire;
 
-        public int nTotalAP;
+        public int nTotalHP;
 
         public float RoleMoveSpeed;                                                                 //角色移动速度
 
