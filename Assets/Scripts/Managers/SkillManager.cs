@@ -193,6 +193,7 @@ public class SkillManager : MonoBehaviour
         ActionInfos ai = skill.GetComponent<ActionInfos>();
         ai.SetOwner(m_bcCurBox.gameObject, null, null);
         Owner.HoldBoxTrans = m_bcCurBox.transform;
+        AudioManager.PlayAudio(Owner.gameObject, eAudioType.Audio_Skill, "PickUpBox");
     }
 
     void DoBeforeThrowBox()
@@ -205,6 +206,7 @@ public class SkillManager : MonoBehaviour
         boxCon.OnStart(Owner);
         m_bcCurBox = null;
         Owner.HoldBoxTrans = null;
+        AudioManager.PlayAudio(Owner.gameObject, eAudioType.Audio_Skill, "ThrowBox");
     }
     #endregion
 

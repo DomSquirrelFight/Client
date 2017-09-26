@@ -636,6 +636,7 @@ public class PlayerManager : MonoBehaviour
         {
             m_fStartTime = Time.time;
             Owner.Velocity = new Vector3(0f, InitSpeed, 0f);
+            AudioManager.PlayAudio(Owner.gameObject, eAudioType.Audio_Skill, "JumpUp");
         }
         m_ePlayerNormalBehav = type;
         fOrigHeight  = Owner.ActorTrans.transform.position.y;

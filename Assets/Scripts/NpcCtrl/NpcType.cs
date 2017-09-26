@@ -57,7 +57,9 @@ public class NpcType :  BaseAction{
         switch (MonsterType) {
             case eMonsterType.MonType_Rock:             //怪兽类型是陨石 -> 相当于直接释放技能
                 {
-                    Instantiate(obj, transform.position, transform.rotation);         
+                    GameObject _obj =  Instantiate(obj, transform.position, transform.rotation) as GameObject;
+                    ActionInfos ai = _obj.GetComponent<ActionInfos>();
+                    ai.SetOwner(_obj);
                     break;
                 }
             case eMonsterType.MonType_GroundNpc:
