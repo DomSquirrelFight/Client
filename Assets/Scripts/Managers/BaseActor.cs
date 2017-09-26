@@ -142,14 +142,12 @@ public class BaseActor : MonoBehaviour
                     ba.baseattr = (BaseAttr)ba.gameObject.GetOrAddComponent<PlayerAttr>();
                     ba.BaseAtt.InitAttr(roleInfos);
                     if (
-                      null != ba.PlayerMgr/*读取角色管理器*/ ||
                       null != ba.CameraContrl/*相机实例对象*/ ||
                       null != ba.RB/*加载刚体*/ ||
                       null != ba.SkillMgr ||
                       null != ba.AnimMgr
                       )
                     {
-                        ba.PlayerMgr.OnStart(ba);//启动角色管理器
                         ba.CameraContrl.OnStart(ba);//启动相机
                         ba.SkillMgr.OnStart(ba);
                         ba.AnimMgr.OnStart(ba);
@@ -165,13 +163,11 @@ public class BaseActor : MonoBehaviour
                     ba.baseattr = (BaseAttr)ba.gameObject.GetOrAddComponent<NpcAttr>();
                     ba.BaseAtt.InitAttr(roleInfos);
                     if (
-                     null != ba.PlayerMgr/*读取角色管理器*/ ||
                      null != ba.RB/*加载刚体*/ ||
                      null != ba.SkillMgr ||
                      null != ba.AnimMgr
                      )
                     {
-                        ba.PlayerMgr.OnStart(ba);//启动角色管理器
                         ba.SkillMgr.OnStart(ba);
                         ba.AnimMgr.OnStart(ba);
                     }

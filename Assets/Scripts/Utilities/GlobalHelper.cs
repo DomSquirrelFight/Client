@@ -5,6 +5,18 @@ using AttTypeDefine;
 public class GlobalHelper
 {
 
+    private static bool IsTest;
+    public static void SetTest(bool istest)
+    {
+        IsTest = istest;
+    }
+    public static bool BIsTest
+    {
+        get
+        {
+            return IsTest;
+        }
+    }
 
     public static bool CheckMoveBoundaryBlock(Vector3 pos,float size)
     {

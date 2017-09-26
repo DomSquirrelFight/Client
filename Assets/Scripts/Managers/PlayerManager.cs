@@ -195,7 +195,7 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 外部接口 / 系统接口
-    public void OnStart(BaseActor owner)
+    public void OnStart(BaseActor owner, PathArea birthArea)
     {
         NpcMaskGlossy = LayerMask.NameToLayer("NPC");
         NpcMask = 1 << NpcMaskGlossy;
@@ -240,6 +240,16 @@ public class PlayerManager : MonoBehaviour
         SMoveSpeed = Owner.BaseAtt.RoleInfo.RoleMoveSpeed;
         SBackSpeed = Owner.BaseAtt.RoleInfo.RoleBackSpeed;
         SRotSpeed = Owner.BaseAtt.RoleInfo.RoleRotSpeed;
+
+        //根据出生点 : 形成初始化的路线.
+        ArrtTPoints = new Transform[birthArea.RoutePoints.Length];
+        birthArea.RoutePoints.CopyTo(ArrtTPoints, 0);
+        //for (int i = 0; i < birthArea.RoutePoints.Length; i++)
+        //{
+        //   ArrtTPoints.co
+        //}
+        int a = 0;
+
     }
 
 
@@ -680,6 +690,26 @@ public class PlayerManager : MonoBehaviour
 
     #endregion
 
+
+    #region 寻路
+    Transform[] ArrtTPoints;
+    public void RotatePlayer()
+    {
+        //if (m_vInputMove.x != 0f)
+        //{
+        //    m_vCurForward = new Vector3(m_vInputMove.x, 0f, 0f);
+        //    Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, SRotSpeed * Time.deltaTime);
+        //}
+
+        /**
+         * 1 ： 拿到当前点
+         * 2 ： 拿到下一个点 -> 判定下一个点是否是分叉点 -> 如果不是，那么什么都不做，继续往前走，如果是 -> 随机选择一个方向，-> 根据选择的方向重新生成路径点序列
+         * 
+         * */
+
+    }
+    #endregion
+
     #region Translate
 
     public bool RayCastBlock()
@@ -692,15 +722,6 @@ public class PlayerManager : MonoBehaviour
             m_bIsBlocked = true;
         }
         return m_bIsBlocked;
-    }
-
-    public void RotatePlayer()
-    {
-        if (m_vInputMove.x != 0f)
-        {
-            m_vCurForward = new Vector3(m_vInputMove.x, 0f, 0f);
-            Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, SRotSpeed * Time.deltaTime);
-        }
     }
 
     void TranslatePlayer()
