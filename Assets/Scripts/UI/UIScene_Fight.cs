@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
+
 public class UIScene_Fight : UIScene
 {
     #region 摇杆，跳跃，具箱子事件处理
@@ -235,7 +236,9 @@ public class UIScene_Fight : UIScene
 
         cam = NGUITools.FindCameraForLayer(gameObject.layer);
 
-        m_LifeNum = m_uiLife.Length;
+        
+        //m_LifeNum = m_uiLife.Length;
+        m_LifeNum = ba.BaseAtt[eAttInfo.AttInfo_HP];
 
 
 
@@ -353,7 +356,7 @@ public class UIScene_Fight : UIScene
         //Gameover界面的活性打开
         m_oGameOver.SetActive(true);
         //显示最终得分
-        m_uiTotalScore.text = "Total Score=" + m_labelScore.ToString();
+        m_uiTotalScore.text = "Total Score=" + m_labelScore.text;
     }
     void EndTheGame(GameObject obj)
     {

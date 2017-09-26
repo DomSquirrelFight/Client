@@ -7,7 +7,6 @@ namespace Assets.Scripts.Action
     public class ActionTakeDamage : BaseAction
     {
         public StateID InjureType;
-
         public override void TrigAction()
         {
 
@@ -18,6 +17,8 @@ namespace Assets.Scripts.Action
             {
                 //同步UI显示.
                 AudioManager.PlayAudio(Defenser.gameObject, eAudioType.Audio_Skill, "Hurt");
+                //m_delBeinjured();
+                Defenser.PlayerMgr.UISceneFight.BeInjured();
             }
             //计算主角得分
             else
@@ -25,7 +26,8 @@ namespace Assets.Scripts.Action
                 AudioManager.PlayAudio(Defenser.gameObject, eAudioType.Audio_Skill, "HitEnemy");
                 if (null != Attacker)
                 {
-                    //Attacker.PlayerMgr.UISceneFight
+                    Attacker.PlayerMgr.UISceneFight.GetScore(10);
+                    // m_delGetscore(10);
                 }
             }
             #endregion
