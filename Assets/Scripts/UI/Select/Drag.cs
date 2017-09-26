@@ -4,6 +4,7 @@ using UnityEngine;
 using AttTypeDefine;
 
 public class Drag : MakeMove {
+
     #region bool值的成员变量
     //是否触摸
     bool IsTouch = false;
@@ -105,8 +106,50 @@ public class Drag : MakeMove {
 
     #endregion
 
+    #region 系统接口
+
+    private void Start()
+    {
+        //初始化双击事件
+        ResetClick();
+    }
+
     protected override void Update()
     {
         base.Update();
     }
+    #endregion
+
+    #region 双击
+    //ClickState clickstate ;
+    int m_iClickindex ;
+
+    void OnClick()
+    {
+        //第一次点击
+        if(m_iClickindex==0)//&& clickstate==ClickState.Click_Null)
+        {
+            m_iClickindex++;
+            //clickstate = ClickState.Click_First;
+            Invoke("ResetClick", 0.5f);
+        }
+        //双击 
+        else if(m_iClickindex==1)//&& clickstate == ClickState.Click_First)
+        {
+            //处理双击事件，选择当前currindex所对应的人物
+            Debug.Log("double Click");
+            ResetClick();
+        }
+        
+    }
+    void ResetClick()
+    {
+        //clickstate = ClickState.Click_Null;
+        m_iClickindex = 0;
+    }
+    #endregion
+
+
+
+
 }
