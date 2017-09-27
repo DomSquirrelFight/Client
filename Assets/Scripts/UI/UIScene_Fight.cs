@@ -229,7 +229,7 @@ public class UIScene_Fight : UIScene
 
     void Start()
     {
-        Debug.Log(eState);
+       
         m_oJoyBack.SetActive(false);
 
         m_vJoyBackOrigPos = m_oJoyBack.transform.position;

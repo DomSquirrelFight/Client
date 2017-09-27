@@ -14,8 +14,12 @@ public class StartPoint : MonoBehaviour {
     {
         BaseActor player = BaseActor.CreatePlayer(RoleId, transform.position, transform.rotation, Vector3.one);
 
+        player.CameraContrl.BRefreshCameraData = true;
+
         //启动玩家的角色管理器
         player.PlayerMgr.OnStart(player, BirthArea);
+
+       
 
     }
         

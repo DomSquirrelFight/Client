@@ -6704,7 +6704,8 @@ public class iTween : MonoBehaviour{
 		int numSections = pts.Length - 3;
 		int currPt = Mathf.Min(Mathf.FloorToInt(t * (float) numSections), numSections - 1);
 		float u = t * (float) numSections - (float) currPt;
-				
+        if (t < 0f)
+            Debug.Log(123);
 		Vector3 a = pts[currPt];
 		Vector3 b = pts[currPt + 1];
 		Vector3 c = pts[currPt + 2];

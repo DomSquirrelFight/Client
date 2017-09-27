@@ -23,5 +23,28 @@ public static class UnityEngineExtention  {
         yield return null;
         callback();
     }
-	
+
+    public static void LookAt2D(this Transform trans, Vector3 target)
+    {
+
+        if (trans == null)
+        {
+            return;
+        }
+
+        var lookAtPoint = target;
+        lookAtPoint.y = trans.position.y;
+        trans.LookAt(lookAtPoint);
+    }
+
+    public static void LookAt2D(this Transform trans, Transform target)
+    {
+        if (trans == null || target == null)
+        {
+            return;
+        }
+
+        LookAt2D(trans, target.position);
+    }
+
 }

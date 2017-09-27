@@ -244,12 +244,6 @@ public class PlayerManager : MonoBehaviour
         //根据出生点 : 形成初始化的路线.
         ArrtTPoints = new Transform[birthArea.RoutePoints.Length];
         birthArea.RoutePoints.CopyTo(ArrtTPoints, 0);
-        //for (int i = 0; i < birthArea.RoutePoints.Length; i++)
-        //{
-        //   ArrtTPoints.co
-        //}
-        int a = 0;
-
     }
 
 
@@ -280,8 +274,6 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-        //执行旋转操作
-        RotatePlayer();
         //播放位移动画
         PlayMoveAnim();
         if (0f != m_vInputMove.x)
@@ -290,6 +282,8 @@ public class PlayerManager : MonoBehaviour
             {
                 if (!RayCastBlock())//横向阻挡
                 {
+                    //执行旋转操作
+                    RotatePlayer();
                     //执行move操作
                     TranslatePlayer();
                 }
@@ -554,7 +548,8 @@ public class PlayerManager : MonoBehaviour
         //Gizmos.DrawLine(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, hitInfo.transform.position);
 
         //Gizmos.DrawSphere(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, 0.55f);
-
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(LookTarget, 0.4f);
         tmpx = 1;
         if (m_vInputMove.x == 0f)
         {
@@ -690,22 +685,73 @@ public class PlayerManager : MonoBehaviour
 
     #endregion
 
-
     #region 寻路
     Transform[] ArrtTPoints;
+    float PathPercent = 0f;
+    float PathSpeed = 0.4f;
+    float LookAheadAmount = 0.01f;
+    Vector3 LookTarget = Vector3.zero;
+    Vector3 coordinateOnPath;
+    Vector3 floorPosition;
+    float pathPosition = 0;
     public void RotatePlayer()
     {
-        //if (m_vInputMove.x != 0f)
-        //{
-        //    m_vCurForward = new Vector3(m_vInputMove.x, 0f, 0f);
-        //    Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, SRotSpeed * Time.deltaTime);
-        //}
 
-        /**
-         * 1 ： 拿到当前点
-         * 2 ： 拿到下一个点 -> 判定下一个点是否是分叉点 -> 如果不是，那么什么都不做，继续往前走，如果是 -> 随机选择一个方向，-> 根据选择的方向重新生成路径点序列
-         * 
-         * */
+        //获取当前点坐标.
+
+        //获取运动朝向距离自己最近的点.
+
+        #region 根据输入计算进度
+        if (m_vInputMove.x > 0f)
+        {
+            pathPosition += Time.deltaTime * PathSpeed;
+            if (pathPosition > 1f)
+                pathPosition = 1f;
+        }
+        else if(m_vInputMove.x < 0f)
+        {
+            pathPosition -= Time.deltaTime * PathSpeed;
+            if (pathPosition < 0f)
+                pathPosition = 0f;
+        }
+
+        PathPercent = pathPosition % 1;
+
+        //if (PathPercent < 0f)
+        //    PathPercent = 0f;
+        //else if (PathPercent > 1)
+        //    PathPercent = 1f;
+
+        #endregion
+
+        if (PathPercent - LookAheadAmount >= float.Epsilon && PathPercent + LookAheadAmount <= 1f)
+        {
+            if (m_vInputMove.x > 0f)
+            {
+                LookTarget = iTween.PointOnPath(ArrtTPoints, PathPercent + LookAheadAmount);
+            }
+            else if (m_vInputMove.x < 0f)
+            {
+                LookTarget = iTween.PointOnPath(ArrtTPoints, PathPercent - LookAheadAmount);
+            }
+            Owner.ActorTrans.LookAt2D(LookTarget);
+            coordinateOnPath = iTween.PointOnPath(ArrtTPoints, PathPercent);
+            if (Physics.Raycast(coordinateOnPath, -Vector3.up, out hitInfo, Owner.ActorHeight, mask))
+            {
+                Debug.DrawRay(coordinateOnPath, -Vector3.up * hitInfo.distance);
+                floorPosition = hitInfo.point;
+            }
+
+            Owner.ActorTrans.position = new Vector3(
+                floorPosition.x,
+                Owner.ActorTrans.position.y,
+                floorPosition.z
+                );
+
+        }
+
+    
+      
 
     }
     #endregion
@@ -726,8 +772,8 @@ public class PlayerManager : MonoBehaviour
 
     void TranslatePlayer()
     {
-        if(m_vInputMove.x != 0f)
-            Owner.ActorTrans.Translate(new Vector3(0f, 0f,  Mathf.Abs(m_vInputMove.x) * SMoveSpeed * Time.deltaTime));
+        //if(m_vInputMove.x != 0f)
+        //    Owner.ActorTrans.Translate(new Vector3(0f, 0f,  Mathf.Abs(m_vInputMove.x) * SMoveSpeed * Time.deltaTime));
     }
 
     public bool CheckMoveBoundaryBlock(float extra = 0f) 
