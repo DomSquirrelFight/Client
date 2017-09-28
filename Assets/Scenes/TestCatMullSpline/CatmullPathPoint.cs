@@ -12,6 +12,7 @@ namespace Assets.Scenes.TestCatmull
         {
             ePoint_Area1,
             ePoint_Area2,
+            ePoint_ExtraPoint,
         }
 
         public eCatmullPointType PointType = eCatmullPointType.ePoint_Area1;
@@ -30,6 +31,11 @@ namespace Assets.Scenes.TestCatmull
                 case eCatmullPointType.ePoint_Area2:
                     {
                         Gizmos.color = Color.cyan;
+                        break;
+                    }
+                case eCatmullPointType.ePoint_ExtraPoint:
+                    {
+                        Gizmos.color = Color.grey;
                         break;
                     }
             }
