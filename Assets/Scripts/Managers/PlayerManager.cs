@@ -335,7 +335,14 @@ public class PlayerManager : MonoBehaviour
             }
             else if (0f != he)
             {
-                m_vInputMove.x = he;
+                //m_vInputMove.x = he;
+                if (he > 0)
+                {
+                    m_vInputMove.x = 1;
+                }
+                else if (he < 0)
+                    m_vInputMove.x = -1;
+
             }
         }
     }
@@ -711,9 +718,20 @@ public class PlayerManager : MonoBehaviour
 
     bool bPass = false;
     float pathPosition = 0;
+
+    void ResetpathPosition()
+    {
+        if(pathPosition<0)
+        {
+            pathPosition = 0;
+        }
+        if (pathPosition >= 1)
+            pathPosition = 1;
+    }
+
     public void RotatePlayerAlongBezier()
     {
-
+        ResetpathPosition();
         #region 根据输入计算进度
         if (m_vInputMove.x > 0f)
         {
@@ -730,7 +748,7 @@ public class PlayerManager : MonoBehaviour
         //当前区域的长度
         int length = CurArea.RoutePoints.Length;
         float ChangPercent = Vector3.Distance(ArrtTPoints[length - 2].transform.position, ArrtTPoints[0].transform.position) / Vector3.Distance(ArrtTPoints[length - 1].transform.position ,ArrtTPoints[0].transform.position);
-        if (pathPosition >= ChangPercent && !bPass)
+        if (pathPosition >= ChangPercent-0.01f && !bPass)
         {
             bPass = true;
             //新区域的进度值归零
@@ -769,10 +787,18 @@ public class PlayerManager : MonoBehaviour
             }
             #endregion
         }
-
+        //当到达终点位置的时候限制人物的位置
+        if (pathPosition >= 1)
+        {
+            Owner.ActorTrans.position = new Vector3(
+            ArrtTPoints[ArrtTPoints.Length - 1].transform.position.x,
+            Owner.ActorTrans.position.y,
+           ArrtTPoints[ArrtTPoints.Length - 1].transform.position.z
+            );
+        }
 
         #region 计算角色偏移
-       floorPosition= BezierLine.GwtMove(PathPercent, ArrtTPoints.Length);
+        floorPosition = BezierLine.GwtMove(PathPercent, ArrtTPoints.Length);
         //Owner.ActorTrans.position = new Vector3(
         //    floorPosition.x,
         //    Owner.ActorTrans.position.y,
