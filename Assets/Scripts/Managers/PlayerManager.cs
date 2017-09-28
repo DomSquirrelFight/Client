@@ -5,6 +5,7 @@ using AttTypeDefine;
 using System.Linq;
 using Assets.Scripts.Helper;
 using Assets.Scripts.AssetInfoEditor;
+using System;
 public class PlayerManager : MonoBehaviour
 {
 
@@ -217,6 +218,10 @@ public class PlayerManager : MonoBehaviour
         HoldBoxMaskGlossy = LayerMask.NameToLayer("HoldBox");
         HoldBoxMask = 1 << HoldBoxMaskGlossy;
 
+
+        WayFindingMaskGlossy = LayerMask.NameToLayer("WayFinidngBox");
+        WayFinidngMask = 1 << WayFindingMaskGlossy;
+
         Owner = owner;
 
         SkillMgr = Owner.SkillMgr;
@@ -244,6 +249,14 @@ public class PlayerManager : MonoBehaviour
         //根据出生点 : 形成初始化的路线.
         ArrtTPoints = new Transform[birthArea.RoutePoints.Length];
         birthArea.RoutePoints.CopyTo(ArrtTPoints, 0);
+        PathPercent = min;
+        PahtAreaCtrl = birthArea.transform.parent;
+        CurArea = birthArea;
+        m_sStellerCat.PathPoints = PathFinding.GetPointPos(ArrtTPoints);
+        //m_sStellerCat.ControlPathPoints = PathFinding.PathControlPointController(m_sStellerCat.PathPoints, default(Vector3),
+        //    CurArea.RoutePoints[CurArea.RoutePoints.Length - 1].position + CurArea.RoutePoints[CurArea.RoutePoints.Length - 1].position - CurArea.NextAreas[0].RoutePoints[0].position);
+        m_sStellerCat.ControlPathPoints = PathFinding.PathControlPointController(m_sStellerCat.PathPoints, default(Vector3), CurArea.NextAreas[0].RoutePoints[0].position);
+        //m_sStellerCat.ControlPathPoints = PathFinding.PathControlPointController(m_sStellerCat.PathPoints, default(Vector3));
     }
 
 
@@ -686,72 +699,94 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 寻路
-    Transform[] ArrtTPoints;
-    float PathPercent = 0f;
+    sStellerCatMull m_sStellerCat;
+    int WayFindingMaskGlossy;
+    int WayFinidngMask;
+    float PathPercent;
     float PathSpeed = 0.4f;
     float LookAheadAmount = 0.01f;
     Vector3 LookTarget = Vector3.zero;
     Vector3 coordinateOnPath;
     Vector3 floorPosition;
+    float min = 0f;
+    Transform PahtAreaCtrl;                         //寻路点管理对象
+    PathArea CurArea;                                 //当前所在区域
+    PathArea NextArea;
+    Transform[] ArrtTPoints;                         //当前路线点
+
+    bool bPass = false;
     float pathPosition = 0;
     public void RotatePlayer()
     {
-
-        //获取当前点坐标.
-
-        //获取运动朝向距离自己最近的点.
 
         #region 根据输入计算进度
         if (m_vInputMove.x > 0f)
         {
             pathPosition += Time.deltaTime * PathSpeed;
-            if (pathPosition > 1f)
-                pathPosition = 1f;
         }
-        else if(m_vInputMove.x < 0f)
+        else if (m_vInputMove.x < 0f)
         {
             pathPosition -= Time.deltaTime * PathSpeed;
-            if (pathPosition < 0f)
-                pathPosition = 0f;
+        }
+        #endregion
+        PathPercent = pathPosition % 1f;
+        if (pathPosition >= 1f && !bPass)
+        {
+            bPass = true;
+            int length = CurArea.RoutePoints.Length;
+            NextArea = CurArea.NextAreas[0];
+            int n = NextArea.RoutePoints.Length;
+            ArrtTPoints = new Transform[n + 1];
+            ArrtTPoints[0] = CurArea.RoutePoints[length - 1];
+            for (int i = 0; i < NextArea.RoutePoints.Length; i++)
+            {
+                ArrtTPoints[1 + i] = NextArea.RoutePoints[i];
+            }
+            m_sStellerCat.PathPoints = PathFinding.GetPointPos(ArrtTPoints);
+            Vector3 LastSec = CurArea.RoutePoints[CurArea.RoutePoints.Length - 2].position;
+            CurArea = NextArea;
+            m_sStellerCat.ControlPathPoints = PathFinding.PathControlPointController(m_sStellerCat.PathPoints, LastSec);
         }
 
-        PathPercent = pathPosition % 1;
-
-        //if (PathPercent < 0f)
-        //    PathPercent = 0f;
-        //else if (PathPercent > 1)
-        //    PathPercent = 1f;
-
-        #endregion
-
+        //如果进度在合法范围内
         if (PathPercent - LookAheadAmount >= float.Epsilon && PathPercent + LookAheadAmount <= 1f)
         {
+            #region 计算朝向
             if (m_vInputMove.x > 0f)
             {
-                LookTarget = iTween.PointOnPath(ArrtTPoints, PathPercent + LookAheadAmount);
+                LookTarget = PathFinding.Interp(m_sStellerCat.ControlPathPoints, PathPercent + LookAheadAmount);
             }
             else if (m_vInputMove.x < 0f)
             {
-                LookTarget = iTween.PointOnPath(ArrtTPoints, PathPercent - LookAheadAmount);
+                LookTarget = PathFinding.Interp(m_sStellerCat.ControlPathPoints, PathPercent - LookAheadAmount);
             }
             Owner.ActorTrans.LookAt2D(LookTarget);
-            coordinateOnPath = iTween.PointOnPath(ArrtTPoints, PathPercent);
-            if (Physics.Raycast(coordinateOnPath, -Vector3.up, out hitInfo, Owner.ActorHeight, mask))
-            {
-                Debug.DrawRay(coordinateOnPath, -Vector3.up * hitInfo.distance);
-                floorPosition = hitInfo.point;
-            }
-
-            Owner.ActorTrans.position = new Vector3(
-                floorPosition.x,
-                Owner.ActorTrans.position.y,
-                floorPosition.z
-                );
-
+            #endregion
         }
 
-    
-      
+
+        #region 计算角色偏移
+        //if (PathPercent < min)
+        //    return;
+        coordinateOnPath = PathFinding.Interp(m_sStellerCat.ControlPathPoints, PathPercent);
+        if (Physics.Raycast(coordinateOnPath, -Vector3.up, out hitInfo, Owner.ActorHeight, mask))
+        {
+            Debug.DrawRay(coordinateOnPath, -Vector3.up * hitInfo.distance);
+            floorPosition = hitInfo.point;
+        }
+
+        Owner.ActorTrans.position = new Vector3(
+            floorPosition.x,
+            Owner.ActorTrans.position.y,
+            floorPosition.z
+            );
+            
+            //Vector3.Lerp(Owner.ActorTrans.position, new Vector3(
+            //floorPosition.x,
+            //Owner.ActorTrans.position.y,
+            //floorPosition.z
+            //), 10 * Time.deltaTime);
+        #endregion
 
     }
     #endregion
@@ -914,7 +949,7 @@ public class PlayerManager : MonoBehaviour
               * 如果举着盒子，当和主角满足一定条件，那么扔掉盒子，否则一直举着盒子
               * 
               * */
-                    n = Random.Range(0, 100);
+                    n = UnityEngine.Random.Range(0, 100);
 
                     //m_vInputMove.x = 0 - m_vInputMove.x;
                     //return;

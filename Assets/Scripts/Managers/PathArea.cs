@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class PathArea : MonoBehaviour {
     public Transform[] RoutePoints;
-    public Transform[] LinkAreaPoints;
+    public PathArea[] NextAreas;
+    //public Transform[] LinkAreaPoints;
     
     void OnDrawGizmos()
     {

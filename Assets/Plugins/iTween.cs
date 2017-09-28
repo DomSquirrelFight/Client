@@ -6681,8 +6681,6 @@ public class iTween : MonoBehaviour{
 		vector3s = new Vector3[suppliedPath.Length+offset];
 		Array.Copy(suppliedPath,0,vector3s,1,suppliedPath.Length);
 		
-		//populate start and end control points:
-		//vector3s[0] = vector3s[1] - vector3s[2];
 		vector3s[0] = vector3s[1] + (vector3s[1] - vector3s[2]);
 		vector3s[vector3s.Length-1] = vector3s[vector3s.Length-2] + (vector3s[vector3s.Length-2] - vector3s[vector3s.Length-3]);
 		
