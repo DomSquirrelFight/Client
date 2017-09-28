@@ -17,4 +17,18 @@ public class PathArea : MonoBehaviour {
         //Handles.Label(transform.position + Vector3.up, index.ToString());
 #endif
     }
+
+    public static Vector3[] GetVectorArray(PathArea pa)
+    {
+        Vector3[]  m_vCurPoints = new Vector3[pa.RoutePoints.Length];
+
+        for (int i = 0; i < m_vCurPoints.Length; i++)
+        {
+            m_vCurPoints[i] = pa.RoutePoints[i].transform.position;
+        }
+
+        return m_vCurPoints;
+
+    }
+
 }

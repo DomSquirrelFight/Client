@@ -219,9 +219,6 @@ public class PlayerManager : MonoBehaviour
         HoldBoxMask = 1 << HoldBoxMaskGlossy;
 
 
-        WayFindingMaskGlossy = LayerMask.NameToLayer("WayFinidngBox");
-        WayFinidngMask = 1 << WayFindingMaskGlossy;
-
         Owner = owner;
 
         SkillMgr = Owner.SkillMgr;
@@ -246,17 +243,8 @@ public class PlayerManager : MonoBehaviour
         SBackSpeed = Owner.BaseAtt.RoleInfo.RoleBackSpeed;
         SRotSpeed = Owner.BaseAtt.RoleInfo.RoleRotSpeed;
 
-        //根据出生点 : 形成初始化的路线.
-        ArrtTPoints = new Transform[birthArea.RoutePoints.Length];
-        birthArea.RoutePoints.CopyTo(ArrtTPoints, 0);
-        PathPercent = min;
-        PahtAreaCtrl = birthArea.transform.parent;
-        CurArea = birthArea;
-        m_sStellerCat.PathPoints = PathFinding.GetPointPos(ArrtTPoints);
-        //m_sStellerCat.ControlPathPoints = PathFinding.PathControlPointController(m_sStellerCat.PathPoints, default(Vector3),
-        //    CurArea.RoutePoints[CurArea.RoutePoints.Length - 1].position + CurArea.RoutePoints[CurArea.RoutePoints.Length - 1].position - CurArea.NextAreas[0].RoutePoints[0].position);
-        m_sStellerCat.ControlPathPoints = PathFinding.PathControlPointController(m_sStellerCat.PathPoints, default(Vector3), CurArea.NextAreas[0].RoutePoints[0].position);
-        //m_sStellerCat.ControlPathPoints = PathFinding.PathControlPointController(m_sStellerCat.PathPoints, default(Vector3));
+        InitializePathFind(birthArea);          //初始化寻路数据
+     
     }
 
 
@@ -561,8 +549,7 @@ public class PlayerManager : MonoBehaviour
         //Gizmos.DrawLine(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, hitInfo.transform.position);
 
         //Gizmos.DrawSphere(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, 0.55f);
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(LookTarget, 0.4f);
+     
         tmpx = 1;
         if (m_vInputMove.x == 0f)
         {
@@ -571,9 +558,7 @@ public class PlayerManager : MonoBehaviour
         else if (m_vInputMove.x < 0f)
             tmpx = -1;
 
-
         //RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3(0.1f, Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.5f), Owner.ActorTrans.forward, Quaternion.Euler(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BoxMask);
-
 
         ExtDebug.DrawBoxCastBox(
         Owner.ActorTrans.position + Owner.BC.center,
@@ -699,94 +684,50 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 寻路
-    sStellerCatMull m_sStellerCat;
-    int WayFindingMaskGlossy;
-    int WayFinidngMask;
-    float PathPercent;
-    float PathSpeed = 0.4f;
-    float LookAheadAmount = 0.01f;
-    Vector3 LookTarget = Vector3.zero;
-    Vector3 coordinateOnPath;
-    Vector3 floorPosition;
-    float min = 0f;
-    Transform PahtAreaCtrl;                         //寻路点管理对象
-    PathArea CurArea;                                 //当前所在区域
-    PathArea NextArea;
-    Transform[] ArrtTPoints;                         //当前路线点
 
-    bool bPass = false;
-    float pathPosition = 0;
+    void InitializePathFind(PathArea pa)
+    {
+        m_CurPathArea = pa;
+        m_vCurPoints = PathFinding.InitializePointPath(pa.RoutePoints);
+    }
+
+    Vector3[] m_vCurPoints;
+    float m_fCurPercent;
+    float m_fPer;
+    float m_fSpeed = 0.3f;
+    PathArea m_CurPathArea;
     public void RotatePlayer()
     {
-
-        #region 根据输入计算进度
+        #region 计算进度
         if (m_vInputMove.x > 0f)
         {
-            pathPosition += Time.deltaTime * PathSpeed;
+            m_fCurPercent += m_fSpeed * Time.deltaTime;
         }
         else if (m_vInputMove.x < 0f)
         {
-            pathPosition -= Time.deltaTime * PathSpeed;
+            m_fCurPercent -= m_fSpeed * Time.deltaTime;
         }
+       
+
         #endregion
-        PathPercent = pathPosition % 1f;
-        if (pathPosition >= 1f && !bPass)
+
+        if (PathFinding.CheckRecalculatePath(m_vCurPoints, m_fPer))
         {
-            bPass = true;
-            int length = CurArea.RoutePoints.Length;
-            NextArea = CurArea.NextAreas[0];
-            int n = NextArea.RoutePoints.Length;
-            ArrtTPoints = new Transform[n + 1];
-            ArrtTPoints[0] = CurArea.RoutePoints[length - 1];
-            for (int i = 0; i < NextArea.RoutePoints.Length; i++)
+            if (m_CurPathArea.NextAreas.Length > 0)
             {
-                ArrtTPoints[1 + i] = NextArea.RoutePoints[i];
+                PathFinding.RecalculatePath(ref m_vCurPoints, PathArea.GetVectorArray(m_CurPathArea.NextAreas[0]), ref m_fCurPercent);
+                m_CurPathArea = m_CurPathArea.NextAreas[0];
             }
-            m_sStellerCat.PathPoints = PathFinding.GetPointPos(ArrtTPoints);
-            Vector3 LastSec = CurArea.RoutePoints[CurArea.RoutePoints.Length - 2].position;
-            CurArea = NextArea;
-            m_sStellerCat.ControlPathPoints = PathFinding.PathControlPointController(m_sStellerCat.PathPoints, LastSec);
         }
 
-        //如果进度在合法范围内
-        if (PathPercent - LookAheadAmount >= float.Epsilon && PathPercent + LookAheadAmount <= 1f)
-        {
-            #region 计算朝向
-            if (m_vInputMove.x > 0f)
-            {
-                LookTarget = PathFinding.Interp(m_sStellerCat.ControlPathPoints, PathPercent + LookAheadAmount);
-            }
-            else if (m_vInputMove.x < 0f)
-            {
-                LookTarget = PathFinding.Interp(m_sStellerCat.ControlPathPoints, PathPercent - LookAheadAmount);
-            }
-            Owner.ActorTrans.LookAt2D(LookTarget);
-            #endregion
-        }
+         m_fPer = m_fCurPercent % 1f;
 
-
-        #region 计算角色偏移
-        //if (PathPercent < min)
-        //    return;
-        coordinateOnPath = PathFinding.Interp(m_sStellerCat.ControlPathPoints, PathPercent);
-        if (Physics.Raycast(coordinateOnPath, -Vector3.up, out hitInfo, Owner.ActorHeight, mask))
-        {
-            Debug.DrawRay(coordinateOnPath, -Vector3.up * hitInfo.distance);
-            floorPosition = hitInfo.point;
-        }
-
-        Owner.ActorTrans.position = new Vector3(
-            floorPosition.x,
-            Owner.ActorTrans.position.y,
-            floorPosition.z
+         Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
+        transform.position = new Vector3(
+            pos.x,
+            transform.position.y,
+            pos.z
             );
-            
-            //Vector3.Lerp(Owner.ActorTrans.position, new Vector3(
-            //floorPosition.x,
-            //Owner.ActorTrans.position.y,
-            //floorPosition.z
-            //), 10 * Time.deltaTime);
-        #endregion
 
     }
     #endregion

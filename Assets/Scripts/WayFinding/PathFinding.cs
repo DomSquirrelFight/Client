@@ -1,6 +1,11 @@
 ﻿/**
  * author : Erric.Z
  * data : 2017.09.27
+ * 
+ * 注意事项1 ： 第一条路线长度最好长一点，当角色走到当前路线的倒数第二个区域的时候，需要重新计算路线。
+ * 注意事项2 ： 根据第一条的规则，最后要留出4个点 -> 每条路线最少要放置3个点.<系统会额外分配两个点>。
+ * 注意事项3 ： 当前游戏规则<游戏开始的直线道路放置10个点，那么其他所有道路都必须放置6个点>。
+ * 
  **/
 using System.Collections;
 using System.Collections.Generic;
@@ -12,53 +17,76 @@ using AttTypeDefine;
 public class PathFinding : MonoBehaviour
 {
 
-    /// <summary>
-    /// 原理 ： 在路线的起点和终点的前面和后面生成两个点
-    /// 目的 ： 对于起点来说，新生成的第一个点，保证了 01和12的线段斜率一致。
-    /// </summary>
-    /// <returns>寻路路径点数组</returns>
-    public static Vector3[] PathControlPointController(Vector3[] path, Vector3 startpoint = default(Vector3), Vector3 endpoint = default(Vector3))                              //生成寻路路径点数组
+
+    public static Vector3[] InitializePointPath(Transform[] points)
     {
 
-        //新建一个数组，数组的长度是传入数组长度 + 2.
-        Vector3[] output = new Vector3[path.Length + 2];
-
-        Array.Copy(path, 0, output, 1, path.Length);
-
-        if (startpoint == default(Vector3))
+        Vector3[] source = new Vector3[points.Length];
+        for (int i = 0; i < source.Length; i++)
         {
-            output[0] = path[1] + path[1] - path[2];
-        }
-        else
-        {
-            output[0] = startpoint;
+            source[i] = points[i].transform.position;
         }
 
+        Vector3[] outputs = new Vector3[points.Length + 2];
 
-        if (endpoint == default(Vector3))
-        {
-            output[output.Length - 1] = output[output.Length - 2] + output[output.Length - 2] - output[output.Length - 3];   
-        }
-        else
-        {
-            output[output.Length - 1] = endpoint;
-        }
+        Array.Copy(source, 0, outputs, 1, source.Length);
 
-        return output;
+        outputs[0] = outputs[1] + outputs[1] - outputs[2];
+
+        outputs[outputs.Length - 1] = outputs[outputs.Length - 2] + outputs[outputs.Length - 2] - outputs[outputs.Length - 3];
+ 
+        return outputs;
+
     }
-    
 
-    public static Vector3 Interp(Vector3[] pts, float t)
+    public static bool CheckRecalculatePath(Vector3[] source, float per)          //判定是否重新计算路线
     {
-        int numSections = pts.Length - 3;
-        int currPt = Mathf.Min(Mathf.FloorToInt(t * (float)numSections), numSections - 1);
-        float u = t * (float)numSections - (float)currPt;
-        if (t < 0f)
-            Debug.Log(123);
-        Vector3 a = pts[currPt];
-        Vector3 b = pts[currPt + 1];
-        Vector3 c = pts[currPt + 2];
-        Vector3 d = pts[currPt + 3];
+
+        int numSections = source.Length - 3;
+        
+        int index = numSections - 1;
+
+        int currPt = Mathf.Min(Mathf.FloorToInt(per * (float)numSections), numSections - 1);
+
+        if (currPt == index)
+            return true;
+
+        return false;
+    }
+
+    public static void RecalculatePath(ref Vector3[] source, Vector3[] nextArea, ref float fRealPercent)             //重新计算路线
+    {
+        fRealPercent = 0f;
+        int numSections = source.Length - 3;
+
+        int index = numSections - 1;
+        //int index = source.Length - 4;
+        Vector3[] tmp = new Vector3[source.Length];
+        Array.Copy(source, index, tmp, 0, source.Length - index - 1);
+        for (int i = index - 1; i >= 0; i--)
+        {
+            tmp[tmp.Length - 1 - i - 1] = nextArea[index - 1 - i];
+        }
+
+        tmp[tmp.Length - 1] = tmp[tmp.Length - 2] + tmp[tmp.Length - 2] - tmp[tmp.Length - 3];
+
+        Array.Copy(tmp, source, tmp.Length);
+
+    }
+
+
+    public static Vector3 Interp(Vector3[] source, float per)    //插值获取路线点坐标
+    {
+
+        int numSections = source.Length - 3;
+        int currPt = Mathf.Min(Mathf.FloorToInt(per * (float)numSections), numSections - 1);
+
+        float u = per * (float)numSections - (float)currPt;
+
+        Vector3 a = source[currPt];
+        Vector3 b = source[currPt + 1];
+        Vector3 c = source[currPt + 2];
+        Vector3 d = source[currPt + 3];
 
         return .5f * (
             (-a + 3f * b - 3f * c + d) * (u * u * u)
@@ -68,17 +96,11 @@ public class PathFinding : MonoBehaviour
         );
     }
 
-    public static Vector3[] GetPointPos(Transform[] t)
-    {
 
-        Vector3[] suppliedPath = new Vector3[t.Length];
-        for (int i = 0; i < t.Length; i++)
-        {
-            suppliedPath[i] = t[i].position;
-        }
 
-        return suppliedPath;
-      
-    }
+
+
+
+
     
 }

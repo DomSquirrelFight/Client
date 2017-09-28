@@ -30,12 +30,12 @@ namespace Assets.Scenes.TestCatmull
                     }
                 case eCatmullPointType.ePoint_Area2:
                     {
-                        Gizmos.color = Color.cyan;
+                        Gizmos.color = Color.white;
                         break;
                     }
                 case eCatmullPointType.ePoint_ExtraPoint:
                     {
-                        Gizmos.color = Color.grey;
+                        Gizmos.color = Color.black;
                         break;
                     }
             }
