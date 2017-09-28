@@ -208,7 +208,12 @@ namespace AttTypeDefine
         public Vector3[] PathPoints;           //用户传入的点数组
         public Vector3[] ControlPathPoints; // 在用户传入的点数组基础上添加了起点和终点
     }
-
+    //贝塞尔曲线点的模式限制
+    public enum eBezierLineConstrainedMode
+    {
+        Free,
+        Mirror,
+    };
     #endregion
 
 

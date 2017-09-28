@@ -252,13 +252,10 @@ public class PlayerManager : MonoBehaviour
         PathPercent = min;
         PahtAreaCtrl = birthArea.transform.parent;
         CurArea = birthArea;
-        m_sStellerCat.PathPoints = PathFinding.GetPointPos(ArrtTPoints);
-        //m_sStellerCat.ControlPathPoints = PathFinding.PathControlPointController(m_sStellerCat.PathPoints, default(Vector3),
-        //    CurArea.RoutePoints[CurArea.RoutePoints.Length - 1].position + CurArea.RoutePoints[CurArea.RoutePoints.Length - 1].position - CurArea.NextAreas[0].RoutePoints[0].position);
-        m_sStellerCat.ControlPathPoints = PathFinding.PathControlPointController(m_sStellerCat.PathPoints, default(Vector3), CurArea.NextAreas[0].RoutePoints[0].position);
-        //m_sStellerCat.ControlPathPoints = PathFinding.PathControlPointController(m_sStellerCat.PathPoints, default(Vector3));
+        GameObject bezierline = new GameObject("BezierLine");
+        bezierline.AddComponent<BezierLine>();
+        m_sStellerCat.PathPoints = BezierLine.GetBezierPoints(ArrtTPoints);
     }
-
 
     void Update()
     {
@@ -296,7 +293,7 @@ public class PlayerManager : MonoBehaviour
                 if (!RayCastBlock())//横向阻挡
                 {
                     //执行旋转操作
-                    RotatePlayer();
+                    RotatePlayerAlongBezier();
                     //执行move操作
                     TranslatePlayer();
                 }
@@ -561,8 +558,8 @@ public class PlayerManager : MonoBehaviour
         //Gizmos.DrawLine(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, hitInfo.transform.position);
 
         //Gizmos.DrawSphere(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, 0.55f);
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(LookTarget, 0.4f);
+        //Gizmos.color = Color.red;
+        //Gizmos.DrawSphere(LookTarget, 0.4f);
         tmpx = 1;
         if (m_vInputMove.x == 0f)
         {
@@ -698,15 +695,13 @@ public class PlayerManager : MonoBehaviour
 
     #endregion
 
-    #region 寻路
+    #region 贝塞尔曲线 寻路
     sStellerCatMull m_sStellerCat;
     int WayFindingMaskGlossy;
     int WayFinidngMask;
     float PathPercent;
     float PathSpeed = 0.4f;
     float LookAheadAmount = 0.01f;
-    Vector3 LookTarget = Vector3.zero;
-    Vector3 coordinateOnPath;
     Vector3 floorPosition;
     float min = 0f;
     Transform PahtAreaCtrl;                         //寻路点管理对象
@@ -716,7 +711,7 @@ public class PlayerManager : MonoBehaviour
 
     bool bPass = false;
     float pathPosition = 0;
-    public void RotatePlayer()
+    public void RotatePlayerAlongBezier()
     {
 
         #region 根据输入计算进度
@@ -729,63 +724,66 @@ public class PlayerManager : MonoBehaviour
             pathPosition -= Time.deltaTime * PathSpeed;
         }
         #endregion
+        //进度百分比
         PathPercent = pathPosition % 1f;
-        if (pathPosition >= 1f && !bPass)
+        //到达倒数第二点的临界位置的比
+        //当前区域的长度
+        int length = CurArea.RoutePoints.Length;
+        float ChangPercent = Vector3.Distance(ArrtTPoints[length - 2].transform.position, ArrtTPoints[0].transform.position) / Vector3.Distance(ArrtTPoints[length - 1].transform.position ,ArrtTPoints[0].transform.position);
+        if (pathPosition >= ChangPercent && !bPass)
         {
             bPass = true;
-            int length = CurArea.RoutePoints.Length;
+            //新区域的进度值归零
+            pathPosition = 0;
+            //下一个区域
             NextArea = CurArea.NextAreas[0];
+            //下一个区域的长度
             int n = NextArea.RoutePoints.Length;
-            ArrtTPoints = new Transform[n + 1];
-            ArrtTPoints[0] = CurArea.RoutePoints[length - 1];
+            //新的路线确定，起点为旧路线的最后一个点
+            ArrtTPoints = new Transform[n + 2];
+            ArrtTPoints[0] = CurArea.RoutePoints[length - 2];
+            ArrtTPoints[1] = CurArea.RoutePoints[length - 1];
+
             for (int i = 0; i < NextArea.RoutePoints.Length; i++)
             {
-                ArrtTPoints[1 + i] = NextArea.RoutePoints[i];
+                ArrtTPoints[2 + i] = NextArea.RoutePoints[i];
             }
-            m_sStellerCat.PathPoints = PathFinding.GetPointPos(ArrtTPoints);
-            Vector3 LastSec = CurArea.RoutePoints[CurArea.RoutePoints.Length - 2].position;
+            BezierLine.GetBezierPoints(ArrtTPoints);
             CurArea = NextArea;
-            m_sStellerCat.ControlPathPoints = PathFinding.PathControlPointController(m_sStellerCat.PathPoints, LastSec);
+            return;
         }
 
         //如果进度在合法范围内
         if (PathPercent - LookAheadAmount >= float.Epsilon && PathPercent + LookAheadAmount <= 1f)
         {
             #region 计算朝向
+            Vector3 dir = BezierLine.GetDirection(PathPercent, ArrtTPoints.Length);
+            Vector3 m_vOwnerPosition = Owner.ActorTrans.position;
             if (m_vInputMove.x > 0f)
             {
-                LookTarget = PathFinding.Interp(m_sStellerCat.ControlPathPoints, PathPercent + LookAheadAmount);
+                Owner.ActorTrans.LookAt2D(m_vOwnerPosition+dir);
             }
             else if (m_vInputMove.x < 0f)
             {
-                LookTarget = PathFinding.Interp(m_sStellerCat.ControlPathPoints, PathPercent - LookAheadAmount);
+                Owner.ActorTrans.LookAt2D(m_vOwnerPosition -dir);
             }
-            Owner.ActorTrans.LookAt2D(LookTarget);
             #endregion
         }
 
 
         #region 计算角色偏移
-        //if (PathPercent < min)
-        //    return;
-        coordinateOnPath = PathFinding.Interp(m_sStellerCat.ControlPathPoints, PathPercent);
-        if (Physics.Raycast(coordinateOnPath, -Vector3.up, out hitInfo, Owner.ActorHeight, mask))
-        {
-            Debug.DrawRay(coordinateOnPath, -Vector3.up * hitInfo.distance);
-            floorPosition = hitInfo.point;
-        }
-
-        Owner.ActorTrans.position = new Vector3(
+       floorPosition= BezierLine.GwtMove(PathPercent, ArrtTPoints.Length);
+        //Owner.ActorTrans.position = new Vector3(
+        //    floorPosition.x,
+        //    Owner.ActorTrans.position.y,
+        //    floorPosition.z
+        //    );
+        Owner.ActorTrans.position = Vector3.Lerp(Owner.ActorTrans.position, new Vector3(
             floorPosition.x,
             Owner.ActorTrans.position.y,
             floorPosition.z
-            );
-            
-            //Vector3.Lerp(Owner.ActorTrans.position, new Vector3(
-            //floorPosition.x,
-            //Owner.ActorTrans.position.y,
-            //floorPosition.z
-            //), 10 * Time.deltaTime);
+            ), SMoveSpeed*Time.deltaTime );
+
         #endregion
 
     }
@@ -920,7 +918,7 @@ public class PlayerManager : MonoBehaviour
                 return;
             }
 
-            RotatePlayer();
+            RotatePlayerAlongBezier();
 
             m_vInputMove = transform.forward;
 
