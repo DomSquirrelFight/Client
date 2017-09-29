@@ -53,6 +53,23 @@ public class PathFinding : MonoBehaviour
         return false;
     }
 
+
+    public static Vector3 Velocity(Vector3[] source, float t)
+    {
+        int numSections = source.Length - 3;
+        int currPt = Mathf.Min(Mathf.FloorToInt(t * (float)numSections), numSections - 1);
+        float u = t * (float)numSections - (float)currPt;
+
+        Vector3 a = source[currPt];
+        Vector3 b = source[currPt + 1];
+        Vector3 c = source[currPt + 2];
+        Vector3 d = source[currPt + 3];
+
+        return 1.5f * (-a + 3f * b - 3f * c + d) * (u * u)
+                + (2f * a - 5f * b + 4f * c - d) * u
+                + .5f * c - .5f * a;
+    }
+
     public static void RecalculatePath(ref Vector3[] source, Vector3[] nextArea, ref float fRealPercent)             //重新计算路线
     {
         float per = fRealPercent % 1f;
@@ -97,12 +114,23 @@ public class PathFinding : MonoBehaviour
         );
     }
 
-    //Vector3 fDmDt;
+    public static void GizmoDraw(Vector3[] source, float t)
+    {
+        Gizmos.color = Color.white;
+        Vector3 prevPt = Interp(source, 0);
 
-    //public static void InitializePathFinding()
-    //{
-    //   // fDmDt = 
-    //}
+        for (int i = 1; i <= 20; i++)
+        {
+            float pm = (float)i / 20f;
+            Vector3 currPt = Interp(source, pm);
+            Gizmos.DrawLine(currPt, prevPt);
+            prevPt = currPt;
+        }
+
+        Gizmos.color = Color.blue;
+        Vector3 pos = Interp(source, t);
+        Gizmos.DrawLine(pos, pos + Velocity(source, t).normalized);
+    }
 
 
 

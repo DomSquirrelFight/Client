@@ -549,7 +549,12 @@ public class PlayerManager : MonoBehaviour
         //Gizmos.DrawLine(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, hitInfo.transform.position);
 
         //Gizmos.DrawSphere(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, 0.55f);
-     
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(Target, 0.25f);
+
+        PathFinding.GizmoDraw(m_vCurPoints, m_fPer);
+            
         tmpx = 1;
         if (m_vInputMove.x == 0f)
         {
@@ -692,10 +697,14 @@ public class PlayerManager : MonoBehaviour
     }
 
     Vector3[] m_vCurPoints;
-    float m_fCurPercent;
+    float m_fCurPercent = 0.04f;
     float m_fPer;
     float m_fSpeed = 0.3f;
+    float lookAheadAmount = 0.01f;
+    float min = 0.04f;
     PathArea m_CurPathArea;
+    Vector3 Target;
+    bool m_bIsFirst = true;
     public void RotatePlayer()
     {
         #region 计算进度
@@ -712,6 +721,30 @@ public class PlayerManager : MonoBehaviour
         m_fPer = m_fCurPercent % 1f;
         #endregion
 
+        #region 计算方向
+        if (m_fPer - lookAheadAmount >= float.Epsilon && m_fPer + lookAheadAmount <= 1f)
+        {
+            if (m_vInputMove.x > 0f)
+            {
+                Target = PathFinding.Interp(m_vCurPoints, m_fPer + lookAheadAmount);
+            }
+            else if (m_vInputMove.x < 0f)
+            {
+                Target = PathFinding.Interp(m_vCurPoints, m_fPer - lookAheadAmount);
+            }
+            transform.LookAt2D(Target);
+
+        }
+        #endregion
+
+        if (m_bIsFirst)
+        {
+            m_bIsFirst = false;
+            if (m_fCurPercent < min)
+                return;
+        }
+
+        #region 计算位置
         if (PathFinding.CheckRecalculatePath(m_vCurPoints, m_fPer))
         {
             if (m_CurPathArea.NextAreas.Length > 0)
@@ -722,8 +755,6 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-
-
         Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
 
         transform.position = Vector3.Lerp(transform.position, new Vector3(
@@ -731,7 +762,7 @@ public class PlayerManager : MonoBehaviour
             transform.position.y,
             pos.z
             ), 10 * Time.deltaTime);
-
+        #endregion
     }
     #endregion
 
