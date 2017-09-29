@@ -252,9 +252,11 @@ public class PlayerManager : MonoBehaviour
         PathPercent = min;
         PahtAreaCtrl = birthArea.transform.parent;
         CurArea = birthArea;
-        GameObject bezierline = new GameObject("BezierLine");
-        bezierline.AddComponent<BezierLine>();
         m_sStellerCat.PathPoints = BezierLine.GetBezierPoints(ArrtTPoints);
+        //加载贝塞尔曲线
+       GameObject bezierline=  Instantiate(Resources.Load("Prefabs/Maps/FightTest/BezierLine")) as GameObject;
+        bezierline.transform.position = Vector3.zero;
+
     }
 
     void Update()
@@ -731,7 +733,6 @@ public class PlayerManager : MonoBehaviour
 
     public void RotatePlayerAlongBezier()
     {
-        ResetpathPosition();
         #region 根据输入计算进度
         if (m_vInputMove.x > 0f)
         {
@@ -741,12 +742,16 @@ public class PlayerManager : MonoBehaviour
         {
             pathPosition -= Time.deltaTime * PathSpeed;
         }
+        Debug.Log(Time.deltaTime * PathSpeed);
+        //限制进度
+        ResetpathPosition();
         #endregion
+
         //进度百分比
         PathPercent = pathPosition % 1f;
-        //到达倒数第二点的临界位置的比
         //当前区域的长度
         int length = CurArea.RoutePoints.Length;
+        //到达倒数第二点的临界位置的比
         float ChangPercent = Vector3.Distance(ArrtTPoints[length - 2].transform.position, ArrtTPoints[0].transform.position) / Vector3.Distance(ArrtTPoints[length - 1].transform.position ,ArrtTPoints[0].transform.position);
         if (pathPosition >= ChangPercent-0.01f && !bPass)
         {
@@ -788,13 +793,14 @@ public class PlayerManager : MonoBehaviour
             #endregion
         }
         //当到达终点位置的时候限制人物的位置
-        if (pathPosition >= 1)
+        if (pathPosition >= 0.99f)
         {
-            Owner.ActorTrans.position = new Vector3(
-            ArrtTPoints[ArrtTPoints.Length - 1].transform.position.x,
-            Owner.ActorTrans.position.y,
-           ArrtTPoints[ArrtTPoints.Length - 1].transform.position.z
-            );
+            // Owner.ActorTrans.position = new Vector3(
+            // ArrtTPoints[ArrtTPoints.Length - 1].transform.position.x,
+            // Owner.ActorTrans.position.y,
+            //ArrtTPoints[ArrtTPoints.Length - 1].transform.position.z
+            // );
+            Time.timeScale = 0;
         }
 
         #region 计算角色偏移

@@ -13,9 +13,9 @@ public class BezierLine : MonoBehaviour {
         for(int i=0;i<points.Length;i++)
         {
             m_vBezierPoints[i] = points[i].position;
-           
+            //EnforceMode(i, points.Length, eBezierLineConstrainedMode.Mirror);
         }
-        EnforceMode(1, points.Length, eBezierLineConstrainedMode.Mirror);
+       EnforceMode(1, points.Length-1, eBezierLineConstrainedMode.Mirror);
         return m_vBezierPoints;
     }
 
@@ -50,8 +50,9 @@ public class BezierLine : MonoBehaviour {
     }
     #endregion
 
+    #region 切线朝向
     //计算切线朝向
-    public static  Vector3 GetDirection(float t,int num)
+    public static Vector3 GetDirection(float t, int num)
     {
         int i;
         if (t >= 1.0f)
@@ -62,15 +63,15 @@ public class BezierLine : MonoBehaviour {
         else
         {
             //曲线个数
-            t *=((num-1)/3);
+            t *= ((num - 1) / 3);
             i = (int)t;
             t = t - i;
             i *= 3;
         }
         Vector3 p0 = m_vBezierPoints[i];
-        Vector3 p1 = m_vBezierPoints[i+1];
-        Vector3 p2 = m_vBezierPoints[i+2];
-        Vector3 p3 = m_vBezierPoints[i+3];
+        Vector3 p1 = m_vBezierPoints[i + 1];
+        Vector3 p2 = m_vBezierPoints[i + 2];
+        Vector3 p3 = m_vBezierPoints[i + 3];
 
         t = Mathf.Clamp01(t);
         float oneMinusT = 1f - t;
@@ -79,9 +80,11 @@ public class BezierLine : MonoBehaviour {
             6f * oneMinusT * t * (p2 - p1) +
             3f * t * t * (p3 - p2);
     }
+    #endregion
 
+    #region 进度点
     //根据进度获取点
-    public static  Vector3 GwtMove(float t,int num)
+    public static Vector3 GwtMove(float t, int num)
     {
         int i;
         if (t >= 1.0f)
@@ -109,16 +112,19 @@ public class BezierLine : MonoBehaviour {
             t * t * t * p3;
 
     }
+    #endregion
 
+    #region 添加点的限制模式
     //添加点的限制模式
-
-    public static void EnforceMode(int index,int PointNum,eBezierLineConstrainedMode eMode)
+    public static void EnforceMode(int index, int PointNum, eBezierLineConstrainedMode eMode)
     {
-        if (index < 0 || index > PointNum)
+        //只有一条曲线的时候直接返回
+        if (PointNum <= 4)
             return;
-
+        if (index <= 0 || index >=  PointNum-1)
+            return;
         int modeIndex = (index + 1) / 3;
-        if (modeIndex == 0 )
+        if (modeIndex == 0)
             return;
 
         if (eMode == eBezierLineConstrainedMode.Free)
@@ -147,5 +153,7 @@ public class BezierLine : MonoBehaviour {
             m_vBezierPoints[enforcedIndex] = enforcedPoint;
         }
     }
+    #endregion
+
 
 }

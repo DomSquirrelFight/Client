@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
+using AttTypeDefine;
 [CustomEditor(typeof(BezierLine))]
 public class BezierLineForTurningEditor : Editor {
     #region 成员变量
@@ -29,14 +28,23 @@ public class BezierLineForTurningEditor : Editor {
             Handles.DrawBezier(p0, p3, p1, p2, Color.white, null, 2f);
             p0 = p3;
         }
-
+    }
+    public override void OnInspectorGUI()
+    {
+        curve = target as BezierLine;
+        if (m_nSelectedIndex!=-1)
+        {
+            DrawSelectedIndexPoint();
+        }
     }
 #endregion
 
      Vector3 ShowPoint(int index)
     {
+
         //获得curve中的点坐标
         Vector3 p = curve.transform.TransformPoint(curve[index]);
+        EditorGUI.BeginChangeCheck();
         if (Handles.Button(p, curve.transform.rotation, 0.08f, 0.16f, Handles.DotHandleCap))
         {
             m_nSelectedIndex = index;
@@ -44,7 +52,7 @@ public class BezierLineForTurningEditor : Editor {
         }
         if (index == m_nSelectedIndex)
         {
-            p = Handles.DoPositionHandle(p, curve.transform.rotation);
+             p = Handles.DoPositionHandle(p, curve.transform.rotation);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(curve, "Move Point");
@@ -53,5 +61,18 @@ public class BezierLineForTurningEditor : Editor {
             }
         }
         return p;
+    }
+
+    void DrawSelectedIndexPoint()
+    {
+        GUILayout.Label("Selected Point");
+        EditorGUI.BeginChangeCheck();
+        Vector3 p = EditorGUILayout.Vector3Field("point position", curve[m_nSelectedIndex]);
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(curve, "Change Point");
+            curve[m_nSelectedIndex] = p;
+            EditorUtility.SetDirty(curve);
+        }
     }
 }
