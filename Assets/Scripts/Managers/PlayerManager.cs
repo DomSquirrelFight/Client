@@ -706,8 +706,9 @@ public class PlayerManager : MonoBehaviour
         else if (m_vInputMove.x < 0f)
         {
             m_fCurPercent -= m_fSpeed * Time.deltaTime;
+            if (m_fCurPercent <= 0f)
+                m_fCurPercent = 0f;
         }
-
         m_fPer = m_fCurPercent % 1f;
         #endregion
 
@@ -721,14 +722,15 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
-       
 
-         Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
-        transform.position = new Vector3(
+
+        Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
+
+        transform.position = Vector3.Lerp(transform.position, new Vector3(
             pos.x,
             transform.position.y,
             pos.z
-            );
+            ), 10 * Time.deltaTime);
 
     }
     #endregion

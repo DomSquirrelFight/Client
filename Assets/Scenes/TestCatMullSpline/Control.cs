@@ -64,7 +64,7 @@ namespace Assets.Scenes.TestCatmull
             }
             per = fCurPercent % 1f;
 
-        
+            
 
             if (PathFinding.CheckRecalculatePath(CurRoute, per))
             {
