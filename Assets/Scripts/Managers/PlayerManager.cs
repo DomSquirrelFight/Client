@@ -248,15 +248,27 @@ public class PlayerManager : MonoBehaviour
     }
 
 
-    void Update()
+    bool CanMajorMove()
     {
         if (!Owner)
-            return;
+            return false;
 
         if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major)
-            return;
+            return false;
 
         if (Owner.FSM.IsInState(StateID.Injured))
+            return false;
+
+        if (Owner.CameraContrl.CamState == eCameStates.eCam_Birth)
+            return false;
+
+        return true;
+    }
+
+    void Update()
+    {
+
+        if (!CanMajorMove())
             return;
 
         CalMoveInput();

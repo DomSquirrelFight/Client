@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
+using Assets.Scripts.Action;
 public class CameraController : MonoBehaviour {
 
         #region 变量
@@ -198,7 +199,7 @@ public class CameraController : MonoBehaviour {
 
             m_bRefreshCameraData = false; //处理完相机数据，关闭处理相机数据开关
         }
-
+        
         void CalTargetFourCorner()                                                                                                                                                                  //计算目标4个corner坐标 
         {
             Vector3 tmp;
@@ -258,7 +259,7 @@ public class CameraController : MonoBehaviour {
              return corner;
         }
 
-        void CalCamFourDir()                                        //确定相机的四个视野方向                                                                                                                                                                                                                         
+        void CalCamFourDir()                                                                                                                                                                               //确定相机的四个视野方
         {
             Vector3 tmp;
             //UpperLeft
@@ -344,11 +345,49 @@ public class CameraController : MonoBehaviour {
             return m_vMiddlePoint;
         }
         
+        
+        #region 相机状态管理
+        public eCameStates CamBirthState = eCameStates.eCam_Birth;
+        private eCameStates m_eCamState = eCameStates.eCam_NULL;
+        public eCameStates CamState
+        {
+            get
+            {
+                return m_eCamState;
+            }
+            set
+            {
+                if (value != m_eCamState)
+                {
+
+                    if (value == eCameStates.eCam_Birth && m_eCamState == eCameStates.eCam_NULL)
+                    {
+                        m_BirthCamAction.OnStart();
+                    }
+
+                    m_eCamState = value;
+                }
+            }
+        }
+        public BirthCameraAction m_BirthCamAction;
+        
+        
+        #endregion
+
         void Update()
         {
 
             if (!Owner)
                 return;
+
+            switch (m_eCamState)
+            {
+                case eCameStates.eCam_Follow:
+                    {
+                        //固定的空间距离，固定的空间角度
+                        break;
+                    }
+            }
 
             DetectTransformChange();
 
@@ -394,8 +433,7 @@ public class CameraController : MonoBehaviour {
 
             BRefreshCameraData = true;
 
-            RefreshCamTargetBorderPoint();
-
+            CamState = CamBirthState;
         }
         
 }   

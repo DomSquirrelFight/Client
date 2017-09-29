@@ -53,7 +53,6 @@ public class PathFinding : MonoBehaviour
         return false;
     }
 
-
     public static Vector3 Velocity(Vector3[] source, float t)
     {
         int numSections = source.Length - 3;
@@ -132,10 +131,4 @@ public class PathFinding : MonoBehaviour
         Gizmos.DrawLine(pos, pos + Velocity(source, t).normalized);
     }
 
-
-
-
-
-
-    
 }

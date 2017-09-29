@@ -14,17 +14,17 @@ namespace Assets.Scripts.Action
         float m_fStartTime = 0f;
         float m_fConStartTime = 0f;
         protected bool m_bSend = false;
-
+        bool m_bStartCounting = false;
         public virtual void Awake()
         {
             if (CountTimeType == eCoutTimeType.CountType_Auto)
-                m_fStartTime = Time.time;
+                m_bStartCounting = true;
         }
 
-        public void OnStart()
+        public virtual void OnStart()
         {
             if (CountTimeType == eCoutTimeType.CountType_Condition)
-                m_fConStartTime = Time.time;
+                m_bStartCounting = true;
         }
 
         protected void Reset()
@@ -39,7 +39,7 @@ namespace Assets.Scripts.Action
         {
             if (m_bSend)
                 return;
-            if (CountTimeType == eCoutTimeType.CountType_Auto && 0f != m_fStartTime)
+            if (CountTimeType == eCoutTimeType.CountType_Auto && m_bStartCounting)
             {
                 if (Time.time - m_fStartTime > m_fDelayTime)
                 {
@@ -47,7 +47,7 @@ namespace Assets.Scripts.Action
                     m_bSend = true;
                 }
             }
-            else if (CountTimeType == eCoutTimeType.CountType_Condition && 0f != m_fConStartTime)
+            else if (CountTimeType == eCoutTimeType.CountType_Condition && m_bStartCounting)
             {
                 if (Time.time - m_fConStartTime > m_fDelayTime)
                 {
