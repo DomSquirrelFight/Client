@@ -135,8 +135,11 @@ public class CameraController : MonoBehaviour {
                     //{
                        
                     //}
-
                     m_bRefreshCameraData = value;
+                    if (value == true)
+                    {
+                        RefreshCamTargetBorderPoint();
+                    }
                 }
                    
             }
@@ -364,14 +367,19 @@ public class CameraController : MonoBehaviour {
                     {
                         m_BirthCamAction.OnStart();
                     }
+                    else if (value == eCameStates.eCam_SLGFollow)
+                    {
+
+                    }
 
                     m_eCamState = value;
                 }
             }
         }
         public BirthCameraAction m_BirthCamAction;
-        
-        
+        public Vector3 Direction;
+        public Vector3 OffSet;
+        int nTmp = 1;
         #endregion
 
         void Update()
@@ -382,43 +390,58 @@ public class CameraController : MonoBehaviour {
 
             switch (m_eCamState)
             {
-                case eCameStates.eCam_Follow:
+                case eCameStates.eCam_SLGFollow:
                     {
-                        //固定的空间距离，固定的空间角度
+                      //  transform.forward = Vector3.Lerp(transform.forward, Owner.ActorTrans.rotation * transform.forward, 10 * Time.deltaTime);
+                        DetectTransformChange();
+                        nTmp = 1;
+                        if (Owner.PlayerMgr.VInputMove.x < 0f)
+                        {
+                            nTmp = -1;
+                            transform.forward = Vector3.Lerp(transform.forward, Owner.ActorTrans.right, 10 * Time.deltaTime);
+                        }
+                        else
+                        {
+                            transform.forward = Vector3.Lerp(transform.forward, Quaternion.Euler(0f, 180f, 0f) * Owner.ActorTrans.right, 10 * Time.deltaTime);
+                        }
+
+                       
+                        Vector3 target = Owner.ActorTrans.transform.position + (transform.forward * (-10)  + Vector3.up * 3);
+                        transform.position = Vector3.Lerp(transform.position, target, 10 * Time.deltaTime);
+                        //switch (cammovedir)
+                        //{
+                        //    case eCamMoveDir.CamMove_Right:
+                        //        {
+                        //            if (Owner.ActorTrans.transform.position.x > m_vMiddlePoint.x)
+                        //            {
+                                     
+                                        
+                        //            }
+                        //            break;
+                        //        }
+                        //    case eCamMoveDir.CamMove_Left:
+                        //        {
+                        //            if (Owner.ActorTrans.transform.position.x < m_vMiddlePoint.x)
+                        //            {
+                        //                transform.Translate(Vector3.left * SMoveSpeed * Time.deltaTime, Space.World);
+                        //            }
+                        //            break;
+                        //        }
+                        //    case eCamMoveDir.CamMove_Up:
+                        //        {
+                        //            if (Owner.ActorTrans.transform.position.y > m_vMiddlePoint.y)
+                        //            {
+                        //                transform.Translate(Vector3.up * SUpSpeed * Time.deltaTime, Space.World);
+                        //            }
+                        //            break;
+                        //        }
+                        //}
+
                         break;
                     }
             }
 
-            DetectTransformChange();
-
-            switch (cammovedir)
-            {
-                case eCamMoveDir.CamMove_Right:
-                    {
-                        if (Owner.ActorTrans.transform.position.x > m_vMiddlePoint.x)
-                        {
-                            transform.Translate(Vector3.right * SMoveSpeed * Time.deltaTime, Space.World);
-                        }
-                        break;
-                    }
-                case eCamMoveDir.CamMove_Left:
-                    {
-                        if (Owner.ActorTrans.transform.position.x < m_vMiddlePoint.x)
-                        {
-                            transform.Translate(Vector3.left * SMoveSpeed * Time.deltaTime, Space.World);
-                        }
-                        break;
-                    }
-                case eCamMoveDir.CamMove_Up:
-                    {
-                        if (Owner.ActorTrans.transform.position.y > m_vMiddlePoint.y)
-                        {
-                            transform.Translate(Vector3.up * SUpSpeed * Time.deltaTime, Space.World);
-                        }
-                        break;
-                    }
-
-            }
+          
         }
         
         public void OnStart(BaseActor _owner)
@@ -436,4 +459,9 @@ public class CameraController : MonoBehaviour {
             CamState = CamBirthState;
         }
         
-}   
+}
+
+/*
+ *             
+                  
+*/

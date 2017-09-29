@@ -148,8 +148,8 @@ namespace AttTypeDefine
     {
         eCam_NULL,
         eCam_Birth,             //出生相机
-        eCam_Follow,//给一个target，相对于target
-        eCam_Transforming,  //切换相机状态
+        eCam_RPGFollow,
+        eCam_SLGFollow,
         eCam_Zoom,          //缩进，缩远
         eCam_Dead,          //死亡相机
     }

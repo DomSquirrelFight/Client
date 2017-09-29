@@ -711,12 +711,14 @@ public class PlayerManager : MonoBehaviour
     Vector3[] m_vCurPoints;
     float m_fCurPercent = 0.04f;
     float m_fPer;
-    float m_fSpeed = 0.3f;
+    float m_fSpeed = 0.2f;
     float lookAheadAmount = 0.01f;
     float min = 0.04f;
     PathArea m_CurPathArea;
     Vector3 Target;
     bool m_bIsFirst = true;
+    Quaternion OldRot;
+    Quaternion CurRot;
     public void RotatePlayer()
     {
         #region 计算进度
@@ -744,7 +746,12 @@ public class PlayerManager : MonoBehaviour
             {
                 Target = PathFinding.Interp(m_vCurPoints, m_fPer - lookAheadAmount);
             }
+
+            //OldRot = transform.rotation;
             transform.LookAt2D(Target);
+            //CurRot = transform.rotation;
+            //transform.rotation = OldRot;
+            //transform.rotation = Quaternion.Lerp(transform.rotation, CurRot, 10 * Time.deltaTime);
 
         }
         #endregion
@@ -757,15 +764,15 @@ public class PlayerManager : MonoBehaviour
         }
 
         #region 计算位置
-        if (PathFinding.CheckRecalculatePath(m_vCurPoints, m_fPer))
-        {
-            if (m_CurPathArea.NextAreas.Length > 0)
-            {
-                PathFinding.RecalculatePath(ref m_vCurPoints, PathArea.GetVectorArray(m_CurPathArea.NextAreas[0]), ref m_fCurPercent);
-                m_CurPathArea = m_CurPathArea.NextAreas[0];
-                m_fPer = m_fCurPercent % 1f;
-            }
-        }
+        //if (PathFinding.CheckRecalculatePath(m_vCurPoints, m_fPer))
+        //{
+        //    if (m_CurPathArea.NextAreas.Length > 0)
+        //    {
+        //        PathFinding.RecalculatePath(ref m_vCurPoints, PathArea.GetVectorArray(m_CurPathArea.NextAreas[0]), ref m_fCurPercent);
+        //        m_CurPathArea = m_CurPathArea.NextAreas[0];
+        //        m_fPer = m_fCurPercent % 1f;
+        //    }
+        //}
 
         Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
 
