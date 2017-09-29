@@ -3,8 +3,8 @@
  * data : 2017.09.27
  * 
  * 注意事项1 ： 第一条路线长度最好长一点，当角色走到当前路线的倒数第二个区域的时候，需要重新计算路线。
- * 注意事项2 ： 根据第一条的规则，最后要留出4个点 -> 每条路线最少要放置3个点.<系统会额外分配两个点>。
- * 注意事项3 ： 当前游戏规则<游戏开始的直线道路放置10个点，那么其他所有道路都必须放置6个点>。
+ * 注意事项2 ： 根据第一条的规则，最后要留出5个点 -> 每条路线最少要放置4个点.<系统会额外分配两个点>。
+ * 注意事项3 ： 当前游戏规则<游戏开始的直线道路放置10个点，那么其他所有道路都必须放置5个点>。
  * 
  **/
 using System.Collections;
@@ -16,7 +16,6 @@ using AttTypeDefine;
 
 public class PathFinding : MonoBehaviour
 {
-
 
     public static Vector3[] InitializePointPath(Transform[] points)
     {
@@ -44,7 +43,7 @@ public class PathFinding : MonoBehaviour
 
         int numSections = source.Length - 3;
         
-        int index = numSections - 1;
+        int index = numSections - 2;
 
         int currPt = Mathf.Min(Mathf.FloorToInt(per * (float)numSections), numSections - 1);
 
@@ -56,10 +55,13 @@ public class PathFinding : MonoBehaviour
 
     public static void RecalculatePath(ref Vector3[] source, Vector3[] nextArea, ref float fRealPercent)             //重新计算路线
     {
-        fRealPercent = 0f;
+        float per = fRealPercent % 1f;
         int numSections = source.Length - 3;
+        int currPt = Mathf.Min(Mathf.FloorToInt(per * (float)numSections), numSections - 1);
 
-        int index = numSections - 1;
+        fRealPercent = per * (float)numSections - (float)currPt;
+
+        int index = numSections - 2;
         //int index = source.Length - 4;
         Vector3[] tmp = new Vector3[source.Length];
         Array.Copy(source, index, tmp, 0, source.Length - index - 1);
@@ -74,7 +76,6 @@ public class PathFinding : MonoBehaviour
 
     }
 
-
     public static Vector3 Interp(Vector3[] source, float per)    //插值获取路线点坐标
     {
 
@@ -88,7 +89,7 @@ public class PathFinding : MonoBehaviour
         Vector3 c = source[currPt + 2];
         Vector3 d = source[currPt + 3];
 
-        return .5f * (
+        return  0.5f * (
             (-a + 3f * b - 3f * c + d) * (u * u * u)
             + (2f * a - 5f * b + 4f * c - d) * (u * u)
             + (-a + c) * u
@@ -96,6 +97,12 @@ public class PathFinding : MonoBehaviour
         );
     }
 
+    //Vector3 fDmDt;
+
+    //public static void InitializePathFinding()
+    //{
+    //   // fDmDt = 
+    //}
 
 
 

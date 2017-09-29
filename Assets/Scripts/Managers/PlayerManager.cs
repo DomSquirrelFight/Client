@@ -707,8 +707,8 @@ public class PlayerManager : MonoBehaviour
         {
             m_fCurPercent -= m_fSpeed * Time.deltaTime;
         }
-       
 
+        m_fPer = m_fCurPercent % 1f;
         #endregion
 
         if (PathFinding.CheckRecalculatePath(m_vCurPoints, m_fPer))
@@ -717,10 +717,11 @@ public class PlayerManager : MonoBehaviour
             {
                 PathFinding.RecalculatePath(ref m_vCurPoints, PathArea.GetVectorArray(m_CurPathArea.NextAreas[0]), ref m_fCurPercent);
                 m_CurPathArea = m_CurPathArea.NextAreas[0];
+                m_fPer = m_fCurPercent % 1f;
             }
         }
 
-         m_fPer = m_fCurPercent % 1f;
+       
 
          Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
         transform.position = new Vector3(

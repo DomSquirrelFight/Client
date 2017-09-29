@@ -49,22 +49,49 @@ namespace Assets.Scenes.TestCatmull
             return outputs;
 
         }
-
+        bool m_bIsFirst = false;
         void Move()
         {
-            Vector3 pos = Interp();
-            transform.position = new Vector3(
+            if (Input.GetAxis("Horizontal") > 0)
+            {
+                fCurPercent += speed * Time.deltaTime;
+            }
+            else if (Input.GetAxis("Horizontal") < 0)
+            {
+                fCurPercent -= speed * Time.deltaTime;
+                if (fCurPercent <= 0f)
+                    fCurPercent = 0f;
+            }
+            per = fCurPercent % 1f;
+
+        
+
+            if (PathFinding.CheckRecalculatePath(CurRoute, per))
+            {
+                if (Area2.Length > 0 && !m_bIsFirst)
+                {
+                    m_bIsFirst = true;
+                    PathFinding.RecalculatePath(ref CurRoute, CatmullPathPoint.GetVectorArray(Area2), ref fCurPercent);
+                    per = fCurPercent % 1f;
+                }
+            }
+
+
+            Vector3 pos = PathFinding.Interp(CurRoute, per);
+
+            transform.position = Vector3.Lerp(transform.position, new Vector3(
                 pos.x,
                 transform.position.y,
                 pos.z
-                );
+                ), 10 * Time.deltaTime);
+            //transform.position = ;
 
         }
 
         float fCurPercent = 0f;
         float per;
         bool bFirst = false;
-        float speed = 0.2f;
+        float speed = 0.4f;
         //int index = 2;          
         Vector3 Interp()      //working-V1
         {

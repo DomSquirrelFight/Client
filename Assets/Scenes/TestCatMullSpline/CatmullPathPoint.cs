@@ -8,6 +8,19 @@ namespace Assets.Scenes.TestCatmull
     public class CatmullPathPoint : MonoBehaviour
     {
 
+
+        public static Vector3[] GetVectorArray(CatmullPathPoint[] pa)
+        {
+            Vector3[] m_vCurPoints = new Vector3[pa.Length];
+
+            for (int i = 0; i < m_vCurPoints.Length; i++)
+            {
+                m_vCurPoints[i] = pa[i].transform.position;
+            }
+
+            return m_vCurPoints;
+
+        }
         public enum eCatmullPointType
         {
             ePoint_Area1,
