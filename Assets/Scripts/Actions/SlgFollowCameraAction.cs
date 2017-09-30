@@ -6,10 +6,11 @@ namespace Assets.Scripts.Action
 {
     public class SlgFollowCameraAction : CameraBaseAction
     {
-        void Reset()
+        protected override void Reset()
         {
+            base.Reset();
             SelfState = eCameStates.eCam_SLGFollow;
-            CountTimeType = eCoutTimeType.CountType_Condition;
+            
         }
     }
 }

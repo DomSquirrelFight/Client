@@ -9,79 +9,79 @@ namespace Assets.Scripts.Action
     {
 
 
-        void Reset()
+        public Transform BirthPoint;
+
+        public Transform EndPoint;
+
+        public float duration;
+
+        protected override void Reset()
         {
+            base.Reset();
             SelfState = eCameStates.eCam_Birth;
         }
 
-        //public Transform BirthPoint;
 
-        //public Transform EndPoint;
+        public override void TrigAction()           //延时触发回调
+        {
+            base.TrigAction();
 
-        //public float Speed;
+            CamCtrl.CamInstTrans.position = BirthPoint.position;
+            CamCtrl.CamInstTrans.rotation = BirthPoint.rotation;
 
-        //public eCameStates NextCamState;
+        }
 
-        //public CameraController control;
+        protected override void Update()         
+        {
 
-        //public float duration;
+            if (m_bSend)
+            {
+                if (duration <= 0f)
+                {
+                    DoBeforeLeavingState();
+                  
+                    return;
+                }
 
-        //public override void TrigAction()
-        //{
-        //    transform.position = BirthPoint.position;
-        //    transform.rotation = BirthPoint.rotation;
-           
+                duration -= Time.deltaTime;
 
-        //}
+                CamCtrl.CamInstTrans.position = Vector3.Lerp(CamCtrl.CamInstTrans.position, EndPoint.position, fMoveSpeed * Time.deltaTime);
 
-        //protected override void Update()
-        //{
+                CamCtrl.CamInstTrans.rotation = Quaternion.Lerp(CamCtrl.CamInstTrans.rotation, EndPoint.rotation, fMoveSpeed * Time.deltaTime);
+            }
 
-        //    if (m_bSend)
-        //    {
-        //        if (duration <= 0f)
-        //        {
-        //            control.CamState = NextCamState;
-        //            SelfDestroy();
-        //            return;
-        //        }
+            base.Update();
+        }
 
-        //        duration -= Time.deltaTime;
+        public override void OnStart()              //状态启动机
+        {
+            base.OnStart();
+        }
 
-        //        transform.position = Vector3.Lerp(transform.position, EndPoint.position, Speed * Time.deltaTime);
+        protected override void DoBeforeLeavingState()          //离开当前状态
+        {
+            base.DoBeforeLeavingState();
+            SelfDestroy();
+        }
 
-        //        transform.rotation = Quaternion.Lerp(transform.rotation, EndPoint.rotation, Speed * Time.deltaTime);
-        //    }
+        void SelfDestroy()
+        {
+            Destroy(BirthPoint.gameObject);
+            Destroy(EndPoint.gameObject);
+            Destroy(this);
+        }
 
-        //    base.Update();
-        //}
+        public void OnDrawGizmos()
+        {
 
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(BirthPoint.position, 0.5f);
 
-        //public override void OnStart()
-        //{
-        //    base.OnStart();
-        //}
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(EndPoint.position, 0.5f);
 
-        //void SelfDestroy()
-        //{
-        //    Destroy(BirthPoint.gameObject);
-        //    Destroy(EndPoint.gameObject);
-        //    Destroy(this);
-        //}
+        }
 
-
-        //public void OnDrawGizmos()
-        //{
-
-        //    Gizmos.color = Color.red;
-        //    Gizmos.DrawWireSphere(BirthPoint.position, 0.5f);
-
-        //    Gizmos.color = Color.green;
-        //    Gizmos.DrawWireSphere(EndPoint.position, 0.5f);
-
-        //}
-
-       
     }
 
 }
