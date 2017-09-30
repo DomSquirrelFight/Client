@@ -144,6 +144,8 @@ namespace AttTypeDefine
 
     #region Camera
 
+    public delegate void NotifyCamContrl (int index);           //通知相机管理器，当前状态已经结束
+
     public enum eCameStates
     {
         eCam_NULL,

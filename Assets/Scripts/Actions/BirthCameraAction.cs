@@ -5,75 +5,81 @@ using AttTypeDefine;
 
 namespace Assets.Scripts.Action
 {
-    public class BirthCameraAction : BaseAction
+    public class BirthCameraAction : CameraBaseAction
     {
 
-        public Transform BirthPoint;
 
-        public Transform EndPoint;
-
-        public float Speed;
-
-        public eCameStates NextCamState;
-
-        public CameraController control;
-
-        public float duration;
-
-        public override void TrigAction()
+        void Reset()
         {
-            transform.position = BirthPoint.position;
-            transform.rotation = BirthPoint.rotation;
+            SelfState = eCameStates.eCam_Birth;
+        }
+
+        //public Transform BirthPoint;
+
+        //public Transform EndPoint;
+
+        //public float Speed;
+
+        //public eCameStates NextCamState;
+
+        //public CameraController control;
+
+        //public float duration;
+
+        //public override void TrigAction()
+        //{
+        //    transform.position = BirthPoint.position;
+        //    transform.rotation = BirthPoint.rotation;
            
 
-        }
+        //}
 
-        protected override void Update()
-        {
+        //protected override void Update()
+        //{
 
-            if (m_bSend)
-            {
-                if (duration <= 0f)
-                {
-                    control.CamState = NextCamState;
-                    SelfDestroy();
-                    return;
-                }
+        //    if (m_bSend)
+        //    {
+        //        if (duration <= 0f)
+        //        {
+        //            control.CamState = NextCamState;
+        //            SelfDestroy();
+        //            return;
+        //        }
 
-                duration -= Time.deltaTime;
+        //        duration -= Time.deltaTime;
 
-                transform.position = Vector3.Lerp(transform.position, EndPoint.position, Speed * Time.deltaTime);
+        //        transform.position = Vector3.Lerp(transform.position, EndPoint.position, Speed * Time.deltaTime);
 
-                transform.rotation = Quaternion.Lerp(transform.rotation, EndPoint.rotation, Speed * Time.deltaTime);
-            }
+        //        transform.rotation = Quaternion.Lerp(transform.rotation, EndPoint.rotation, Speed * Time.deltaTime);
+        //    }
 
-            base.Update();
-        }
-
-
-        public override void OnStart()
-        {
-            base.OnStart();
-        }
-
-        void SelfDestroy()
-        {
-            Destroy(BirthPoint.gameObject);
-            Destroy(EndPoint.gameObject);
-            Destroy(this);
-        }
+        //    base.Update();
+        //}
 
 
-        public void OnDrawGizmos()
-        {
+        //public override void OnStart()
+        //{
+        //    base.OnStart();
+        //}
 
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(BirthPoint.position, 0.5f);
+        //void SelfDestroy()
+        //{
+        //    Destroy(BirthPoint.gameObject);
+        //    Destroy(EndPoint.gameObject);
+        //    Destroy(this);
+        //}
 
-            Gizmos.color = Color.green;
-            Gizmos.DrawWireSphere(EndPoint.position, 0.5f);
 
-        }
+        //public void OnDrawGizmos()
+        //{
+
+        //    Gizmos.color = Color.red;
+        //    Gizmos.DrawWireSphere(BirthPoint.position, 0.5f);
+
+        //    Gizmos.color = Color.green;
+        //    Gizmos.DrawWireSphere(EndPoint.position, 0.5f);
+
+        //}
 
        
     }

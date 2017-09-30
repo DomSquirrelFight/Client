@@ -259,8 +259,9 @@ public class PlayerManager : MonoBehaviour
         if (Owner.FSM.IsInState(StateID.Injured))
             return false;
 
-        if (Owner.CameraContrl.CamState == eCameStates.eCam_Birth)
-            return false;
+        //todo_erric
+        //if (Owner.CameraContrl.CamState == eCameStates.eCam_Birth)
+        //    return false;
 
         return true;
     }
