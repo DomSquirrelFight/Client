@@ -709,7 +709,7 @@ public class PlayerManager : MonoBehaviour
     int WayFindingMaskGlossy;
     int WayFinidngMask;
     float PathPercent;
-    float Length = 5f;
+    float Length = 2f;
     float LookAheadAmount = 0.01f;
     Vector3 floorPosition;
     float min = 0f;
@@ -752,33 +752,33 @@ public class PlayerManager : MonoBehaviour
 
         #endregion
 
-        #region 确定线路
-        int length = CurArea.RoutePoints.Length;
-        //到达倒数第二点的临界位置的比
-        float ChangPercent = Vector3.Distance(ArrtTPoints[length - 2].transform.position, ArrtTPoints[0].transform.position) / Vector3.Distance(ArrtTPoints[length - 1].transform.position ,ArrtTPoints[0].transform.position);
-        if (PathPercent >= ChangPercent-0.01f && !bPass)
-        {
-            bPass = true;
-            //新区域的进度值归零
-            PathPercent = 0;
-            //下一个区域
-            NextArea = CurArea.NextAreas[0];
-            //下一个区域的长度
-            int n = NextArea.RoutePoints.Length;
-            //新的路线确定，起点为旧路线的最后一个点
-            ArrtTPoints = new Transform[n + 2];
-            ArrtTPoints[0] = CurArea.RoutePoints[length - 2];
-            ArrtTPoints[1] = CurArea.RoutePoints[length - 1];
+//        #region 确定线路
+//        int length = CurArea.RoutePoints.Length;
+//        //到达倒数第二点的临界位置的比
+//        float ChangPercent = Vector3.Distance(ArrtTPoints[length - 2].transform.position, ArrtTPoints[0].transform.position) / Vector3.Distance(ArrtTPoints[length - 1].transform.position ,ArrtTPoints[0].transform.position);
+//        if (PathPercent >= ChangPercent-0.01f && !bPass)
+//        {
+//            bPass = true;
+//            //新区域的进度值归零
+//            PathPercent = 0;
+//            //下一个区域
+//            NextArea = CurArea.NextAreas[0];
+//            //下一个区域的长度
+//            int n = NextArea.RoutePoints.Length;
+//            //新的路线确定，起点为旧路线的最后一个点
+//            ArrtTPoints = new Transform[n + 2];
+//            ArrtTPoints[0] = CurArea.RoutePoints[length - 2];
+//            ArrtTPoints[1] = CurArea.RoutePoints[length - 1];
 
-            for (int i = 0; i < NextArea.RoutePoints.Length; i++)
-            {
-                ArrtTPoints[2 + i] = NextArea.RoutePoints[i];
-            }
-            BezierLine.GetBezierPoints(ArrtTPoints);
-            CurArea = NextArea;
-            return;
-        }
-#endregion
+//            for (int i = 0; i < NextArea.RoutePoints.Length; i++)
+//            {
+//                ArrtTPoints[2 + i] = NextArea.RoutePoints[i];
+//            }
+//            BezierLine.GetBezierPoints(ArrtTPoints);
+//            CurArea = NextArea;
+//            return;
+//        }
+//#endregion
 
         #region 控制朝向
         //如果进度在合法范围内
@@ -798,15 +798,20 @@ public class PlayerManager : MonoBehaviour
             }
             #endregion
         }
-#endregion
+       #endregion
 
         #region 计算角色偏移
         floorPosition = BezierLine.GwtMove(PathPercent, ArrtTPoints.Length);
-        Owner.ActorTrans.position = Vector3.Lerp(Owner.ActorTrans.position, new Vector3(
+        //Owner.ActorTrans.position = Vector3.Lerp(Owner.ActorTrans.position, new Vector3(
+        //    floorPosition.x,
+        //    Owner.ActorTrans.position.y,
+        //    floorPosition.z
+        //    ), SMoveSpeed*Time.deltaTime );
+        Owner.ActorTrans.position = new Vector3(
             floorPosition.x,
             Owner.ActorTrans.position.y,
             floorPosition.z
-            ), SMoveSpeed*Time.deltaTime );
+            );
 
         #endregion
 
