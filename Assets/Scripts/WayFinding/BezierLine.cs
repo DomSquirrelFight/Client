@@ -50,9 +50,9 @@ public class BezierLine : MonoBehaviour {
     }
     #endregion
 
-    #region 切线朝向
+    #region 切线斜率
     //计算切线朝向
-    public static Vector3 GetDirection(float t, int num)
+    public static Vector3 GetVelocity(float t, int num)
     {
         int i;
         if (t >= 1.0f)

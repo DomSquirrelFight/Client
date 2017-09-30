@@ -709,7 +709,7 @@ public class PlayerManager : MonoBehaviour
     int WayFindingMaskGlossy;
     int WayFinidngMask;
     float PathPercent;
-    float PathSpeed = 0.4f;
+    float Length = 5f;
     float LookAheadAmount = 0.01f;
     Vector3 floorPosition;
     float min = 0f;
@@ -733,31 +733,34 @@ public class PlayerManager : MonoBehaviour
 
     public void RotatePlayerAlongBezier()
     {
+        #region 进度
+        //切线，朝向
+        Vector3 dir = BezierLine.GetVelocity(PathPercent, ArrtTPoints.Length);
         #region 根据输入计算进度
         if (m_vInputMove.x > 0f)
         {
-            pathPosition += Time.deltaTime * PathSpeed;
+            // m_fCurPercent = m_fCurPercent +( 1f *Time.deltaTime)/ GetVelocity(m_fCurPercent).magnitude;
+            PathPercent = PathPercent + (Length * Time.deltaTime) / dir.magnitude;
+            // pathPosition += Time.deltaTime * PathSpeed;
         }
         else if (m_vInputMove.x < 0f)
         {
-            pathPosition -= Time.deltaTime * PathSpeed;
+            PathPercent = PathPercent - (Length * Time.deltaTime) / dir.magnitude;
         }
-        Debug.Log(Time.deltaTime * PathSpeed);
-        //限制进度
-        ResetpathPosition();
         #endregion
 
-        //进度百分比
-        PathPercent = pathPosition % 1f;
-        //当前区域的长度
+
+        #endregion
+
+        #region 确定线路
         int length = CurArea.RoutePoints.Length;
         //到达倒数第二点的临界位置的比
         float ChangPercent = Vector3.Distance(ArrtTPoints[length - 2].transform.position, ArrtTPoints[0].transform.position) / Vector3.Distance(ArrtTPoints[length - 1].transform.position ,ArrtTPoints[0].transform.position);
-        if (pathPosition >= ChangPercent-0.01f && !bPass)
+        if (PathPercent >= ChangPercent-0.01f && !bPass)
         {
             bPass = true;
             //新区域的进度值归零
-            pathPosition = 0;
+            PathPercent = 0;
             //下一个区域
             NextArea = CurArea.NextAreas[0];
             //下一个区域的长度
@@ -775,41 +778,30 @@ public class PlayerManager : MonoBehaviour
             CurArea = NextArea;
             return;
         }
+#endregion
 
+        #region 控制朝向
         //如果进度在合法范围内
         if (PathPercent - LookAheadAmount >= float.Epsilon && PathPercent + LookAheadAmount <= 1f)
         {
             #region 计算朝向
-            Vector3 dir = BezierLine.GetDirection(PathPercent, ArrtTPoints.Length);
+           
+            Debug.Log(dir * Time.deltaTime);
             Vector3 m_vOwnerPosition = Owner.ActorTrans.position;
             if (m_vInputMove.x > 0f)
             {
-                Owner.ActorTrans.LookAt2D(m_vOwnerPosition+dir);
+                Owner.ActorTrans.LookAt2D(m_vOwnerPosition+dir.normalized);
             }
             else if (m_vInputMove.x < 0f)
             {
-                Owner.ActorTrans.LookAt2D(m_vOwnerPosition -dir);
+                Owner.ActorTrans.LookAt2D(m_vOwnerPosition -dir.normalized);
             }
             #endregion
         }
-        //当到达终点位置的时候限制人物的位置
-        if (pathPosition >= 0.99f)
-        {
-            // Owner.ActorTrans.position = new Vector3(
-            // ArrtTPoints[ArrtTPoints.Length - 1].transform.position.x,
-            // Owner.ActorTrans.position.y,
-            //ArrtTPoints[ArrtTPoints.Length - 1].transform.position.z
-            // );
-            Time.timeScale = 0;
-        }
+#endregion
 
         #region 计算角色偏移
         floorPosition = BezierLine.GwtMove(PathPercent, ArrtTPoints.Length);
-        //Owner.ActorTrans.position = new Vector3(
-        //    floorPosition.x,
-        //    Owner.ActorTrans.position.y,
-        //    floorPosition.z
-        //    );
         Owner.ActorTrans.position = Vector3.Lerp(Owner.ActorTrans.position, new Vector3(
             floorPosition.x,
             Owner.ActorTrans.position.y,
@@ -818,7 +810,19 @@ public class PlayerManager : MonoBehaviour
 
         #endregion
 
+        //当到达终点位置的时候限制人物的位置
+        //if (PathPercent >= 0.99f)
+        //{
+        //    // Owner.ActorTrans.position = new Vector3(
+        //    // ArrtTPoints[ArrtTPoints.Length - 1].transform.position.x,
+        //    // Owner.ActorTrans.position.y,
+        //    //ArrtTPoints[ArrtTPoints.Length - 1].transform.position.z
+        //    // );
+        //    Time.timeScale = 0;
+        //}
+
     }
+
     #endregion
 
     #region Translate
