@@ -4,20 +4,69 @@ using UnityEngine;
 using AttTypeDefine;
 
 public class BezierLine : MonoBehaviour {
-    bool IsCreateLine = false;
-    public  static Vector3[] m_vBezierPoints;
-    public static Vector3[] GetBezierPoints(Transform[] points)
+
+    #region 成员变量
+    public Vector3[] m_vBezierPoints;
+    float PathPercent;
+    float Length;
+    float LookAheadAmount;
+    Vector3 floorPosition;
+
+
+
+    Vector2 m_vInputMove;
+
+    Transform[] ArrtTPoints;
+    BaseActor Owner;
+    //切线，朝向
+    Vector3 dir;
+
+    #endregion
+
+    #region 系统接口
+    private void Start()
+    {
+        PathPercent = 0f;
+        Length = 2f;
+        LookAheadAmount = 0.01f;
+    }
+    #endregion
+
+
+    #region 外部调用接口
+    public void RotatePlayerAlongBezier(Transform[] InArrtTPoints, BaseActor owner, Vector2 m_vInput)
+    {
+        //Debug.Log(PathPercent);
+        if (PathPercent >= 1)
+            return;
+        m_vInputMove = m_vInput;
+        ArrtTPoints = InArrtTPoints;
+        Owner = owner;
+        //初始化点
+        GetBezierPoints(ArrtTPoints);
+        CaculatePercent();
+        dir = GetVelocity(PathPercent);
+        CaculateDir();
+        PlayerMove();
+        
+
+    }
+    #endregion
+
+    #region 初始化点
+    public Vector3[] GetBezierPoints(Transform[] points)
     {
         m_vBezierPoints = new Vector3[points.Length];
-      
-        for(int i=0;i<points.Length;i++)
+
+        for (int i = 0; i < points.Length; i++)
         {
             m_vBezierPoints[i] = points[i].position;
             //EnforceMode(i, points.Length, eBezierLineConstrainedMode.Mirror);
         }
-       EnforceMode(1, points.Length-1, eBezierLineConstrainedMode.Mirror);
+        //EnforceMode(1, points.Length - 1, eBezierLineConstrainedMode.Mirror);
         return m_vBezierPoints;
     }
+    #endregion
 
     #region 属性
     //索引器
@@ -52,18 +101,18 @@ public class BezierLine : MonoBehaviour {
 
     #region 切线斜率
     //计算切线朝向
-    public static Vector3 GetVelocity(float t, int num)
+    public  Vector3 GetVelocity(float t)
     {
         int i;
         if (t >= 1.0f)
         {
             t = 1.0f;
-            i = num - 4;
+            i = PointNum - 4;
         }
         else
         {
             //曲线个数
-            t *= ((num - 1) / 3);
+            t *= CurveNum;
             i = (int)t;
             t = t - i;
             i *= 3;
@@ -84,17 +133,17 @@ public class BezierLine : MonoBehaviour {
 
     #region 进度点
     //根据进度获取点
-    public static Vector3 GwtMove(float t, int num)
+    public  Vector3 GwtMove(float t)
     {
         int i;
         if (t >= 1.0f)
         {
             t = 1.0f;
-            i = num - 4;
+            i = PointNum - 4;
         }
         else
         {
-            t *= ((num - 1) / 3);
+            t *=CurveNum;
             i = (int)t;
             t = t - i;
             i *= 3;
@@ -116,7 +165,7 @@ public class BezierLine : MonoBehaviour {
 
     #region 添加点的限制模式
     //添加点的限制模式
-    public static void EnforceMode(int index, int PointNum, eBezierLineConstrainedMode eMode)
+      void EnforceMode(int index, int PointNum, eBezierLineConstrainedMode eMode)
     {
         //只有一条曲线的时候直接返回
         if (PointNum <= 4)
@@ -155,5 +204,57 @@ public class BezierLine : MonoBehaviour {
     }
     #endregion
 
+    #region 进度值计算
+    void CaculatePercent()
+    {
+        if (dir.magnitude == 0)
+            return;
+        if (m_vInputMove.x > 0f)
+        {
+            PathPercent = PathPercent + (Length * Time.deltaTime)/dir.magnitude;
+        }
+        else if (m_vInputMove.x < 0f)
+        {
+            PathPercent = PathPercent - (Length * Time.deltaTime) / dir.magnitude;
+        }
+
+
+    }
+    #endregion
+
+    #region 角色移动
+    void PlayerMove()
+    {
+        floorPosition = GwtMove(PathPercent);
+        //Owner.ActorTrans.position = Vector3.Lerp(Owner.ActorTrans.position, new Vector3(
+        //    floorPosition.x,
+        //    Owner.ActorTrans.position.y,
+        //    floorPosition.z
+        //    ), SMoveSpeed*Time.deltaTime );
+        Owner.ActorTrans.position = new Vector3(
+            floorPosition.x,
+            Owner.ActorTrans.position.y,
+            floorPosition.z
+            );
+    }
+    #endregion
+
+    #region 朝向控制
+    void CaculateDir()
+    {
+        if (PathPercent - LookAheadAmount >= float.Epsilon && PathPercent + LookAheadAmount <= 1f)
+        {
+            Vector3 m_vOwnerPosition = Owner.ActorTrans.position;
+            if (m_vInputMove.x > 0f)
+            {
+                Owner.ActorTrans.LookAt2D(m_vOwnerPosition + dir.normalized);
+            }
+            else if (m_vInputMove.x < 0f)
+            {
+                Owner.ActorTrans.LookAt2D(m_vOwnerPosition - dir.normalized);
+            }
+        }
+    }
+#endregion
 
 }

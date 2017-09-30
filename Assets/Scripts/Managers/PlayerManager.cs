@@ -96,6 +96,10 @@ public class PlayerManager : MonoBehaviour
 
     int HoldBoxMaskGlossy;
 
+    int WayFindingMaskGlossy;
+
+    int WayFinidngMask;
+
     public int NHoldBoxMaskGlossy
     {
         get
@@ -193,6 +197,12 @@ public class PlayerManager : MonoBehaviour
     public float SBackSpeed = 5f;
     public float SRotSpeed = 60f;
 
+    Transform PahtAreaCtrl;                         //寻路点管理对象
+    PathArea CurArea;                                 //当前所在区域
+    PathArea NextArea;
+    Transform[] ArrtTPoints;                         //当前路线点
+    sStellerCatMull m_sStellerCat;
+    BezierLine m_Bezier;
     #endregion
 
     #region 外部接口 / 系统接口
@@ -249,12 +259,12 @@ public class PlayerManager : MonoBehaviour
         //根据出生点 : 形成初始化的路线.
         ArrtTPoints = new Transform[birthArea.RoutePoints.Length];
         birthArea.RoutePoints.CopyTo(ArrtTPoints, 0);
-        PathPercent = min;
         PahtAreaCtrl = birthArea.transform.parent;
         CurArea = birthArea;
-        m_sStellerCat.PathPoints = BezierLine.GetBezierPoints(ArrtTPoints);
+        //m_sStellerCat.PathPoints = BezierLine.GetBezierPoints(ArrtTPoints);
         //加载贝塞尔曲线
        GameObject bezierline=  Instantiate(Resources.Load("Prefabs/Maps/FightTest/BezierLine")) as GameObject;
+        m_Bezier = bezierline.GetComponent<BezierLine>();
         bezierline.transform.position = Vector3.zero;
 
     }
@@ -295,7 +305,7 @@ public class PlayerManager : MonoBehaviour
                 if (!RayCastBlock())//横向阻挡
                 {
                     //执行旋转操作
-                    RotatePlayerAlongBezier();
+                    m_Bezier. RotatePlayerAlongBezier(ArrtTPoints,Owner,m_vInputMove);
                     //执行move操作
                     TranslatePlayer();
                 }
@@ -704,131 +714,7 @@ public class PlayerManager : MonoBehaviour
 
     #endregion
 
-    #region 贝塞尔曲线 寻路
-    sStellerCatMull m_sStellerCat;
-    int WayFindingMaskGlossy;
-    int WayFinidngMask;
-    float PathPercent;
-    float Length = 2f;
-    float LookAheadAmount = 0.01f;
-    Vector3 floorPosition;
-    float min = 0f;
-    Transform PahtAreaCtrl;                         //寻路点管理对象
-    PathArea CurArea;                                 //当前所在区域
-    PathArea NextArea;
-    Transform[] ArrtTPoints;                         //当前路线点
-
-    bool bPass = false;
-    float pathPosition = 0;
-
-    void ResetpathPosition()
-    {
-        if(pathPosition<0)
-        {
-            pathPosition = 0;
-        }
-        if (pathPosition >= 1)
-            pathPosition = 1;
-    }
-
-    public void RotatePlayerAlongBezier()
-    {
-        #region 进度
-        //切线，朝向
-        Vector3 dir = BezierLine.GetVelocity(PathPercent, ArrtTPoints.Length);
-        #region 根据输入计算进度
-        if (m_vInputMove.x > 0f)
-        {
-            // m_fCurPercent = m_fCurPercent +( 1f *Time.deltaTime)/ GetVelocity(m_fCurPercent).magnitude;
-            PathPercent = PathPercent + (Length * Time.deltaTime) / dir.magnitude;
-            // pathPosition += Time.deltaTime * PathSpeed;
-        }
-        else if (m_vInputMove.x < 0f)
-        {
-            PathPercent = PathPercent - (Length * Time.deltaTime) / dir.magnitude;
-        }
-        #endregion
-
-
-        #endregion
-
-//        #region 确定线路
-//        int length = CurArea.RoutePoints.Length;
-//        //到达倒数第二点的临界位置的比
-//        float ChangPercent = Vector3.Distance(ArrtTPoints[length - 2].transform.position, ArrtTPoints[0].transform.position) / Vector3.Distance(ArrtTPoints[length - 1].transform.position ,ArrtTPoints[0].transform.position);
-//        if (PathPercent >= ChangPercent-0.01f && !bPass)
-//        {
-//            bPass = true;
-//            //新区域的进度值归零
-//            PathPercent = 0;
-//            //下一个区域
-//            NextArea = CurArea.NextAreas[0];
-//            //下一个区域的长度
-//            int n = NextArea.RoutePoints.Length;
-//            //新的路线确定，起点为旧路线的最后一个点
-//            ArrtTPoints = new Transform[n + 2];
-//            ArrtTPoints[0] = CurArea.RoutePoints[length - 2];
-//            ArrtTPoints[1] = CurArea.RoutePoints[length - 1];
-
-//            for (int i = 0; i < NextArea.RoutePoints.Length; i++)
-//            {
-//                ArrtTPoints[2 + i] = NextArea.RoutePoints[i];
-//            }
-//            BezierLine.GetBezierPoints(ArrtTPoints);
-//            CurArea = NextArea;
-//            return;
-//        }
-//#endregion
-
-        #region 控制朝向
-        //如果进度在合法范围内
-        if (PathPercent - LookAheadAmount >= float.Epsilon && PathPercent + LookAheadAmount <= 1f)
-        {
-            #region 计算朝向
-           
-            Debug.Log(dir * Time.deltaTime);
-            Vector3 m_vOwnerPosition = Owner.ActorTrans.position;
-            if (m_vInputMove.x > 0f)
-            {
-                Owner.ActorTrans.LookAt2D(m_vOwnerPosition+dir.normalized);
-            }
-            else if (m_vInputMove.x < 0f)
-            {
-                Owner.ActorTrans.LookAt2D(m_vOwnerPosition -dir.normalized);
-            }
-            #endregion
-        }
-       #endregion
-
-        #region 计算角色偏移
-        floorPosition = BezierLine.GwtMove(PathPercent, ArrtTPoints.Length);
-        //Owner.ActorTrans.position = Vector3.Lerp(Owner.ActorTrans.position, new Vector3(
-        //    floorPosition.x,
-        //    Owner.ActorTrans.position.y,
-        //    floorPosition.z
-        //    ), SMoveSpeed*Time.deltaTime );
-        Owner.ActorTrans.position = new Vector3(
-            floorPosition.x,
-            Owner.ActorTrans.position.y,
-            floorPosition.z
-            );
-
-        #endregion
-
-        //当到达终点位置的时候限制人物的位置
-        //if (PathPercent >= 0.99f)
-        //{
-        //    // Owner.ActorTrans.position = new Vector3(
-        //    // ArrtTPoints[ArrtTPoints.Length - 1].transform.position.x,
-        //    // Owner.ActorTrans.position.y,
-        //    //ArrtTPoints[ArrtTPoints.Length - 1].transform.position.z
-        //    // );
-        //    Time.timeScale = 0;
-        //}
-
-    }
-
-    #endregion
+   
 
     #region Translate
 
@@ -959,7 +845,7 @@ public class PlayerManager : MonoBehaviour
                 return;
             }
 
-            RotatePlayerAlongBezier();
+            //RotatePlayerAlongBezier();
 
             m_vInputMove = transform.forward;
 
