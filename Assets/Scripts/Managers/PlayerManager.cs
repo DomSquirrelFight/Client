@@ -259,9 +259,8 @@ public class PlayerManager : MonoBehaviour
         if (Owner.FSM.IsInState(StateID.Injured))
             return false;
 
-        //todo_erric
-        //if (Owner.CameraContrl.CamState == eCameStates.eCam_Birth)
-        //    return false;
+        if (Owner.CameraContrl.CurCamAction.SelfState == eCameStates.eCam_Birth)
+            return false;
 
         return true;
     }
@@ -814,23 +813,24 @@ public class PlayerManager : MonoBehaviour
                 return false;
         }
        
-        if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
-        {
-            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
-                return true;//block left
-        }
-        else if (cc.CamMoveDir == eCamMoveDir.CamMove_Left)
-        {
-            if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
-                return true; //block right
-        }
-        else if (cc.CamMoveDir == eCamMoveDir.CamMove_Up)
-        {
-            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
-                return true;//block left
-            else if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
-                return true; //block right
-        }
+        //todo_erric
+        //if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
+        //{
+        //    if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
+        //        return true;//block left
+        //}
+        //else if (cc.CamMoveDir == eCamMoveDir.CamMove_Left)
+        //{
+        //    if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
+        //        return true; //block right
+        //}
+        //else if (cc.CamMoveDir == eCamMoveDir.CamMove_Up)
+        //{
+        //    if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
+        //        return true;//block left
+        //    else if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
+        //        return true; //block right
+        //}
     
         return false; 
     }

@@ -9,30 +9,11 @@ public class CameraControllerEditor : Editor {
 
     CameraController tc;
 
-    #region 清理数据
-
-    void OnDisable()
-    {
-
-    }
-    #endregion
-
     #region 初始化数据
     void OnEnable()
     {
         tc = target as CameraController;
-
     }
-
-    void InitializeAllCamStatesInfo()
-    {
-        //拿到所有状态对象
-
-        //拿到所有状态枚举
-
-        //制作dictionary <int, eCamStates>
-    }
-
     #endregion
 
     #region Inspector 显示数据
@@ -60,13 +41,17 @@ public class CameraControllerEditor : Editor {
 
     void ShowCurCamState()
     {
-
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("当前的相机行为状态 : ");
+        if (null != tc.CurCamAction)
+            EditorGUILayout.LabelField(tc.CurCamAction.name);
+        else
+            EditorGUILayout.LabelField("NULL");
+        EditorGUILayout.EndHorizontal();
     }
 
     public override void OnInspectorGUI()
     {
-        //toggle 判断是否显示所有相机状态
-        //如果是yes，那么显示所有相机状态
 
         EditorGUILayout.BeginHorizontal ();
         bool IsShow = EditorGUILayout.Toggle("是否显示相机所有状态", tc.BShowAllCamStates);
@@ -81,16 +66,7 @@ public class CameraControllerEditor : Editor {
             ShowAllCamStates();
         }
 
-        if (null == tc.Owner)       //在编辑器模式下
-        {
-
-        }
-        //在运行模式下
-        else
-        {
-            //显示当前相机状态
-            ShowCurCamState();
-        }
+        ShowCurCamState();
 
     }
     #endregion
