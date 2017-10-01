@@ -20,7 +20,7 @@ namespace Assets.Scripts.Action
 
         protected NotifyCamContrl DelNotifyCamContrl_StateOver;         //通知相机管理器当前状态已经结束
 
-        BaseActor Owner;
+        protected BaseActor Owner;
 
         #endregion
 
@@ -51,8 +51,32 @@ namespace Assets.Scripts.Action
         #endregion
 
         #region 计算相机中点，相机corner坐标
-        Transform tTarget;
-        Transform tCamera;
+        protected Transform tTarget;
+        protected Transform tCamera;
+        protected Vector3 CameraForward
+        {
+            get
+            {
+                return Quaternion.Euler(0f, 2*tCamera.rotation.eulerAngles.y, 0f) * tCamera.forward;
+            }
+        }
+
+        protected Vector3 CameraPosition
+        {
+            get
+            {
+                return Quaternion.Euler(0f, 2*tCamera.rotation.eulerAngles.y, 0f) * tCamera.position;
+            }
+        }
+
+        protected Vector3 TargetPosition
+        {
+            get
+            {
+                return  (tTarget.rotation) * tTarget.position; 
+            }
+        }
+
         Vector3 vLastPos;
         Vector3 vLastRot;
         protected bool BRefreshCameraData = true;                                                                           //初始化刷新相机数据状态 ： true
@@ -64,29 +88,92 @@ namespace Assets.Scripts.Action
                 return middlePoint;
             }
         }
-        protected void DetectTransformChange()
-        {
-            if (vLastPos != transform.position || vLastRot != transform.rotation.eulerAngles)
-            {
-                BRefreshCameraData = true;                  //改变了相机的位置或者旋转
-            }
-            if (BRefreshCameraData)
-                    RefreshCameraData();
-            vLastPos = transform.position;
-            vLastRot = transform.rotation.eulerAngles;
-        }                                                                                                                                                        //检测相机的位置或者旋转是否发生了变化，如果发生变化，重新计算所有数据
 
-        Vector3 CalMiddleAtTargetPlane()                                                                                                                                                        //计算相机朝向和目标平面的交点坐标.
+        //protected void DetectTransformChange()
+        //{
+        //    //todo_erric
+        //    //if (vLastPos != tCamera.position || vLastRot != tCamera.rotation.eulerAngles)
+        //    //{
+        //    //    BRefreshCameraData = true;                  //改变了相机的位置或者旋转
+        //    //}
+        //    //if (BRefreshCameraData)
+        //    //        RefreshCameraData();
+        //    //vLastPos = tCamera.position;
+        //    //vLastRot = tCamera.rotation.eulerAngles;
+        //    RefreshCameraData();
+        //}                                                                                                                                                        //检测相机的位置或者旋转是否发生了变化，如果发生变化，重新计算所有数据
+
+        protected Vector3 CalMiddleAtTargetPlane()                                                                                                                                                        //计算相机朝向和目标平面的交点坐标.
         {
-            float t = (tTarget.position.z - tCamera.position.z) / tCamera.forward.z;
-            middlePoint = tCamera.position + t * tCamera.forward;
+
+
+            //if(Physics.Raycast (tCamera.position, tCamera.for))
+
+            /*
+             * 
+                 c      Camera Position : tCamera.position.
+             *  dir    Camera Direction : tCamera.forward
+             *  m     Middle Position : middlePoint.position.
+             *  t       tTarget Position : tTarget.position.
+             * 
+             * 
+             * 
+             * */
+            //float t = 0f;
+            //middlePoint = tCamera.position + t * tCamera.forward;
+
+            //Vector3 cm = t * tCamera.forward;
+
+            //Vector3 mt = tTarget.position - tCamera.position - t * tCamera.forward;
+
+            //float t, t1, t2 = 0f;
+
+            /*
+             * 
+             * 将主角坐标转换到相机坐标系
+             * 
+             * */
+
+        
+
+            //float d1 = Vector3.Distance(postion, tCamera.position);
+            //float d2 = Vector3.Distance(tTarget.position, tCamera.position);
+
+            ////Vector3 pos = tTarget.worldToLocalMatrix * tTarget.position;
+            //t1 = Mathf.Abs((tTarget.position.x - tCamera.position.x) / (tCamera.forward.x));
+            //t2 = Mathf.Abs((tTarget.position.z - tCamera.position.z) / (tCamera.forward.z));
+
+            //t = t1 > t2 ? t2 : t1;
+            //middlePoint = tCamera.position + t* tCamera.forward;
+
+            Vector3 postion = Quaternion.Euler(0f, tCamera.rotation.eulerAngles.y, 0f) * tTarget.position;
+            Vector3 campos = Quaternion.Euler(0f, tCamera.rotation.eulerAngles.y, 0f) * tCamera.position;
+            middlePoint = new Vector3(campos.x, campos.y, postion.z);
+            middlePoint = Quaternion.Euler(0f, -tCamera.rotation.eulerAngles.y, 0f) * middlePoint;
             return middlePoint;
+
+
+
+
+
+            //Vector3 dir = (tTarget.position - tCamera.position).normalized;
+            //float distance = Vector3.Distance(tTarget.position, tCamera.position);
+            //middlePoint = tCamera.position + dir * distance;
+            //return middlePoint;
+            //todo_erric
+            ////float t = (tTarget.position - tCamera.position) / tCamera.forward;
+            ////middlePoint = tCamera.position + t * tCamera.forward;
+            ////return middlePoint;
+            
+            //float t = (TargetPosition.x - CameraPosition.z) / CameraForward.z;
+            //middlePoint = CameraPosition + t * CameraForward;
+            //return middlePoint;
         }
 
-        protected void RefreshCameraData()
-        {
-            CalMiddleAtTargetPlane();
-        }
+        //protected void RefreshCameraData()
+        //{
+        //    //CalMiddleAtTargetPlane();
+        //}
 
         protected void ResetCameraData()
         {

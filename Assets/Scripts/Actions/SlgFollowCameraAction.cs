@@ -13,14 +13,14 @@ namespace Assets.Scripts.Action
             
         }
 
-        public override void Update()
+        protected override void Update()
         {
             //计时已经结束
             if (m_bSend)
             {
                 if (SelfState == eCameStates.eCam_SLGFollow)
                 {
-                    DetectTransformChange();    //检测相机数据是否需要更新
+                   // DetectTransformChange();    //检测相机数据是否需要更新
 
                     SlgFollow();                           //处理跟随数据
 
@@ -33,20 +33,22 @@ namespace Assets.Scripts.Action
 
         void SlgFollow()
         {
-            //如果判定主角过了相机中点，那么相机就要跟随主角。
+            if (Owner.PlayerMgr.VInputMove.x < 0f)
+            {
+                tCamera.forward = Vector3.Lerp(tCamera.forward, tTarget.right, 10 * Time.deltaTime);
+            }
+            else if (Owner.PlayerMgr.VInputMove.x > 0f)
+            {
+                tCamera.forward = Vector3.Lerp(tCamera.forward, Quaternion.Euler(0f, 180f, 0f) * tTarget.right, 10 * Time.deltaTime);
+            }
 
-            //扩展相机编辑器，绘制相机视野的中点坐标。
-        }
-
-      
-
-
-        
-
-    }
-
-
+            if (Owner.PlayerMgr.VInputMove.x != 0f)
+            {
+                Vector3 target = tTarget.position + (tCamera.forward * (-10) + Vector3.up * 3);
+                tCamera.position = Vector3.Lerp(tCamera.position, target, 10 * Time.deltaTime);
+            }
        
-
+        }
+    }
 }
 

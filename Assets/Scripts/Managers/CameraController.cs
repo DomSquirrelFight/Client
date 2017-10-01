@@ -274,7 +274,7 @@ public class CameraController : MonoBehaviour
         //public Dictionary<eCamFourCorner, Vector3> m_dCamDir = new Dictionary<eCamFourCorner, Vector3>();                                                      //相机视野四个角的方向向量
 
         //[HideInInspector]
-        public Dictionary<eTargetFourCorner, Vector3> m_dTargetCornerPoints = new Dictionary<eTargetFourCorner, Vector3>();                                   //目标视野边界顶点坐标          
+        //public Dictionary<eTargetFourCorner, Vector3> m_dTargetCornerPoints = new Dictionary<eTargetFourCorner, Vector3>();                                   //目标视野边界顶点坐标          
 
     //private Vector3 middlepoint;
     //public Vector3 m_vMiddlePoint                                                                                                                                                                //相机朝向和目标平面的焦点.
