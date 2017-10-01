@@ -16,4 +16,5 @@ public class Global : MonoBehaviour {
     public static int Grid_CurrentIndex ;
     public static string Scene_Go;
     public static StateUI e_State = StateUI.State_Stay;
+    public static DragState dragstate;
 }
