@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 
-public class PassBehavior : MonoBehaviour {
+public class PassBehavior : UIScene_Custompass {
 
     #region 成员变量
     //当前的pass的index值做保存
@@ -36,7 +36,7 @@ public class PassBehavior : MonoBehaviour {
     void OnDrag(Vector2 delta)
     {
         
-        if(Global.dragstate==DragState.State_Drag)
+        if(dragstate==DragState.State_Drag)
         {
             //跟随鼠标移动
             gameObject.transform.localPosition += (Vector3)delta;
@@ -49,7 +49,7 @@ public class PassBehavior : MonoBehaviour {
         if(Vector3.Distance(gameObject.transform.position,m_oSelect.transform.position)<=1f)
         {
             gameObject.transform.localPosition = m_oSelect.transform.localPosition;
-            Global.dragstate = DragState.State_Stop;
+            dragstate = DragState.State_Stop;
         }
         else
         {
@@ -60,7 +60,7 @@ public class PassBehavior : MonoBehaviour {
 
     #region 控制scale
 
-#endregion
+  #endregion
 
 
 }

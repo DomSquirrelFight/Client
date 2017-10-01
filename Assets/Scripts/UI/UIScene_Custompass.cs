@@ -6,13 +6,13 @@ public class UIScene_Custompass : UIScene {
     #region 成员变量
     public GameObject[] m_oPass;
     public GameObject m_oSelect;
-  
+    public DragState dragstate;
     #endregion
 
     #region 系统接口
     private void Start()
     {
-        Global.dragstate = DragState.State_Drag;
+        dragstate = DragState.State_Drag;
         InitePass();
     }
     private void Update()
