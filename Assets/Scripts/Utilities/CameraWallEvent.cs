@@ -12,6 +12,7 @@ public class CameraWallEvent : MonoBehaviour {
         bc.isTrigger = true;
     }
 
+    public eCamMoveDir m_eCamMoveDir = eCamMoveDir.CamMove_Right;
     public bool BIsTriggerOnce = false;
 
     void OnTriggerEnter(Collider other)
@@ -28,7 +29,25 @@ public class CameraWallEvent : MonoBehaviour {
                 return;
             }
 
-      
+            //设置新的运动方向
+            cc.CamMoveDir = m_eCamMoveDir;
+            //todo_erric
+            //switch (m_eCamMoveDir)
+            //{
+            //    case eCamMoveDir.CamMove_Left:
+            //        {
+            //            //cc.GetCameraMajorBorderPoint(eCameraBorderSide.CameraSide_Right, cc.ZLineLength);
+            //            cc.RefreshCamTargetBorderPoint();
+            //            break;
+            //        }
+            //    case eCamMoveDir.CamMove_Right:
+            //        {
+            //            cc.RefreshCamTargetBorderPoint();
+            //            break;
+            //        }
+            //}
+            //todo_erric
+            //cc.BRefreshCameraData = true;           //碰到转向墙
 
             if (BIsTriggerOnce)
                 Destroy(gameObject);

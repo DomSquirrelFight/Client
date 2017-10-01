@@ -21,55 +21,55 @@ public class CameraController : MonoBehaviour
             }
         }
 
-        //private Vector3 cammovevector = Vector3.zero;
-        //public Vector3 m_vCamMoveVector
-        //{
-        //    get
-        //    {
-        //        return cammovevector;
-        //    }
-        //}
+        private Vector3 cammovevector = Vector3.zero;
+        public Vector3 m_vCamMoveVector
+        {
+            get
+            {
+                return cammovevector;
+            }
+        }
 
-        //private eCamMoveDir cammovedir;                                                                                                                                                             // 当前的运动方向
-        //public eCamMoveDir CamMoveDir
-        //{
-        //    get
-        //    {
-        //        return cammovedir;
-        //    }
-        //    set
-        //    {
-        //        if (value != cammovedir)
-        //        {
-        //            cammovedir = value;
-        //            switch (cammovedir)
-        //            {
-        //                case eCamMoveDir.CamMove_Left:
-        //                    {
-        //                        cammovevector = Vector3.left;
-        //                        break;
-        //                    }
-        //                case eCamMoveDir.CamMove_Right:
-        //                    {
-        //                        cammovevector = Vector3.right;
-        //                        break;
-        //                    }
-        //                case eCamMoveDir.CamMove_Up:
-        //                    {
-        //                        cammovevector = Vector3.up;
-        //                        break;
-        //                    }
-        //                case eCamMoveDir.CamMove_Down:
-        //                    {
-        //                        cammovevector = Vector3.down;
-        //                        break;
-        //                    }
+        private eCamMoveDir cammovedir;                                                                                                                                                             // 当前的运动方向
+        public eCamMoveDir CamMoveDir
+        {
+            get
+            {
+                return cammovedir;
+            }
+            set
+            {
+                if (value != cammovedir)
+                {
+                    cammovedir = value;
+                    switch (cammovedir)
+                    {
+                        case eCamMoveDir.CamMove_Left:
+                            {
+                                cammovevector = Vector3.left;
+                                break;
+                            }
+                        case eCamMoveDir.CamMove_Right:
+                            {
+                                cammovevector = Vector3.right;
+                                break;
+                            }
+                        case eCamMoveDir.CamMove_Up:
+                            {
+                                cammovevector = Vector3.up;
+                                break;
+                            }
+                        case eCamMoveDir.CamMove_Down:
+                            {
+                                cammovevector = Vector3.down;
+                                break;
+                            }
 
-        //            }
-        //        }
+                    }
+                }
 
-        //    }
-        //}
+            }
+        }
 
         private BaseActor owner;
         public BaseActor Owner
@@ -79,6 +79,10 @@ public class CameraController : MonoBehaviour
                 return owner;
             }
         }
+
+        //[HideInInspector]
+        public Dictionary<eTargetFourCorner, Vector3> m_dTargetCornerPoints = new Dictionary<eTargetFourCorner, Vector3>();                                   //目标视野边界顶点坐标          
+
 
         #endregion
         
@@ -189,6 +193,10 @@ public class CameraController : MonoBehaviour
             }
         }
         //----------------------------------------------------------------------------------------End-------------------------------------------------------------------------------//
+
+
+
+    
 
         #endregion
 

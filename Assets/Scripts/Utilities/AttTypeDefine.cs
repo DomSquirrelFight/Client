@@ -158,11 +158,29 @@ namespace AttTypeDefine
     {
         eCam_NULL,
         eCam_Birth,             //出生相机
-        eCam_ChoosePath,    //选择路线
         eCam_RPGFollow,
         eCam_SLGFollow,
         eCam_Zoom,          //缩进，缩远
         eCam_Dead,          //死亡相机
+    }
+
+
+    public enum eCamFourCorner
+    {
+        CamCorner_UpperLeft,
+        CamCorner_UpperRight,
+        CamCorner_DownLeft,
+        CamCorner_DownRight,
+        CamCorner_Size,
+    }
+
+    public enum eTargetFourCorner
+    {
+        TargetCorner_Left,
+        TargetCorner_Right,
+        TargetCorner_Up,
+        TargetCorner_Down,
+        TargetCorner_Size,
     }
 
     #endregion
@@ -199,6 +217,7 @@ namespace AttTypeDefine
 
     #endregion
 
+
     #region way finding
     public enum eBezierLineConstrainedMode
     {
@@ -220,5 +239,6 @@ namespace AttTypeDefine
 
 
     #endregion
+
 
 }

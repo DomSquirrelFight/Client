@@ -68,12 +68,11 @@ public class BoxController : MonoBehaviour {
             else
             {
                 //飞了相机视野
-                //todo_erric
-                //if (GlobalHelper.CheckMoveBoundaryBlock(transform.position, halfsize))
-                //{
-                //    Destroy(gameObject);
-                //    return;
-                //}
+                if (GlobalHelper.CheckMoveBoundaryBlock(transform.position, halfsize))
+                {
+                    Destroy(gameObject);
+                    return;
+                }
 
                 if (Time.time - m_fStartDownTime < FDownDuration && m_fOrigHeight - transform.position.y <= AbsDis)
                 {

@@ -19,25 +19,25 @@ public class GlobalHelper
         }
     }
 
-    //public static bool CheckMoveBoundaryBlock(Vector3 pos,float size)
-    //{
+    public static bool CheckMoveBoundaryBlock(Vector3 pos,float size)
+    {
 
-    //    CameraController cc = Camera.main.GetComponent<CameraController>();
+        CameraController cc = Camera.main.GetComponent<CameraController>();
 
-    //    if (null != cc)
-    //    {
-    //        if (
-    //                (pos.x <= cc.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x - size) ||
-    //                (pos.x >= cc.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x + size)
-    //            )
-    //            return true;//block left, right
-    //    }
-    //    else
-    //        return false;
+        if (null != cc)
+        {
+            if (
+                    (pos.x <= cc.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x - size) ||
+                    (pos.x >= cc.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x + size)
+                )
+                return true;//block left, right
+        }
+        else
+            return false;
 
 
-    //    return false;
-    //}
+        return false;
+    }
 
     #region 场景加载
     public static void LoadLevel(string name)
