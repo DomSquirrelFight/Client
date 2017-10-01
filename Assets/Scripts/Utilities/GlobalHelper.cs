@@ -5,6 +5,7 @@ using AttTypeDefine;
 public class GlobalHelper
 {
 
+
     private static bool IsTest;
     public static void SetTest(bool istest)
     {

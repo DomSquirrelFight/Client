@@ -18,8 +18,13 @@ public class RpgFollowCameraAction : CameraBaseAction {
 
     protected override void Update()
     {
+<<<<<<< HEAD
 //        if (m_bIsClosed == true)
    //         return;
+=======
+        if (m_bIsClosed == true)
+            return;
+>>>>>>> 862dafe9a25131a179b9ad7b2b3bbb0d427d015b
         //计时已经结束
         if (m_bSend)
         {

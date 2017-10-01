@@ -13,8 +13,12 @@ namespace Assets.Scripts.Action
             
         }
 
+
         protected override void Update()
         {
+
+            if (m_bIsClosed == true)
+                return;
             //计时已经结束
             if (m_bSend)
             {
@@ -31,17 +35,17 @@ namespace Assets.Scripts.Action
         {
             if (Owner.PlayerMgr.VInputMove.x < 0f)
             {
-                tCamera.forward = Vector3.Lerp(tCamera.forward, tTarget.right, 10 * Time.deltaTime);
+                tCamera.forward = Vector3.Lerp(tCamera.forward, tTarget.right, fRotSpeed * Time.deltaTime);
             }
             else if (Owner.PlayerMgr.VInputMove.x > 0f)
             {
-                tCamera.forward = Vector3.Lerp(tCamera.forward, Quaternion.Euler(0f, 180f, 0f) * tTarget.right, 10 * Time.deltaTime);
+                tCamera.forward = Vector3.Lerp(tCamera.forward, Quaternion.Euler(0f, 180f, 0f) * tTarget.right, fRotSpeed * Time.deltaTime);
             }
 
             if (Owner.PlayerMgr.VInputMove.x != 0f)
             {
                 Vector3 target = tTarget.position + (tCamera.forward * (-10) + Vector3.up * 3);
-                tCamera.position = Vector3.Lerp(tCamera.position, target, 10 * Time.deltaTime);
+                tCamera.position = Vector3.Lerp(tCamera.position, target, fMoveSpeed * Time.deltaTime);
             }
         }
     }

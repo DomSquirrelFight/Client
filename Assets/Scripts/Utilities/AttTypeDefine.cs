@@ -4,6 +4,14 @@ namespace AttTypeDefine
 
     #region UI
 
+
+    public enum DragState       //ZL
+    {
+        State_Drag,
+        State_Stop,
+    }
+
+
     public enum eAudioType
     {
         Audio_Skill,
@@ -211,12 +219,23 @@ namespace AttTypeDefine
 
 
     #region way finding
+    public enum eBezierLineConstrainedMode
+    {
+        Free,
+        Mirror,
+    };
+
     public enum eWayFinding
     {
         eWayFind_NULL,
         eWayFind_PathLastPoint,
     }
 
+
+    public enum eWallEvent
+    {
+        eWallEvent_ChoosePath,
+    }
 
 
     #endregion
