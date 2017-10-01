@@ -6681,8 +6681,6 @@ public class iTween : MonoBehaviour{
 		vector3s = new Vector3[suppliedPath.Length+offset];
 		Array.Copy(suppliedPath,0,vector3s,1,suppliedPath.Length);
 		
-		//populate start and end control points:
-		//vector3s[0] = vector3s[1] - vector3s[2];
 		vector3s[0] = vector3s[1] + (vector3s[1] - vector3s[2]);
 		vector3s[vector3s.Length-1] = vector3s[vector3s.Length-2] + (vector3s[vector3s.Length-2] - vector3s[vector3s.Length-3]);
 		
@@ -6704,7 +6702,8 @@ public class iTween : MonoBehaviour{
 		int numSections = pts.Length - 3;
 		int currPt = Mathf.Min(Mathf.FloorToInt(t * (float) numSections), numSections - 1);
 		float u = t * (float) numSections - (float) currPt;
-				
+        if (t < 0f)
+            Debug.Log(123);
 		Vector3 a = pts[currPt];
 		Vector3 b = pts[currPt + 1];
 		Vector3 c = pts[currPt + 2];

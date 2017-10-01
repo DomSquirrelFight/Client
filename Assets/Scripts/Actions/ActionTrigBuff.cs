@@ -34,7 +34,7 @@ namespace Assets.Scripts.Action
                     }
                 case '5':
                     {
-                        UnityEngine.Object obj = Resources.Load("IGSoft_Projects/Rocks/RockBuff/" + id);
+                        UnityEngine.Object obj = Resources.Load("IGSoft_Projects/Buffs/" + id);
                         GameObject tmp = Instantiate(obj) as GameObject;
                         ActionInfos acInfos = tmp.GetComponent<ActionInfos>();
                         acInfos.SetOwner(DataStore.Target.gameObject, DataStore.Target);

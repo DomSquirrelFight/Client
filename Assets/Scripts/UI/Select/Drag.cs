@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 
-public class Drag : MakeMove {
+public class Drag : MonoBehaviour {
+    #region 成员变量
     #region bool值的成员变量
     //是否触摸
     bool IsTouch = false;
@@ -20,18 +21,48 @@ public class Drag : MakeMove {
 
     #endregion
 
+    UIScene_SelecteV1 select;
+    GameObject Grid;
+    int Grid_Count;
+    int Grid_CurrentIndex;
+    StateUI e_State;
+    float Grid_PerSize;
+    #endregion
+
+
+    #region 系统接口
+    private void Start()
+    {
+        select = gameObject.GetComponentInParent<UIScene_SelecteV1>();
+        Grid = select.Grid;
+        Grid_CurrentIndex = select.Grid_CurrentIndex;
+        Grid_Count = select.Grid_Count;
+        Grid_PerSize = select.Grid_PerSize;
+        //初始化双击事件
+        ResetClick();
+    }
+
+    private void Update()
+    {
+        Debug.Log(Grid_CurrentIndex);
+        if (e_State == StateUI.State_Move)
+        {
+            select. MoveOutDrag(Grid_CurrentIndex);
+        }
+        if ((Mathf.Abs(Grid.transform.localPosition.x + (Grid_CurrentIndex * Grid_PerSize))) < 10f)
+        {
+            e_State = StateUI.State_Stay;
+        }
+    }
+    #endregion
+
+
+    #region 通过判断drag来改变ui的位置
     //存储delta
     Vector3 drag;
     //记录grid的原始位置
     Vector3 Pos;
-    //drag开始首先确定当前的card的index
-    void Start()
-    {
-        IsFinalPos = false;
-    }
-    //drag 的时候，让card跟随delta移动
-
-    #region 通过判断drag来改变ui的位置
+    #region 拖拽中的判定
     void OnDrag(Vector2 delta)
     {
         drag = delta;
@@ -51,71 +82,94 @@ public class Drag : MakeMove {
             IsTouch = true;
         }
         //根据当前移动的dalta来移动ui和btn的位置
-        MoveInDrag(delta);
+        select. MoveInDrag(delta);
         ////移动ui
         //Global.Grid.transform.localPosition += (Vector3)delta;
         ////移动curbtn
         //Global.CurBtn.transform.localPosition += new Vector3(-((Vector3)delta).x / 4, 0, 0);
     }
+    #endregion
+
+    #region 拖拽结束之后的判定
     void OnPress()
     {
         if (IsClick)
         {
-            Pos = Global.Grid.transform.localPosition;
+            Pos =  Grid.transform.localPosition;
             IsClick = false;
         }
         else
         {
-            float Dis = Global.Grid.transform.localPosition.x - Pos.x;
+            float Dis = Grid.transform.localPosition.x - Pos.x;
             //判断当是第一个或者是最后一个ui的时候
-            if (Global.Grid_CurrentIndex == Global.Grid_Count-1 || Global.Grid_CurrentIndex == 0)
+            if (Grid_CurrentIndex == Grid_Count - 1 || Grid_CurrentIndex == 0)
             {
-                MoveInmarginal(Global.Grid_CurrentIndex);
+                select. MoveInmarginal(Grid_CurrentIndex);
             }
-            if (Global.Grid_CurrentIndex < Global.Grid_Count -1&& IsLeft)
+            if (Grid_CurrentIndex < Grid_Count - 1 && IsLeft)
             {
-                if (drag.x > Dis)
+                //if (drag.x > Dis)
+                if (Dis < -Screen.width / 2)
                 {
-                    Global.Grid_CurrentIndex++;
+                    Grid_CurrentIndex++;
                     //Global.Grid.transform.localPosition = new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0);
-                    IsFinalPos = true;
+                    //IsFinalPos = true;
+                    e_State = StateUI.State_Move;
                 }
 
             }
 
-            if (Global.Grid_CurrentIndex > 0 && IsRight)
+            if (Grid_CurrentIndex > 0 && IsRight)
             {
-                if (drag.x < Dis)
+                if (Dis > Screen.width / 2)
                 {
-                    Global.Grid_CurrentIndex--;
+                    Grid_CurrentIndex--;
                     // Global.Grid.transform.localPosition = new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0);
-                    IsFinalPos = true;
+                    //IsFinalPos = true;
+                    e_State = StateUI.State_Move;
                 }
             }
+            select. MoveInmarginal(Grid_CurrentIndex);
             IsDrag = false;
             IsRight = false;
             IsLeft = false;
             IsTouch = false;
             IsClick = true;
         }
-
-
     }
+    #endregion
 
     #endregion
 
-    // Update is called once per frame
-    void Update () {
-        //通过判断drag来改变ui的位置
-        if (IsFinalPos)
-        {
-            //drag结束之后移动btn和ui的位置
-            MoveOutDrag(Global.Grid_CurrentIndex);
-        }
-        if ((Mathf.Abs(Global.Grid.transform.localPosition.x + (Global.Grid_CurrentIndex * Global.Grid_PerSize)) )< 0.5f)
-        {
-            IsFinalPos = false;
-        }
 
+
+    #region 双击
+    //ClickState clickstate ;
+    int m_iClickindex ;
+
+    void OnClick()
+    {
+        //第一次点击
+        if(m_iClickindex==0)//&& clickstate==ClickState.Click_Null)
+        {
+            m_iClickindex++;
+            //clickstate = ClickState.Click_First;
+            Invoke("ResetClick", 0.5f);
+        }
+        //双击 
+        else if(m_iClickindex==1)//&& clickstate == ClickState.Click_First)
+        {
+            //处理双击事件，选择当前currindex所对应的人物
+            Debug.Log("double Click");
+            ResetClick();
+        }
+        
     }
+    void ResetClick()
+    {
+        //clickstate = ClickState.Click_Null;
+        m_iClickindex = 0;
+    }
+    #endregion
+
 }

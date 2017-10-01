@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 using System;
-using Assets.Scripts.RoleInfoEditor;
+using Assets.Scripts.AssetInfoEditor;
 public class BaseActor : MonoBehaviour
 {
 
@@ -57,6 +57,50 @@ public class BaseActor : MonoBehaviour
 
     #endregion
 
+    #region 动作树行为脚本
+    private StateBehaviour statebe;
+    public StateBehaviour StateBehav
+    {
+        get
+        {
+            if (null == statebe)
+            {
+                statebe = AM.GetBehaviour<StateBehaviour>();
+            }
+            return statebe;
+        }
+    }
+    #endregion
+
+    #region 角色role id
+
+    int roleid;
+
+    public int RoleID
+    {
+        get
+        {
+            return roleid;
+        }
+    }
+
+    #endregion
+
+    #region AnimatorMgr
+    private AnimatorMgr animatormgr;
+    public AnimatorMgr AnimMgr
+    {
+        get
+        {
+            if (null == animatormgr)
+            {
+                animatormgr = Actor.GetOrAddComponent<AnimatorMgr>();
+            }
+            return animatormgr;
+        }
+    }
+    #endregion
+
     #region 加载角色
     /// <summary>
     /// 创建角色，并将角色实例返回
@@ -66,11 +110,11 @@ public class BaseActor : MonoBehaviour
     {
 
         #region 加载Asset文件
-        string assetpath = "Assets/RoleInfos/" + roldid.ToString();
-        RoleInfos roleInfos = (Resources.Load(assetpath)) as RoleInfos;
+
+        RoleInfos roleInfos = DataRecordManager.GetDataInstance<RoleInfos>(roldid);
         if (null == roleInfos)
         {
-            Debug.LogErrorFormat("Fail to find asset in route ({0})", assetpath);
+            Debug.LogErrorFormat("Fail to find asset in route ({0})", roleInfos.strRolePath);
             return null;
         }
         #endregion
@@ -89,6 +133,7 @@ public class BaseActor : MonoBehaviour
         #endregion
 
         #region 角色属性
+        ba.roleid = roldid;
         switch (roleInfos.CharacType)
         {
             case eCharacType.Type_Major:
@@ -97,13 +142,15 @@ public class BaseActor : MonoBehaviour
                     ba.baseattr = (BaseAttr)ba.gameObject.GetOrAddComponent<PlayerAttr>();
                     ba.BaseAtt.InitAttr(roleInfos);
                     if (
-                      null != ba.PlayerMgr/*读取角色管理器*/ ||
                       null != ba.CameraContrl/*相机实例对象*/ ||
-                      null != ba.RB/*加载刚体*/
+                      null != ba.RB/*加载刚体*/ ||
+                      null != ba.SkillMgr ||
+                      null != ba.AnimMgr
                       )
                     {
-                        ba.PlayerMgr.OnStart(ba);//启动角色管理器
                         ba.CameraContrl.OnStart(ba);//启动相机
+                        ba.SkillMgr.OnStart(ba);
+                        ba.AnimMgr.OnStart(ba);
                     }
                    
                     ba.fsm = (FSMBehaviour)ba.gameObject.GetOrAddComponent<PlayerFSM>();
@@ -116,14 +163,20 @@ public class BaseActor : MonoBehaviour
                     ba.baseattr = (BaseAttr)ba.gameObject.GetOrAddComponent<NpcAttr>();
                     ba.BaseAtt.InitAttr(roleInfos);
                     if (
-                     null != ba.PlayerMgr/*读取角色管理器*/ ||
-                     null != ba.RB/*加载刚体*/
+                     null != ba.RB/*加载刚体*/ ||
+                     null != ba.SkillMgr ||
+                     null != ba.AnimMgr
                      )
                     {
-                        ba.PlayerMgr.OnStart(ba);//启动角色管理器
+                        ba.SkillMgr.OnStart(ba);
+                        ba.AnimMgr.OnStart(ba);
                     }
-                    ba.fsm = (FSMBehaviour)ba.gameObject.GetOrAddComponent<AIEnemy>();
-                    ba.InitShaderProperties();
+
+                    if (roleInfos.MonsterType != eMonsterType.MonType_Rock)
+                    {
+                        ba.fsm = (FSMBehaviour)ba.gameObject.GetOrAddComponent<AIEnemy>();
+                        ba.InitShaderProperties();
+                    }
                     break;
                 }
         }
@@ -198,7 +251,7 @@ public class BaseActor : MonoBehaviour
         get
         {
             if (null == cc)
-                    cc = Camera.main.GetComponent<CameraController>();
+                    cc = Camera.main.transform.parent.GetComponent<CameraController>();
             return cc;
         }
     }
@@ -262,7 +315,22 @@ public class BaseActor : MonoBehaviour
 
     #endregion
 
+    #region 技能管理器
 
+    private SkillManager skillmgr;
+    public SkillManager SkillMgr
+    {
+        get
+        {
+            if (null == skillmgr)
+            {
+                skillmgr = gameObject.GetOrAddComponent<SkillManager>();
+            }
+            return skillmgr;
+        }
+    }
+
+    #endregion
 
     #region 玩家状态
 
@@ -304,23 +372,24 @@ public class BaseActor : MonoBehaviour
 
         if (null == m_sDeadShader)
         {
-            m_sDeadShader = Shader.Find("Custom/Alpha");
+            m_sDeadShader = Shader.Find("UnityChan/Skin - Transparent");
             m_smr.materials[0].shader = m_sDeadShader;
-            m_smr.materials[0].SetFloat("_AlphaScale", 1.0f);
+            m_smr.materials[0].SetVector("_Color", Vector4.one);
         }
-        while (true)
+        while ( RB.isKinematic == true &&  BC.enabled == false)
         {
             if (m_alpha <= 0 || m_alpha >= 1.0f)
             {
                 m_aplhaStep = 0 - m_aplhaStep;
             }
-            m_smr.materials[0].SetFloat("_AlphaScale", m_alpha);
+            m_smr.materials[0].SetVector("_Color", new Vector4(1, 1, 1, m_alpha));
             m_alpha -= Time.deltaTime * m_aplhaStep;
             yield return null;
         }
+
+        m_smr.materials[0].shader = m_sOrig;
       
     }
-
 
     public void EndChangingAlpha(float wait)
     {
@@ -329,14 +398,55 @@ public class BaseActor : MonoBehaviour
 
     void WaitingChangingBack()
     {
-        m_smr.materials[0].shader = m_sOrig;
         RB.isKinematic = false;
         BC.enabled = true;
         FSM.SetTransition(StateID.Idle);
-        StopCoroutine(ChangingAlpha());
+       // StopCoroutine(ChangingAlpha());
     }
 
     #endregion
+
+    #region HoldBoxDir, HoldBoxTransform
+
+    Transform holdboxtrans;
+    public Transform HoldBoxTrans
+    {
+        get
+        {
+            return holdboxtrans;
+        }
+        set
+        {
+            if (value != holdboxtrans)
+                holdboxtrans = value;
+        }
+    }
+
+    private Vector3 holdboxdir;
+    public Vector3 HoldBoxDir
+    {
+        get
+        {
+            return holdboxdir;
+        }
+        set
+        {
+            if (value != holdboxdir)
+                holdboxdir = value;
+        }
+    }
+
+    #endregion
+
+    #region 销毁物理系统
+
+    public void DestroyPhysics()
+    {
+        Destroy(BC);
+        Destroy(RB);
+    }
+    #endregion
+
 
 
 }

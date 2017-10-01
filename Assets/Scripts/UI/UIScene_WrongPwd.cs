@@ -1,19 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using AttTypeDefine;
 
-public class UIScene_WrongPwd : MonoBehaviour {
+public class UIScene_WrongPwd : UIScene {
     public GameObject m_oBtn;
+    public string m_strBtn;
 	// Use this for initialization
 	void Start () {
-        UIEventListener.Get(m_oBtn).onClick = ClickOK;
+        UIEventListener.Get(m_oBtn).onClick = ClickBtn;
 	}
-	void ClickOK(GameObject obj)
+    protected override void ClickBtn(GameObject obj)
     {
-        Destroy(gameObject);
+        AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strBtn);
+        base.ClickBtn(obj);
     }
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
 }

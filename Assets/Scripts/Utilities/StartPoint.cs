@@ -4,16 +4,26 @@ using UnityEngine;
 
 public class StartPoint : MonoBehaviour {
 
-    public float m_fRadius;
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    float m_fRadius = 0.5f;
+
+    public PathArea BirthArea;
+
+    public int RoleId;
+
+    public void OnStart()
+    {
+        BaseActor player = BaseActor.CreatePlayer(RoleId, transform.position, transform.rotation, Vector3.one);
+
+        //todo_erric
+        //player.CameraContrl.BRefreshCameraData = true;
+
+        //启动玩家的角色管理器
+        player.PlayerMgr.OnStart(player, BirthArea);
+
+       
+
+    }
+        
 
     void OnDrawGizmos()
     {

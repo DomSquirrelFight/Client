@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
-public class UIScene_Fight : MonoBehaviour
-{
 
+public class UIScene_Fight : UIScene
+{
+    #region 摇杆，跳跃，具箱子事件处理
     BaseActor ba;
     //摇杆处理
     public GameObject m_oJoyBack;                                                                                  //摇杆背景对象
@@ -39,7 +40,7 @@ public class UIScene_Fight : MonoBehaviour
             {
                 JumpDownBtnColor.SetState(UIButtonColor.State.Normal, true);
             }
-            JumpDownBC.enabled = value;
+            JumpDownBC.enabled = !value;
 
             if (value != bdisablejumpdown)
             {
@@ -54,12 +55,7 @@ public class UIScene_Fight : MonoBehaviour
         ba = _owner;
        
     }
-    void Awake()
-    {
-        UIEventListener.Get(m_oJumpUp).onPress = PressJumpUp;
-        UIEventListener.Get(m_oPickUpBox).onClick = PressPickUpBox;
-        UIEventListener.Get(m_oJumpDown).onPress = PressJumpDown;
-    }
+
 
     void PressJumpUp(GameObject obj, bool pressed)
     {
@@ -74,38 +70,13 @@ public class UIScene_Fight : MonoBehaviour
 
     void PressPickUpBox(GameObject obj)
     {
-        ba.PlayerMgr.CalPickUpBox();
+        ba.SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
     }
 
     //认为最多不会超过10个
     bool[] m_bCanJoy = new bool[10];
     // Use this for initialization
-    void Start()
-    {
-        m_oJoyBack.SetActive(false);
 
-        m_vJoyBackOrigPos = m_oJoyBack.transform.position;
-
-        cam = NGUITools.FindCameraForLayer(gameObject.layer);
-    }
-
-    void Update()
-    {
-        if (m_bPressedJumpUp)
-            ba.PlayerMgr.CalJumpUp();       //上跳
-        else if (m_bPressedJumpDown)
-            ba.PlayerMgr.CalJumpDown();  // 下跳
-
-#if UNITY_EDITOR
-        MouseController();
-#else
-        TouchController ();
-#endif
-        if (m_oJoyFront.transform.localPosition.y > 0f)
-        {
-            m_oJoyFront.transform.localPosition = new Vector3(m_oJoyFront.transform.localPosition.x, 0f, m_oJoyFront.transform.localPosition.z);
-        }
-    }
 
     Vector3 TouchPos;
     void TouchController()
@@ -148,19 +119,19 @@ public class UIScene_Fight : MonoBehaviour
                     }
                 case TouchPhase.Ended:
                     {
+                        dirpos = Vector2.zero;
                         if (!m_bCanJoy[i]) return;
                         m_oJoyBack.SetActive(false);//关闭活性
                         Debug.Log("TouchController :: TouchPhase.Ended");
-                        dirpos = Vector2.zero;
                         //bpressed = false;
                         break;
                     }
                 case TouchPhase.Canceled:
                     {
-
+                        dirpos = Vector2.zero;
                         if (!m_bCanJoy[i]) return;
                         Debug.Log("TouchController :: TouchPhase.Canceled");
-                        dirpos = Vector2.zero;
+                       
                         break;
                     }
                 case TouchPhase.Stationary:
@@ -244,5 +215,152 @@ public class UIScene_Fight : MonoBehaviour
             m_bCanJoy[i] = false;
         }
     }
+    #endregion
 
+    #region 系统接口
+    void Awake()
+    {
+        UIEventListener.Get(m_oJumpUp).onPress = PressJumpUp;
+        UIEventListener.Get(m_oPickUpBox).onClick = PressPickUpBox;
+        UIEventListener.Get(m_oJumpDown).onPress = PressJumpDown;
+        UIEventListener.Get(m_oLeaveBtn).onClick = LeaveScene;
+        UIEventListener.Get(m_oOverBtn).onClick = EndTheGame;
+    }
+
+    void Start()
+    {
+       
+        m_oJoyBack.SetActive(false);
+
+        m_vJoyBackOrigPos = m_oJoyBack.transform.position;
+
+        cam = NGUITools.FindCameraForLayer(gameObject.layer);
+
+        
+        //m_LifeNum = m_uiLife.Length;
+        m_LifeNum = ba.BaseAtt[eAttInfo.AttInfo_HP];
+
+
+
+    }
+
+    void Update()
+    {
+        if (m_bPressedJumpUp)
+            ba.PlayerMgr.CalJumpUp();       //上跳
+        else if (m_bPressedJumpDown)
+            ba.PlayerMgr.CalJumpDown();  // 下跳
+
+#if UNITY_EDITOR
+        MouseController();
+#else
+        TouchController ();
+#endif
+        if (m_oJoyFront.transform.localPosition.y > 0f)
+        {
+            m_oJoyFront.transform.localPosition = new Vector3(m_oJoyFront.transform.localPosition.x, 0f, m_oJoyFront.transform.localPosition.z);
+        }
+        if (eState == LoadingState.e_StartTime)
+        {
+            m_nCurTime = m_nTotalTime;
+            InvokeRepeating("CountTime", 0f, 1f);
+            eState = LoadingState.e_Null;
+        }
+    }
+
+
+    #endregion
+
+    #region 离开游戏
+    public GameObject m_oLeaveBtn;
+    void LeaveScene(GameObject obj)
+    {
+        //退出离开游戏，跳转到login界面
+        GlobalHelper.LoadLevel("Login");
+    }
+    #endregion
+
+    //private void OnGUI()
+    //{
+    //    if (GUI.Button(new Rect(0, 0, 100, 100), "Press"))
+    //    {
+    //        //GetScore(10);
+    //        BeInjured();
+    //        Debug.Log(m_LifeNum);
+    //    }
+    //}
+
+    #region 生命值
+    public UISprite[] m_uiLife;
+    int m_LifeNum;
+    public void BeInjured()
+    {
+        m_LifeNum--;
+        if(m_LifeNum<0)
+        {
+            Gameover();
+        }
+        else
+        {
+            m_uiLife[m_LifeNum].enabled = false;
+        }
+        
+    }
+    #endregion
+
+    #region 分数值
+
+    public UILabel m_labelScore;
+    public TweenScale m_tsLabelScore;
+    int m_nCurScore = 0;
+    public void GetScore(int num)
+    {
+        m_tsLabelScore.ResetToBeginning();
+        m_tsLabelScore.enabled = true;
+        m_nCurScore += num;
+        m_labelScore.text = m_nCurScore.ToString();
+    }
+    #endregion
+
+    #region 倒计时
+    const int m_nTotalTime = 60;
+    private int m_nCurTime;
+    public UILabel m_labelTimeCounter;
+    string leftTime;
+    void CountTime()
+    {
+        
+        m_nCurTime--;
+        if (m_nCurTime < 10)
+        {
+            leftTime = "0" + m_nCurTime.ToString();
+        }
+        else
+            leftTime = m_nCurTime.ToString();
+
+        m_labelTimeCounter.text = "00 : " + leftTime;
+        if(m_nCurTime == 0)
+        {
+            Gameover();
+        }
+    }
+    #endregion
+
+    #region 游戏结束界面
+    public GameObject m_oGameOver;
+    public UILabel m_uiTotalScore;
+    public GameObject m_oOverBtn;
+    void Gameover()
+    {
+        Time.timeScale = 0f;
+        //Gameover界面的活性打开
+        m_oGameOver.SetActive(true);
+        //显示最终得分
+        m_uiTotalScore.text = "Total Score=" + m_labelScore.text;
+    }
+    void EndTheGame(GameObject obj)
+    {
+        GlobalHelper.LoadLevel("SelecteV1");
+    }
+#endregion
 }

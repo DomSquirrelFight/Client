@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
-namespace Assets.Scripts.RoleInfoEditor
+namespace Assets.Scripts.AssetInfoEditor
 {
     public class RoleInfos : ScriptableObject
     {
@@ -31,7 +31,7 @@ namespace Assets.Scripts.RoleInfoEditor
 
         public bool bFire;
 
-        public int nTotalAP;
+        public int nTotalHP;
 
         public float RoleMoveSpeed;                                                                 //角色移动速度
 

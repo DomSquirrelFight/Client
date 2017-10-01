@@ -10,7 +10,7 @@ public class NameToHashScript
     public static int IdleId = StringToHash("Base Layer.Idle");
     public static int InjuredId = StringToHash("Base Layer.Injured");
     public static int DeathId = StringToHash("Base Layer.Death");
-
+    public static int AttackId = StringToHash("Base Layer.Attack");
 
     #endregion
 

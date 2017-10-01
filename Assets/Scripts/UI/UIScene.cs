@@ -1,10 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using AttTypeDefine;
 
 public class UIScene : MonoBehaviour {
-    protected static LoadingState eState = LoadingState.e_Null;
+    protected  LoadingState eState = LoadingState.e_Null;
     protected SceneType eScene;
-    //人物选择
+
+    //弹出ui的销毁按钮
+    protected virtual void ClickBtn(GameObject obj)
+    {
+        Destroy(gameObject);
+    }
 }

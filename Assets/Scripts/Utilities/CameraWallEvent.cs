@@ -46,7 +46,8 @@ public class CameraWallEvent : MonoBehaviour {
             //            break;
             //        }
             //}
-            cc.BRefreshCameraData = true;           //碰到转向墙
+            //todo_erric
+            //cc.BRefreshCameraData = true;           //碰到转向墙
 
             if (BIsTriggerOnce)
                 Destroy(gameObject);

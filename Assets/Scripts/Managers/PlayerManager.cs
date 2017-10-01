@@ -4,11 +4,14 @@ using UnityEngine;
 using AttTypeDefine;
 using System.Linq;
 using Assets.Scripts.Helper;
-using Assets.Scripts.RoleInfoEditor;
+using Assets.Scripts.AssetInfoEditor;
+using System;
 public class PlayerManager : MonoBehaviour
 {
 
     #region 变量
+
+    SkillManager SkillMgr;
     //ePlayerBehaviour m_ePlayerBeha = ePlayerBehaviour.eBehav_Normal;                                                                        //角色行为
     ePlayerNormalBeha PlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;  
     ePlayerNormalBeha m_ePlayerNormalBehav                                            //角色普通行为
@@ -25,7 +28,16 @@ public class PlayerManager : MonoBehaviour
             }
         }
     }
-    
+
+    //對外開放屬性
+    public ePlayerNormalBeha PlayerBehaviour
+    {
+        get
+        {
+            return m_ePlayerNormalBehav;
+        }
+    }
+
     bool bGrounded = true;                                                                                                                                             //判定角色是否落地
     bool m_bGounded
     {
@@ -56,6 +68,14 @@ public class PlayerManager : MonoBehaviour
 
     int BoxMask;
 
+    public int NBoxMask
+    {
+        get
+        {
+            return BoxMask;
+        }
+    }
+
     int MaskGlossy;                                                                                                                                                          //层级平移位数<对比碰撞双方的层级>
 
     int BrickMaskGlossy;                                                                                                                                                 //层级平移位数<对比碰撞双方的层级>
@@ -76,6 +96,14 @@ public class PlayerManager : MonoBehaviour
 
     int HoldBoxMaskGlossy;
 
+    public int NHoldBoxMaskGlossy
+    {
+        get
+        {
+            return HoldBoxMaskGlossy;
+        }
+    }
+
     int HoldBoxMask;
 
     //JumpDataStore m_curJumpData;                                                                                                                                 //跳跃数据
@@ -90,7 +118,6 @@ public class PlayerManager : MonoBehaviour
 
     BoxCollider m_bcCurBox = null;
     bool m_bIsHoldBox = false;
-    float m_fPlayerBoxRaidus = 0f;
 
 
     public float FPlayerJumpBeginYPos                                                                                                                            //角色起跳在Y轴方向的高度值
@@ -113,11 +140,11 @@ public class PlayerManager : MonoBehaviour
             {
                 if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
                 {
-                    if (value == ePlayerJumpDownState.CanJumpDown_YES && (bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NULL || bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NO))                     //ui fight 下跳按钮点亮
+                    if (value == ePlayerJumpDownState.CanJumpDown_YES)                     //ui fight 下跳按钮点亮
                     {
                         m_UISceneFight.BDisableJumpDown = false;
                     }
-                    else if (value == ePlayerJumpDownState.CanJumpDown_NO && (bCanJumpDown == ePlayerJumpDownState.CanJumpDown_NULL || bCanJumpDown == ePlayerJumpDownState.CanJumpDown_YES))               // ui fight 下跳按钮变灰
+                    else if (value == ePlayerJumpDownState.CanJumpDown_NO)               // ui fight 下跳按钮变灰
                     {
                         m_UISceneFight.BDisableJumpDown = true;
                     }
@@ -140,8 +167,22 @@ public class PlayerManager : MonoBehaviour
     float m_fInitSpeed = 0f;
 
     Vector2 m_vInputMove;                                                                                                     //发送平移输入
+    public Vector2 VInputMove
+    {
+        get
+        {
+            return m_vInputMove;
+        }
+    }
 
     UIScene_Fight m_UISceneFight;
+    public UIScene_Fight UISceneFight
+    {
+        get
+        {
+            return m_UISceneFight;
+        }
+    }
 
     public  float SBoxSize = 0.6f;
 
@@ -155,7 +196,7 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 外部接口 / 系统接口
-    public void OnStart(BaseActor owner)
+    public void OnStart(BaseActor owner, PathArea birthArea)
     {
         NpcMaskGlossy = LayerMask.NameToLayer("NPC");
         NpcMask = 1 << NpcMaskGlossy;
@@ -177,7 +218,11 @@ public class PlayerManager : MonoBehaviour
         HoldBoxMaskGlossy = LayerMask.NameToLayer("HoldBox");
         HoldBoxMask = 1 << HoldBoxMaskGlossy;
 
+
         Owner = owner;
+
+        SkillMgr = Owner.SkillMgr;
+
         if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
         {
             m_UISceneFight = Helpers.UIScene<UIScene_Fight>();
@@ -197,18 +242,33 @@ public class PlayerManager : MonoBehaviour
         SMoveSpeed = Owner.BaseAtt.RoleInfo.RoleMoveSpeed;
         SBackSpeed = Owner.BaseAtt.RoleInfo.RoleBackSpeed;
         SRotSpeed = Owner.BaseAtt.RoleInfo.RoleRotSpeed;
+
+        InitializePathFind(birthArea);          //初始化寻路数据
+     
     }
 
 
-    void Update()
+    bool CanMajorMove()
     {
         if (!Owner)
-            return;
+            return false;
 
         if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major)
-            return;
+            return false;
 
         if (Owner.FSM.IsInState(StateID.Injured))
+            return false;
+
+        if (Owner.CameraContrl.CurCamAction.SelfState == eCameStates.eCam_Birth)
+            return false;
+
+        return true;
+    }
+
+    void Update()
+    {
+
+        if (!CanMajorMove())
             return;
 
         CalMoveInput();
@@ -223,12 +283,10 @@ public class PlayerManager : MonoBehaviour
                     CalJumpDown();
 
                 if (Input.GetKeyDown(KeyCode.U))
-                    CalPickUpBox();
+                    SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
             }
         }
 
-        //执行旋转操作
-        RotatePlayer();
         //播放位移动画
         PlayMoveAnim();
         if (0f != m_vInputMove.x)
@@ -237,6 +295,8 @@ public class PlayerManager : MonoBehaviour
             {
                 if (!RayCastBlock())//横向阻挡
                 {
+                    //执行旋转操作
+                    RotatePlayer();
                     //执行move操作
                     TranslatePlayer();
                 }
@@ -321,47 +381,6 @@ public class PlayerManager : MonoBehaviour
     }
     Vector3 pos;
 
-    public bool CalPickUpBox()
-    {
-
-            if (m_bIsHoldBox == false && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide && m_vInputMove.x != 0f && null == m_bcCurBox)
-            {
-
-                float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;
-                pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-
-                //拿到所有的盒子，然后判定盒子位置最低的
-                RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3 (0.1f, Owner.ActorHeight * 0.4f, Owner.ActorHeight * 0.5f), Owner.ActorTrans.forward, Quaternion.Euler (Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BoxMask);
-                if (hits.Length > 0)
-                {
-                    if (hits.Length > 1)
-                        m_bcCurBox = (hits[0].transform.position.y > hits[1].transform.position.y ? (BoxCollider)(hits[1].collider) : (BoxCollider)(hits[0].collider));
-                    else
-                        m_bcCurBox = (BoxCollider)(hits[0].collider);
-#if UNITY_EDITOR
-                    Debug.Log("Successfully Pick up the Box");
-#endif
-                    DoBeforePickUpBox();
-                    return true;
-                }
-                else
-                {
-#if UNITY_EDITOR
-                    Debug.Log("Fail to pick up the box");
-#endif
-                }
-            }
-            else if (m_bIsHoldBox == true && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
-            {
-                m_bIsHoldBox = false;                                                                                               //复位托举状态
-                m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空
-                BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
-                boxCon.OnStart();
-                m_bcCurBox = null;                  //这样接下来就可以在举箱子
-                return true;
-            }
-        return false;
-    }
 
     #endregion
 
@@ -389,13 +408,17 @@ public class PlayerManager : MonoBehaviour
                 {
                     OperateGround(other, BoxMask);
                 }
-                else if (other.contacts[0].otherCollider.gameObject.layer == NpcMaskGlossy)
+                else if (other.contacts[0].otherCollider.gameObject.layer == NpcMaskGlossy)                             //如果碰到了npc
                 {
                     if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
                     {
-                        Owner.FSM.SetTransition(StateID.Injured);
+                        UnityEngine.Object obj = Resources.Load("IGSoft_Projects/Buffs/5010101");
+                        GameObject tmp = Instantiate(obj) as GameObject;
+                        ActionInfos acInfos = tmp.GetComponent<ActionInfos>();
+                        acInfos.SetOwner(Owner.gameObject, Owner, null);
                     }
                 }
+              
             }
         }
     }
@@ -514,7 +537,7 @@ public class PlayerManager : MonoBehaviour
     void SetJumpDownState(Collision other)                                                                      //设置角色下跳权限
     {
 #if UNITY_EDITOR
-        Debug.Log("SetJumpDownState -> name : " + other.transform.name);
+        //Debug.Log("SetJumpDownState -> name : " + other.transform.name);
 #endif
         m_bGounded = true;
         m_ePlayerNormalBehav = ePlayerNormalBeha.eNormalBehav_Grounded;
@@ -539,6 +562,11 @@ public class PlayerManager : MonoBehaviour
 
         //Gizmos.DrawSphere(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, 0.55f);
 
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(Target, 0.25f);
+
+        PathFinding.GizmoDraw(m_vCurPoints, m_fPer);
+            
         tmpx = 1;
         if (m_vInputMove.x == 0f)
         {
@@ -547,9 +575,7 @@ public class PlayerManager : MonoBehaviour
         else if (m_vInputMove.x < 0f)
             tmpx = -1;
 
-
         //RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3(0.1f, Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.5f), Owner.ActorTrans.forward, Quaternion.Euler(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BoxMask);
-
 
         ExtDebug.DrawBoxCastBox(
         Owner.ActorTrans.position + Owner.BC.center,
@@ -630,6 +656,7 @@ public class PlayerManager : MonoBehaviour
         {
             m_fStartTime = Time.time;
             Owner.Velocity = new Vector3(0f, InitSpeed, 0f);
+            AudioManager.PlayAudio(Owner.gameObject, eAudioType.Audio_Skill, "JumpUp");
         }
         m_ePlayerNormalBehav = type;
         fOrigHeight  = Owner.ActorTrans.transform.position.y;
@@ -673,6 +700,91 @@ public class PlayerManager : MonoBehaviour
 
     #endregion
 
+    #region 寻路
+
+    void InitializePathFind(PathArea pa)
+    {
+        m_CurPathArea = pa;
+        m_vCurPoints = PathFinding.InitializePointPath(pa.RoutePoints);
+    }
+
+    Vector3[] m_vCurPoints;
+    float m_fCurPercent = 0.04f;
+    float m_fPer;
+    float m_fSpeed = 0.2f;
+    float lookAheadAmount = 0.01f;
+    float min = 0.04f;
+    PathArea m_CurPathArea;
+    Vector3 Target;
+    bool m_bIsFirst = true;
+    Quaternion OldRot;
+    Quaternion CurRot;
+    public void RotatePlayer()
+    {
+        #region 计算进度
+        if (m_vInputMove.x > 0f)
+        {
+            m_fCurPercent += m_fSpeed * Time.deltaTime;
+        }
+        else if (m_vInputMove.x < 0f)
+        {
+            m_fCurPercent -= m_fSpeed * Time.deltaTime;
+            if (m_fCurPercent <= 0f)
+                m_fCurPercent = 0f;
+        }
+        m_fPer = m_fCurPercent % 1f;
+        #endregion
+
+        #region 计算方向
+        if (m_fPer - lookAheadAmount >= float.Epsilon && m_fPer + lookAheadAmount <= 1f)
+        {
+            if (m_vInputMove.x > 0f)
+            {
+                Target = PathFinding.Interp(m_vCurPoints, m_fPer + lookAheadAmount);
+            }
+            else if (m_vInputMove.x < 0f)
+            {
+                Target = PathFinding.Interp(m_vCurPoints, m_fPer - lookAheadAmount);
+            }
+
+            //OldRot = transform.rotation;
+            transform.LookAt2D(Target);
+            //CurRot = transform.rotation;
+            //transform.rotation = OldRot;
+            //transform.rotation = Quaternion.Lerp(transform.rotation, CurRot, 10 * Time.deltaTime);
+
+        }
+        #endregion
+
+        if (m_bIsFirst)
+        {
+            m_bIsFirst = false;
+            if (m_fCurPercent < min)
+                return;
+        }
+
+        #region 计算位置
+        //if (PathFinding.CheckRecalculatePath(m_vCurPoints, m_fPer))
+        //{
+        //    if (m_CurPathArea.NextAreas.Length > 0)
+        //    {
+        //        PathFinding.RecalculatePath(ref m_vCurPoints, PathArea.GetVectorArray(m_CurPathArea.NextAreas[0]), ref m_fCurPercent);
+        //        m_CurPathArea = m_CurPathArea.NextAreas[0];
+        //        m_fPer = m_fCurPercent % 1f;
+        //    }
+        //}
+
+        Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
+
+        transform.position = Vector3.Lerp(transform.position, new Vector3(
+            pos.x,
+            transform.position.y,
+            pos.z
+            ), 10 * Time.deltaTime);
+        #endregion
+    }
+    #endregion
+
     #region Translate
 
     public bool RayCastBlock()
@@ -687,19 +799,10 @@ public class PlayerManager : MonoBehaviour
         return m_bIsBlocked;
     }
 
-    public void RotatePlayer()
-    {
-        if (m_vInputMove.x != 0f)
-        {
-            m_vCurForward = new Vector3(m_vInputMove.x, 0f, 0f);
-            Owner.ActorTrans.forward = Vector3.Lerp(Owner.ActorTrans.forward, m_vCurForward, SRotSpeed * Time.deltaTime);
-        }
-    }
-
     void TranslatePlayer()
     {
-        if(m_vInputMove.x != 0f)
-            Owner.ActorTrans.Translate(new Vector3(0f, 0f,  Mathf.Abs(m_vInputMove.x) * SMoveSpeed * Time.deltaTime));
+        //if(m_vInputMove.x != 0f)
+        //    Owner.ActorTrans.Translate(new Vector3(0f, 0f,  Mathf.Abs(m_vInputMove.x) * SMoveSpeed * Time.deltaTime));
     }
 
     public bool CheckMoveBoundaryBlock(float extra = 0f) 
@@ -710,27 +813,24 @@ public class PlayerManager : MonoBehaviour
                 return false;
         }
        
-
-        //if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major)
-        //    return false;
-
-        if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
-        {
-            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
-                return true;//block left
-        }
-        else if (cc.CamMoveDir == eCamMoveDir.CamMove_Left)
-        {
-            if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
-                return true; //block right
-        }
-        else if (cc.CamMoveDir == eCamMoveDir.CamMove_Up)
-        {
-            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
-                return true;//block left
-            else if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
-                return true; //block right
-        }
+        //todo_erric
+        //if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
+        //{
+        //    if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
+        //        return true;//block left
+        //}
+        //else if (cc.CamMoveDir == eCamMoveDir.CamMove_Left)
+        //{
+        //    if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
+        //        return true; //block right
+        //}
+        //else if (cc.CamMoveDir == eCamMoveDir.CamMove_Up)
+        //{
+        //    if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
+        //        return true;//block left
+        //    else if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
+        //        return true; //block right
+        //}
     
         return false; 
     }
@@ -745,43 +845,7 @@ public class PlayerManager : MonoBehaviour
         }
     }
     #endregion
-
-    #region Pick up box, Throw box, Destroy box
-
-    void DestroyBox()
-    {
-        Destroy(m_bcCurBox);
-        m_bcCurBox = null;
-    }
-
-    void DoBeforePickUpBox()
-    {
-        m_bcCurBox.gameObject.layer = HoldBoxMaskGlossy;
-        m_bcCurBox.isTrigger = true;                                                                                            //将盒子变成触发器           
-        m_fPlayerBoxRaidus = m_bcCurBox.size.y + Owner.ActorHeight * 0.5f ;                             //确认运动半径
-        m_bcCurBox.transform.parent = Owner.ActorTrans.transform;                                          //将盒子变成主角的孩子
-        m_bIsHoldBox = true;                                                                                                       //标识当前是举着箱子的状态
-        StartCoroutine(PickUpBoxBehaviour());                                                                             //播放举箱子动画
-    }
-
-    IEnumerator PickUpBoxBehaviour()
-    {
-        //盒子繞著指定的半徑，圍繞主角做圓周運動
-
-        while (m_bcCurBox.transform.localPosition.y < m_fPlayerBoxRaidus - 0.1f)
-        {
-            m_bcCurBox.transform.localPosition = Vector3.Lerp(m_bcCurBox.transform.localPosition, new Vector3(0f, m_fPlayerBoxRaidus, 0f), 30 * Time.deltaTime);
-
-             yield return null;
-        }
-
-        m_bcCurBox.gameObject.transform.localRotation = Quaternion.identity;
-
-    }
-
-
-    #endregion
-
+  
     #region 通用接口
 
     void ResetAllData()
@@ -790,7 +854,6 @@ public class PlayerManager : MonoBehaviour
         m_bCollisionEntered = false;
     }
     #endregion
-
 
     #region 非主角NPC状态机驱动接口
 
@@ -828,6 +891,15 @@ public class PlayerManager : MonoBehaviour
                     }
             }
 
+            //执行小跳跃
+            JumpBehaviour();
+
+            //自由下落
+            FreeFall();
+
+            //执行下跳操作
+            JumpDownBehaviour();
+
             //复位数据
             ResetAllData();
         }
@@ -856,30 +928,38 @@ public class PlayerManager : MonoBehaviour
                                      Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f, BoxMask + WallMask))
             {
                 m_bIsBlocked = true;
-                /*
-                 * 怪兽有可能有三种行为
-                 * 1 : 跳过盒子
-                 * 2 : 举起盒子
-                 * 3 : 朝着反方向运动
-                 * 
-                 * 如果举着盒子，当和主角满足一定条件，那么扔掉盒子，否则一直举着盒子
-                 * 
-                 * */
-                n = Random.Range(0, 100);
 
-                //m_vInputMove.x = 0 - m_vInputMove.x;
-                //return;
-                if (n > 70)             //跳过盒子
-                {
-                    CalJumpUp();
-                }
-                else if (n <= 70 && n > 30)                     //举起盒子
-                {
-                    CalPickUpBox();
-                }
-                else                                                        //朝着反方向行走
+                if (hitInfo.collider.gameObject.layer == WallMaskGlossy)
                 {
                     m_vInputMove.x = 0 - m_vInputMove.x;
+                }
+                else
+                {
+                    /*
+              * 怪兽有可能有三种行为
+              * 1 : 跳过盒子
+              * 2 : 举起盒子
+              * 3 : 朝着反方向运动
+              * 
+              * 如果举着盒子，当和主角满足一定条件，那么扔掉盒子，否则一直举着盒子
+              * 
+              * */
+                    n = UnityEngine.Random.Range(0, 100);
+
+                    //m_vInputMove.x = 0 - m_vInputMove.x;
+                    //return;
+                    if (n > 70 )             //跳过盒子
+                    {
+                        CalJumpUp();
+                    }
+                    else if (n <= 70 && n > 30 && m_bIsHoldBox == false && null == m_bcCurBox)                     //举起盒子
+                    {
+                        SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
+                    }
+                    else                                                        //朝着反方向行走
+                    {
+                        m_vInputMove.x = 0 - m_vInputMove.x;
+                    }
                 }
             }
             else
@@ -891,3 +971,77 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
 }
+
+//#region Pick up box, Throw box, Destroy box
+
+//void DestroyBox()
+//{
+//    Destroy(m_bcCurBox);
+//    m_bcCurBox = null;
+//}
+
+//void DoBeforePickUpBox()
+//{
+//    m_bcCurBox.gameObject.layer = HoldBoxMaskGlossy;
+//    m_bcCurBox.isTrigger = true;                                                                                            //将盒子变成触发器           
+//    float radius = m_bcCurBox.size.y + Owner.ActorHeight * 0.5f ;                             //确认运动半径
+//    m_bcCurBox.transform.parent = Owner.ActorTrans.transform;                                          //将盒子变成主角的孩子
+//    m_bIsHoldBox = true;                                                                                                       //标识当前是举着箱子的状态
+//    StartCoroutine(PickUpBoxBehaviour(radius));                                                                             //播放举箱子动画
+//}
+
+//IEnumerator PickUpBoxBehaviour(float radius)
+//{
+//    //盒子繞著指定的半徑，圍繞主角做圓周運動
+//    while (m_bcCurBox.transform.localPosition.y < radius - 0.1f)
+//    {
+//        m_bcCurBox.transform.localPosition = Vector3.Lerp(m_bcCurBox.transform.localPosition, new Vector3(0f, radius, 0f), 30 * Time.deltaTime);
+
+//         yield return null;
+//    }
+
+//    m_bcCurBox.gameObject.transform.localRotation = Quaternion.identity;
+
+//}
+
+//#endregion
+//    public bool CalPickUpBox()
+//    {
+
+//            if (m_bIsHoldBox == false && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide && m_vInputMove.x != 0f && null == m_bcCurBox)
+//            {
+//                float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;
+//                pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
+
+//                //拿到所有的盒子，然后判定盒子位置最低的<判定的依据，做多有两个盒子> todo_erric ： 如何有多个盒子，或者尺寸出现了变化，那么就无法判定了
+//                RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3 (0.1f, Owner.ActorHeight * 0.4f, Owner.ActorHeight * 0.5f), Owner.ActorTrans.forward, Quaternion.Euler (Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BoxMask);
+//                if (hits.Length > 0)
+//                {
+//                    if (hits.Length > 1)
+//                        m_bcCurBox = (hits[0].transform.position.y > hits[1].transform.position.y ? (BoxCollider)(hits[1].collider) : (BoxCollider)(hits[0].collider));
+//                    else
+//                        m_bcCurBox = (BoxCollider)(hits[0].collider);
+//#if UNITY_EDITOR
+//                    Debug.Log("Successfully Pick up the Box");
+//#endif
+//                    DoBeforePickUpBox();
+//                    return true;
+//                }
+//                else
+//                {
+//#if UNITY_EDITOR
+//                    Debug.Log("Fail to pick up the box");
+//#endif
+//                }
+//            }
+//            else if (m_bIsHoldBox == true && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
+//            {
+//                m_bIsHoldBox = false;                                                                                               //复位托举状态
+//                m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空
+//                BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
+//                boxCon.OnStart();
+//                m_bcCurBox = null;                                                                                                  //这样接下来就可以在举箱子
+//                return true;
+//            }
+//        return false;
+//    }

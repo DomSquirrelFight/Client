@@ -8,10 +8,11 @@ public class NpcState_Chase : FSMState
     public NpcState_Chase(BaseActor owner, StateID id) : base(owner, id) {
         PlayerMgr = Owner.PlayerMgr;
     }
-    
+   
     public override void DoBeforeEntering(BaseActor target)
     {
-        
+      
+
     }
 
     public override void Reason(BaseActor target)

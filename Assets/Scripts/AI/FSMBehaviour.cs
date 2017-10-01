@@ -79,24 +79,4 @@ public class FSMBehaviour : MonoBehaviour {
         }
     }
 
-    //public void Flashing (BaseActor target)
-    //{
-    //    SkinnedMeshRenderer smr = target.actor.GetComponentInChildren<SkinnedMeshRenderer>();
-    //    Texture t2d = smr.materials[0].mainTexture;
-    //    if (t2d.name == target.m_OrigTex.name)
-    //    {
-    //        smr.materials[0].mainTexture = Resources.Load("Textures/1") as Texture2D;
-    //        StartCoroutine(FlashingV1(smr, t2d));
-    //    }
-    //}
-
-    //IEnumerator FlashingV1(SkinnedMeshRenderer smr, Texture t2d)
-    //{
-    //    {
-           
-    //        yield return new WaitForSeconds(0.06f);
-    //        smr.materials[0].mainTexture = t2d;
-    //    }
-    //}
-
 }

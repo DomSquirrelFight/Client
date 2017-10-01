@@ -4,6 +4,14 @@ namespace AttTypeDefine
 
     #region UI
 
+
+    public enum DragState       //ZL
+    {
+        State_Drag,
+        State_Stop,
+    }
+
+
     public enum eAudioType
     {
         Audio_Skill,
@@ -16,6 +24,7 @@ namespace AttTypeDefine
         e_LoadLevel,
         e_ProcessBar,
         e_LoadSelect,
+        e_StartTime,
         e_Null,
     }
 
@@ -36,11 +45,18 @@ namespace AttTypeDefine
     //动画的状态，用于loading界面
     public enum AnimState
     {
-        Start_null,
-        Start_BgAnim,
-        Start_PicAnim,
-        Start_ProgressBar,
+        State_null,
+        State_BgAnim,
+        State_PicAnim,
+        State_ProgressBar,
     }
+    //用于判断双击
+    //public enum ClickState
+    //{
+    //    Click_First,
+    //    Click_Scecond,
+    //    Click_Null,
+    //}
     #endregion
 
     #region Character Behaviour
@@ -135,6 +151,20 @@ namespace AttTypeDefine
 #endregion
 
     #region Camera
+
+    public delegate void NotifyCamContrl (int index);           //通知相机管理器，当前状态已经结束
+
+    public enum eCameStates
+    {
+        eCam_NULL,
+        eCam_Birth,             //出生相机
+        eCam_RPGFollow,
+        eCam_SLGFollow,
+        eCam_Zoom,          //缩进，缩远
+        eCam_Dead,          //死亡相机
+    }
+
+
     public enum eCamFourCorner
     {
         CamCorner_UpperLeft,
@@ -156,6 +186,59 @@ namespace AttTypeDefine
     #endregion
 
     #region Delegate    
+    public delegate void NotifyEvent (GameObject obj);
+    public delegate void DelEventSkillReady();
+    public delegate void DelNotifySkill();
     #endregion
+
+    #region Skill
+    public enum eStateBehaType
+    {
+        State_AnimBegin,
+        State_AnimEnd,
+    }
+
+    public enum eSkillType
+    {
+        SkillType_ThrowBox = 0,                                                 //扔盒子
+        SkillType_FireBullet,                                                  //发射子弹
+        SkillType_SummonMonster,                                      //召唤怪兽
+    }
+    #endregion
+
+    #region Attribute
+
+    public enum eAttInfo
+    {
+        AttInfo_HP = 0,
+        AttInfo_Mp,
+        AttInfo_Size,
+    }
+
+    #endregion
+
+
+    #region way finding
+    public enum eBezierLineConstrainedMode
+    {
+        Free,
+        Mirror,
+    };
+
+    public enum eWayFinding
+    {
+        eWayFind_NULL,
+        eWayFind_PathLastPoint,
+    }
+
+
+    public enum eWallEvent
+    {
+        eWallEvent_ChoosePath,
+    }
+
+
+    #endregion
+
 
 }
