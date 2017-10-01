@@ -42,8 +42,13 @@ namespace AttTypeDefine
         State_PicAnim,
         State_ProgressBar,
     }
+<<<<<<< HEAD
     //用于在关卡选择界面 判断是不是可以移动pass
     public enum DragState
+=======
+ // 关卡选择中判断是不是可以拖动
+ public enum DragState
+>>>>>>> master
     {
         State_Drag,
         State_Stop,
@@ -207,7 +212,12 @@ namespace AttTypeDefine
         public Vector3[] PathPoints;           //用户传入的点数组
         public Vector3[] ControlPathPoints; // 在用户传入的点数组基础上添加了起点和终点
     }
-
+    //贝塞尔曲线点的模式限制
+    public enum eBezierLineConstrainedMode
+    {
+        Free,
+        Mirror,
+    };
     #endregion
 
 
