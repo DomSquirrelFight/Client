@@ -20,11 +20,7 @@ namespace Assets.Scripts.Action
             {
                 if (SelfState == eCameStates.eCam_SLGFollow)
                 {
-                   // DetectTransformChange();    //检测相机数据是否需要更新
-
                     SlgFollow();                           //处理跟随数据
-
-                    ResetCameraData();              //复位刷新相机状态
                 }
 
             }
@@ -47,7 +43,6 @@ namespace Assets.Scripts.Action
                 Vector3 target = tTarget.position + (tCamera.forward * (-10) + Vector3.up * 3);
                 tCamera.position = Vector3.Lerp(tCamera.position, target, 10 * Time.deltaTime);
             }
-       
         }
     }
 }
