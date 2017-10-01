@@ -213,6 +213,11 @@ namespace AttTypeDefine
     }
 
 
+    public enum eWallEvent
+    {
+        eWallEvent_ChoosePath,
+    }
+
 
     #endregion
 

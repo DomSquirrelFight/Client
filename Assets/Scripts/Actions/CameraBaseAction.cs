@@ -8,6 +8,7 @@ namespace Assets.Scripts.Action
     {
         #region 变量
 
+        protected bool m_bIsClosed = false;
         protected Transform tTarget;
 
         protected Transform tCamera;
@@ -46,10 +47,13 @@ namespace Assets.Scripts.Action
         {
             tTarget = Owner.ActorTrans;
             tCamera = CamCtrl.CamInstTrans;
+            m_bIsClosed = false;
             base.OnStart();
         }
 
-        protected virtual void DoBeforeLeavingState() {
+        public virtual void DoBeforeLeavingState() {
+            m_bIsClosed = true;
+            Destroy(gameObject);
             DelNotifyCamContrl_StateOver(StateIndex);
         }
         #endregion

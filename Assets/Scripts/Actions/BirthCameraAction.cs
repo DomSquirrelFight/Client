@@ -58,7 +58,7 @@ namespace Assets.Scripts.Action
             base.OnStart();
         }
 
-        protected override void DoBeforeLeavingState()          //离开当前状态
+        public override void DoBeforeLeavingState()          //离开当前状态
         {
             base.DoBeforeLeavingState();
             SelfDestroy();
