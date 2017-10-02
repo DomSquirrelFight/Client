@@ -41,7 +41,7 @@ public class PassBehavior : UIScene {
         {
             //跟随鼠标移动
             gameObject.transform.localPosition += (Vector3)delta;
-            ScaleControl();
+            ScaleControl(delta);
             //ChangeScale();
         }
        
@@ -58,58 +58,72 @@ public class PassBehavior : UIScene {
         else
         {
             gameObject.transform.localPosition = m_tOrigPos;
-            gameObject.transform.localScale = Vector3.one; 
+            gameObject.transform.localScale = Vector3.one;
+
         }
     }
     #endregion
 
     #region 控制scale
     float i = 1;
-    void ScaleControl()
+    void ScaleControl(Vector2 delta)
     {
-      
-        //float Percent = Vector3.Distance(gameObject.transform.localPosition.y, m_oSelect.transform.localPosition.y) / Vector3.Distance(m_tOrigPos, m_oSelect.transform.position);
-        //计算当前的进度值
-        float Percent = (gameObject.transform.localPosition.y-m_oSelect.transform.localPosition.y) / (m_tOrigPos.y-m_oSelect.transform.localPosition.y);
-        //if (Percent <= 0.1f)
-        //{
-        //    i = 0.1f;
+
+        #region scale改变不均匀
+        ////float Percent = Vector3.Distance(gameObject.transform.localPosition.y, m_oSelect.transform.localPosition.y) / Vector3.Distance(m_tOrigPos, m_oSelect.transform.position);
+        ////计算当前的进度值
+        //float Percent = (gameObject.transform.localPosition.y-m_oSelect.transform.localPosition.y) / (m_tOrigPos.y-m_oSelect.transform.localPosition.y);
+        ////if (Percent <= 0.1f)
+        ////{
+        ////    i = 0.1f;
+        ////    gameObject.transform.localScale = i * Vector3.one;
+        ////    Debug.Log(i);
+        ////}
+        ////缩小的时候，如果按照进度值进行缩小的话，到达终点的位置时候，pass会特别小或者消失
+        //// if (Percent < 0.9f)
+        ////{
+        //    //i = Percent * 2;
+        //    ////if (i >= 1)
+        //    ////    i = Percent;
+        //    //通过i来限制pass的缩放
+        //    if (delta.y < 0)
+        //        i -= 0.008f;
+        //    else if (delta.y > 0)
+        //    {
+        //        i += 0.008f;
+        //        if (Mathf.Abs(Percent - i) <= 0.0001f)
+        //            i = Percent;
+        //    }
+
+        //    if(i<=0.2f)
+        //    {
+        //        i = 0.2f;
+        //    }
+
         //    gameObject.transform.localScale = i * Vector3.one;
-        //    Debug.Log(i);
+
         //}
-        //缩小的时候，如果按照进度值进行缩小的话，到达终点的位置时候，pass会特别小或者消失
-         if (Percent < 0.9f)
-        {
-            //i = Percent * 2;
-            ////if (i >= 1)
-            ////    i = Percent;
-            //通过i来限制pass的缩放
-            i -=0.005f;
-            if(i<=0.2f)
-            {
-                i = 0.2f;
-            }
-            gameObject.transform.localScale = i * Vector3.one;
-           
-        }
-         //在变大的时候直接按照正常进度值进行扩大就可以了
-        else if (Percent >= 0.9f)
-        {
-            i = Percent;
-            gameObject.transform.localScale = i * Vector3.one;
-           
-        }
-        
+        //在变大的时候直接按照正常进度值进行扩大就可以了
+        //else if (Percent >= 0.9f)
+        //{
+        //    i = Percent;
+        //    gameObject.transform.localScale = i * Vector3.one;
 
+        //}
 
+        #endregion
 
+        float percent;
+       percent= (gameObject.transform.localPosition.y - (m_oSelect.transform.localPosition.y-150)) /(m_tOrigPos.y - (m_oSelect.transform.localPosition.y-150));
+        gameObject.transform.localScale = Vector3.one * percent;
     }
     #endregion
 
     #region 场景切换
     void LoadLevel()
     {
-        if(m_CurIndex==1)
+        //dragstate = DragState.State_Drag;
+        if (m_CurIndex==1)
         {
             GlobalHelper.LoadLevel("Map_Test_Fight");
         }

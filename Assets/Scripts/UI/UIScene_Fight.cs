@@ -276,7 +276,7 @@ public class UIScene_Fight : UIScene
     void LeaveScene(GameObject obj)
     {
         //退出离开游戏，跳转到login界面
-        GlobalHelper.LoadLevel("Begin");
+        GlobalHelper.LoadLevel("SelecteV1");
     }
     #endregion
 

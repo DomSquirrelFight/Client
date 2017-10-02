@@ -73,7 +73,6 @@ public class UIScene_SelecteV1 : UIScene {
         {
             e_State = StateUI.State_Stay;
         }
-        Debug.Log(Grid_CurrentIndex);
         CurBtn.transform.localPosition = UI[Grid_CurrentIndex].transform.localPosition;
     }
 
