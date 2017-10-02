@@ -712,11 +712,11 @@ public class PlayerManager : MonoBehaviour
     }
 
     Vector3[] m_vCurPoints;
-    float m_fCurPercent = 0.04f;
+    float m_fCurPercent = 0.00f;
     float m_fPer;
-    float m_fSpeed = 0.15f;
+    float m_fSpeed = 0.1f;
     float lookAheadAmount = 0.01f;
-    float min = 0.04f;
+    float min = 0.00f;
     PathArea m_CurPathArea;
     Vector3 Target;
     bool m_bIsFirst = true;
