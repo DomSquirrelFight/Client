@@ -19,10 +19,7 @@ var inputMoveDirection : Vector3 = Vector3.zero;
 @System.NonSerialized
 var inputJump : boolean = false;
 
-var shouldAutoAccelerate : boolean = false;
-
 class CharacterMotorMovement {
-	
 	// The maximum horizontal speed when moving
 	var maxForwardSpeed : float = 10.0;
 	var maxSidewaysSpeed : float = 10.0;
@@ -504,12 +501,7 @@ private function MoveWithPlatform () : boolean {
 
 private function GetDesiredHorizontalVelocity () {
 	// Find desired velocity
-	//var desiredLocalDirection : Vector3 = Vector3(1.0, 0.0, 0.0);//tr.InverseTransformDirection(inputMoveDirection);
-	var desiredLocalDirection : Vector3;
-	if (shouldAutoAccelerate)
-		desiredLocalDirection = tr.InverseTransformDirection( tr.forward );
-	else
-		desiredLocalDirection = tr.InverseTransformDirection(inputMoveDirection);
+	var desiredLocalDirection : Vector3 = tr.InverseTransformDirection(inputMoveDirection);
 	var maxSpeed : float = MaxSpeedInDirection(desiredLocalDirection);
 	if (grounded) {
 		// Modify max speed on slopes based on slope speed multiplier curve

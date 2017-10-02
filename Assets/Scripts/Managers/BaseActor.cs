@@ -251,7 +251,7 @@ public class BaseActor : MonoBehaviour
         get
         {
             if (null == cc)
-                    cc = Camera.main.GetComponent<CameraController>();
+                    cc = Camera.main.transform.parent.GetComponent<CameraController>();
             return cc;
         }
     }

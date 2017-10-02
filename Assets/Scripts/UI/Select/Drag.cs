@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 
-public class Drag : MakeMove {
-
+public class Drag : MonoBehaviour {
+    #region 成员变量
     #region bool值的成员变量
     //是否触摸
     bool IsTouch = false;
@@ -20,6 +20,42 @@ public class Drag : MakeMove {
     bool IsFinalPos;
 
     #endregion
+
+    UIScene_SelecteV1 select;
+    GameObject Grid;
+    int Grid_Count;
+    int Grid_Currentindex;
+    StateUI e_State;
+    float Grid_PerSize;
+    #endregion
+
+
+    #region 系统接口
+    private void Start()
+    {
+        select = gameObject.GetComponentInParent<UIScene_SelecteV1>();
+        Grid = select.Grid;
+       
+        Grid_Count = select.Grid_Count;
+        Grid_PerSize = select.Grid_PerSize;
+        //初始化双击事件
+        ResetClick();
+    }
+
+    private void Update()
+    {
+        Debug.Log(Grid_Currentindex);
+        if (e_State == StateUI.State_Move)
+        {
+            select. MoveOutDrag(Grid_Currentindex);
+        }
+        if ((Mathf.Abs(Grid.transform.localPosition.x + (Grid_Currentindex * Grid_PerSize))) < 10f)
+        {
+            e_State = StateUI.State_Stay;
+        }
+    }
+    #endregion
+
 
     #region 通过判断drag来改变ui的位置
     //存储delta
@@ -46,7 +82,7 @@ public class Drag : MakeMove {
             IsTouch = true;
         }
         //根据当前移动的dalta来移动ui和btn的位置
-        MoveInDrag(delta);
+        select. MoveInDrag(delta);
         ////移动ui
         //Global.Grid.transform.localPosition += (Vector3)delta;
         ////移动curbtn
@@ -59,42 +95,41 @@ public class Drag : MakeMove {
     {
         if (IsClick)
         {
-            Pos = Global.Grid.transform.localPosition;
+            Pos =  Grid.transform.localPosition;
             IsClick = false;
         }
         else
         {
-            float Dis = Global.Grid.transform.localPosition.x - Pos.x;
-            Debug.Log(Dis);
+            float Dis = Grid.transform.localPosition.x - Pos.x;
             //判断当是第一个或者是最后一个ui的时候
-            if (Global.Grid_CurrentIndex == Global.Grid_Count - 1 || Global.Grid_CurrentIndex == 0)
+            if (Grid_Currentindex == Grid_Count - 1 || Grid_Currentindex == 0)
             {
-                MoveInmarginal(Global.Grid_CurrentIndex);
+                select. MoveInmarginal(Grid_Currentindex);
             }
-            if (Global.Grid_CurrentIndex < Global.Grid_Count - 1 && IsLeft)
+            if (Grid_Currentindex < Grid_Count - 1 && IsLeft)
             {
                 //if (drag.x > Dis)
                 if (Dis < -Screen.width / 2)
                 {
-                    Global.Grid_CurrentIndex++;
+                    Grid_Currentindex++;
                     //Global.Grid.transform.localPosition = new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0);
                     //IsFinalPos = true;
-                    Global.e_State = StateUI.State_Move;
+                    e_State = StateUI.State_Move;
                 }
 
             }
 
-            if (Global.Grid_CurrentIndex > 0 && IsRight)
+            if (Grid_Currentindex > 0 && IsRight)
             {
                 if (Dis > Screen.width / 2)
                 {
-                    Global.Grid_CurrentIndex--;
+                    Grid_Currentindex--;
                     // Global.Grid.transform.localPosition = new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0);
                     //IsFinalPos = true;
-                    Global.e_State = StateUI.State_Move;
+                    e_State = StateUI.State_Move;
                 }
             }
-            MoveInmarginal(Global.Grid_CurrentIndex);
+            select. MoveInmarginal(Grid_Currentindex);
             IsDrag = false;
             IsRight = false;
             IsLeft = false;
@@ -106,19 +141,7 @@ public class Drag : MakeMove {
 
     #endregion
 
-    #region 系统接口
 
-    private void Start()
-    {
-        //初始化双击事件
-        ResetClick();
-    }
-
-    protected override void Update()
-    {
-        base.Update();
-    }
-    #endregion
 
     #region 双击
     //ClickState clickstate ;
@@ -148,8 +171,5 @@ public class Drag : MakeMove {
         m_iClickindex = 0;
     }
     #endregion
-
-
-
 
 }

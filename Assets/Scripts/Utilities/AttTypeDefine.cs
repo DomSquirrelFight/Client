@@ -4,6 +4,14 @@ namespace AttTypeDefine
 
     #region UI
 
+
+    public enum DragState       //ZL
+    {
+        State_Drag,
+        State_Stop,
+    }
+
+
     public enum eAudioType
     {
         Audio_Skill,
@@ -43,6 +51,7 @@ namespace AttTypeDefine
         State_ProgressBar,
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
     //用于在关卡选择界面 判断是不是可以移动pass
     public enum DragState
 =======
@@ -53,6 +62,15 @@ namespace AttTypeDefine
         State_Drag,
         State_Stop,
     }
+=======
+    //用于判断双击
+    //public enum ClickState
+    //{
+    //    Click_First,
+    //    Click_Scecond,
+    //    Click_Null,
+    //}
+>>>>>>> master
     #endregion
 
     #region Character Behaviour
@@ -147,6 +165,20 @@ namespace AttTypeDefine
 #endregion
 
     #region Camera
+
+    public delegate void NotifyCamContrl (int index);           //通知相机管理器，当前状态已经结束
+
+    public enum eCameStates
+    {
+        eCam_NULL,
+        eCam_Birth,             //出生相机
+        eCam_RPGFollow,
+        eCam_SLGFollow,
+        eCam_Zoom,          //缩进，缩远
+        eCam_Dead,          //死亡相机
+    }
+
+
     public enum eCamFourCorner
     {
         CamCorner_UpperLeft,
@@ -201,23 +233,25 @@ namespace AttTypeDefine
 
 
     #region way finding
+    public enum eBezierLineConstrainedMode
+    {
+        Free,
+        Mirror,
+    };
+
     public enum eWayFinding
     {
         eWayFind_NULL,
         eWayFind_PathLastPoint,
     }
 
-    public struct sStellerCatMull
+
+    public enum eWallEvent
     {
-        public Vector3[] PathPoints;           //用户传入的点数组
-        public Vector3[] ControlPathPoints; // 在用户传入的点数组基础上添加了起点和终点
+        eWallEvent_ChoosePath,
     }
-    //贝塞尔曲线点的模式限制
-    public enum eBezierLineConstrainedMode
-    {
-        Free,
-        Mirror,
-    };
+
+
     #endregion
 
 

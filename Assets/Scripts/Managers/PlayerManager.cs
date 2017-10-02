@@ -96,10 +96,6 @@ public class PlayerManager : MonoBehaviour
 
     int HoldBoxMaskGlossy;
 
-    int WayFindingMaskGlossy;
-
-    int WayFinidngMask;
-
     public int NHoldBoxMaskGlossy
     {
         get
@@ -197,12 +193,6 @@ public class PlayerManager : MonoBehaviour
     public float SBackSpeed = 5f;
     public float SRotSpeed = 60f;
 
-    Transform PahtAreaCtrl;                         //寻路点管理对象
-    PathArea CurArea;                                 //当前所在区域
-    PathArea NextArea;
-    Transform[] ArrtTPoints;                         //当前路线点
-    sStellerCatMull m_sStellerCat;
-    BezierLine m_Bezier;
     #endregion
 
     #region 外部接口 / 系统接口
@@ -229,9 +219,6 @@ public class PlayerManager : MonoBehaviour
         HoldBoxMask = 1 << HoldBoxMaskGlossy;
 
 
-        WayFindingMaskGlossy = LayerMask.NameToLayer("WayFinidngBox");
-        WayFinidngMask = 1 << WayFindingMaskGlossy;
-
         Owner = owner;
 
         SkillMgr = Owner.SkillMgr;
@@ -256,28 +243,32 @@ public class PlayerManager : MonoBehaviour
         SBackSpeed = Owner.BaseAtt.RoleInfo.RoleBackSpeed;
         SRotSpeed = Owner.BaseAtt.RoleInfo.RoleRotSpeed;
 
-        //根据出生点 : 形成初始化的路线.
-        ArrtTPoints = new Transform[birthArea.RoutePoints.Length];
-        birthArea.RoutePoints.CopyTo(ArrtTPoints, 0);
-        PahtAreaCtrl = birthArea.transform.parent;
-        CurArea = birthArea;
-        //m_sStellerCat.PathPoints = BezierLine.GetBezierPoints(ArrtTPoints);
-        //加载贝塞尔曲线
-       GameObject bezierline=  Instantiate(Resources.Load("Prefabs/Maps/FightTest/BezierLine")) as GameObject;
-        m_Bezier = bezierline.GetComponent<BezierLine>();
-        bezierline.transform.position = Vector3.zero;
+        InitializePathFind(birthArea);          //初始化寻路数据
+     
+    }
 
+
+    bool CanMajorMove()
+    {
+        if (!Owner)
+            return false;
+
+        if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major)
+            return false;
+
+        if (Owner.FSM.IsInState(StateID.Injured))
+            return false;
+
+        if (Owner.CameraContrl.CurCamAction.SelfState == eCameStates.eCam_Birth)
+            return false;
+
+        return true;
     }
 
     void Update()
     {
-        if (!Owner)
-            return;
 
-        if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major)
-            return;
-
-        if (Owner.FSM.IsInState(StateID.Injured))
+        if (!CanMajorMove())
             return;
 
         CalMoveInput();
@@ -305,7 +296,7 @@ public class PlayerManager : MonoBehaviour
                 if (!RayCastBlock())//横向阻挡
                 {
                     //执行旋转操作
-                    m_Bezier. RotatePlayerAlongBezier(ArrtTPoints,Owner,m_vInputMove);
+                    RotatePlayer();
                     //执行move操作
                     TranslatePlayer();
                 }
@@ -347,14 +338,7 @@ public class PlayerManager : MonoBehaviour
             }
             else if (0f != he)
             {
-                //m_vInputMove.x = he;
-                if (he > 0)
-                {
-                    m_vInputMove.x = 1;
-                }
-                else if (he < 0)
-                    m_vInputMove.x = -1;
-
+                m_vInputMove.x = he;
             }
         }
     }
@@ -577,8 +561,12 @@ public class PlayerManager : MonoBehaviour
         //Gizmos.DrawLine(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, hitInfo.transform.position);
 
         //Gizmos.DrawSphere(Owner.ActorTrans.position + Vector3.up * Owner.ActorHeight * 0.5f, 0.55f);
-        //Gizmos.color = Color.red;
-        //Gizmos.DrawSphere(LookTarget, 0.4f);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(Target, 0.25f);
+
+        PathFinding.GizmoDraw(m_vCurPoints, m_fPer);
+            
         tmpx = 1;
         if (m_vInputMove.x == 0f)
         {
@@ -587,9 +575,7 @@ public class PlayerManager : MonoBehaviour
         else if (m_vInputMove.x < 0f)
             tmpx = -1;
 
-
         //RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3(0.1f, Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.5f), Owner.ActorTrans.forward, Quaternion.Euler(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BoxMask);
-
 
         ExtDebug.DrawBoxCastBox(
         Owner.ActorTrans.position + Owner.BC.center,
@@ -714,7 +700,90 @@ public class PlayerManager : MonoBehaviour
 
     #endregion
 
-   
+    #region 寻路
+
+    void InitializePathFind(PathArea pa)
+    {
+        m_CurPathArea = pa;
+        m_vCurPoints = PathFinding.InitializePointPath(pa.RoutePoints);
+    }
+
+    Vector3[] m_vCurPoints;
+    float m_fCurPercent = 0.04f;
+    float m_fPer;
+    float m_fSpeed = 0.2f;
+    float lookAheadAmount = 0.01f;
+    float min = 0.04f;
+    PathArea m_CurPathArea;
+    Vector3 Target;
+    bool m_bIsFirst = true;
+    Quaternion OldRot;
+    Quaternion CurRot;
+    public void RotatePlayer()
+    {
+        #region 计算进度
+        if (m_vInputMove.x > 0f)
+        {
+            m_fCurPercent += m_fSpeed * Time.deltaTime;
+        }
+        else if (m_vInputMove.x < 0f)
+        {
+            m_fCurPercent -= m_fSpeed * Time.deltaTime;
+            if (m_fCurPercent <= 0f)
+                m_fCurPercent = 0f;
+        }
+        m_fPer = m_fCurPercent % 1f;
+        #endregion
+
+        #region 计算方向
+        if (m_fPer - lookAheadAmount >= float.Epsilon && m_fPer + lookAheadAmount <= 1f)
+        {
+            if (m_vInputMove.x > 0f)
+            {
+                Target = PathFinding.Interp(m_vCurPoints, m_fPer + lookAheadAmount);
+            }
+            else if (m_vInputMove.x < 0f)
+            {
+                Target = PathFinding.Interp(m_vCurPoints, m_fPer - lookAheadAmount);
+            }
+
+            //OldRot = transform.rotation;
+            transform.LookAt2D(Target);
+            //CurRot = transform.rotation;
+            //transform.rotation = OldRot;
+            //transform.rotation = Quaternion.Lerp(transform.rotation, CurRot, 10 * Time.deltaTime);
+
+        }
+        #endregion
+
+        if (m_bIsFirst)
+        {
+            m_bIsFirst = false;
+            if (m_fCurPercent < min)
+                return;
+        }
+
+        #region 计算位置
+        //if (PathFinding.CheckRecalculatePath(m_vCurPoints, m_fPer))
+        //{
+        //    if (m_CurPathArea.NextAreas.Length > 0)
+        //    {
+        //        PathFinding.RecalculatePath(ref m_vCurPoints, PathArea.GetVectorArray(m_CurPathArea.NextAreas[0]), ref m_fCurPercent);
+        //        m_CurPathArea = m_CurPathArea.NextAreas[0];
+        //        m_fPer = m_fCurPercent % 1f;
+        //    }
+        //}
+
+        Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
+
+        transform.position = Vector3.Lerp(transform.position, new Vector3(
+            pos.x,
+            transform.position.y,
+            pos.z
+            ), 10 * Time.deltaTime);
+        #endregion
+    }
+    #endregion
 
     #region Translate
 
@@ -744,23 +813,24 @@ public class PlayerManager : MonoBehaviour
                 return false;
         }
        
-        if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
-        {
-            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
-                return true;//block left
-        }
-        else if (cc.CamMoveDir == eCamMoveDir.CamMove_Left)
-        {
-            if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
-                return true; //block right
-        }
-        else if (cc.CamMoveDir == eCamMoveDir.CamMove_Up)
-        {
-            if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
-                return true;//block left
-            else if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
-                return true; //block right
-        }
+        //todo_erric
+        //if (cc.CamMoveDir == eCamMoveDir.CamMove_Right)
+        //{
+        //    if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
+        //        return true;//block left
+        //}
+        //else if (cc.CamMoveDir == eCamMoveDir.CamMove_Left)
+        //{
+        //    if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
+        //        return true; //block right
+        //}
+        //else if (cc.CamMoveDir == eCamMoveDir.CamMove_Up)
+        //{
+        //    if (Owner.ActorTrans.transform.position.x <= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Left].x + Owner.ActorSize - extra && m_vInputMove.x < 0f) 
+        //        return true;//block left
+        //    else if (Owner.ActorTrans.transform.position.x >= Owner.CameraContrl.m_dTargetCornerPoints[eTargetFourCorner.TargetCorner_Right].x - Owner.ActorSize + extra && m_vInputMove.x > 0f) 
+        //        return true; //block right
+        //}
     
         return false; 
     }
@@ -845,7 +915,7 @@ public class PlayerManager : MonoBehaviour
                 return;
             }
 
-            //RotatePlayerAlongBezier();
+            RotatePlayer();
 
             m_vInputMove = transform.forward;
 
