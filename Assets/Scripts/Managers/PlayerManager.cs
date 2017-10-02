@@ -290,12 +290,11 @@ public class PlayerManager : MonoBehaviour
         PlayMoveAnim();
         if (0f != m_vInputMove.x)
         {
+            RotatePlayer();
             if (!CheckMoveBoundaryBlock())//判定横向是否超出朝向边界
             {
                 if (!RayCastBlock())//横向阻挡
                 {
-                    //执行旋转操作
-                    RotatePlayer();
                     //执行move操作
                     TranslatePlayer();
                 }
@@ -712,33 +711,20 @@ public class PlayerManager : MonoBehaviour
     }
 
     Vector3[] m_vCurPoints;
-    float m_fCurPercent = 0.04f;
+    float m_fCurPercent = 0.00f;
     float m_fPer;
-    float m_fSpeed = 0.15f;
+    float m_fSpeed = 0.1f;
     float lookAheadAmount = 0.01f;
-    float min = 0.04f;
+    float min = 0.00f;
     PathArea m_CurPathArea;
     Vector3 Target;
     bool m_bIsFirst = true;
     Quaternion OldRot;
     Quaternion CurRot;
+
     public void RotatePlayer()
     {
-        #region 计算进度
-        if (m_vInputMove.x > 0f)
-        {
-            m_fCurPercent += m_fSpeed * Time.deltaTime;
-        }
-        else if (m_vInputMove.x < 0f)
-        {
-            m_fCurPercent -= m_fSpeed * Time.deltaTime;
-            if (m_fCurPercent <= 0f)
-                m_fCurPercent = 0f;
-        }
-        m_fPer = m_fCurPercent % 1f;
-        #endregion
-
-        #region 计算方向
+        #region 旋转角色
         if (m_fPer - lookAheadAmount >= float.Epsilon && m_fPer + lookAheadAmount <= 1f)
         {
             if (m_vInputMove.x > 0f)
@@ -758,6 +744,44 @@ public class PlayerManager : MonoBehaviour
 
         }
         #endregion
+    }
+
+    public void TranslatePlayer()
+    {
+        #region 计算进度
+        if (m_vInputMove.x > 0f)
+        {
+            m_fCurPercent += m_fSpeed * Time.deltaTime;
+        }
+        else if (m_vInputMove.x < 0f)
+        {
+            m_fCurPercent -= m_fSpeed * Time.deltaTime;
+            if (m_fCurPercent <= 0f)
+                m_fCurPercent = 0f;
+        }
+        m_fPer = m_fCurPercent % 1f;
+        #endregion
+
+        //#region 计算方向
+        //if (m_fPer - lookAheadAmount >= float.Epsilon && m_fPer + lookAheadAmount <= 1f)
+        //{
+        //    if (m_vInputMove.x > 0f)
+        //    {
+        //        Target = PathFinding.Interp(m_vCurPoints, m_fPer + lookAheadAmount);
+        //    }
+        //    else if (m_vInputMove.x < 0f)
+        //    {
+        //        Target = PathFinding.Interp(m_vCurPoints, m_fPer - lookAheadAmount);
+        //    }
+
+        //    //OldRot = transform.rotation;
+        //    transform.LookAt2D(Target);
+        //    //CurRot = transform.rotation;
+        //    //transform.rotation = OldRot;
+        //    //transform.rotation = Quaternion.Lerp(transform.rotation, CurRot, 10 * Time.deltaTime);
+
+        //}
+        //#endregion
 
         if (m_bIsFirst)
         {
@@ -800,12 +824,6 @@ public class PlayerManager : MonoBehaviour
             m_bIsBlocked = true;
         }
         return m_bIsBlocked;
-    }
-
-    void TranslatePlayer()
-    {
-        //if(m_vInputMove.x != 0f)
-        //    Owner.ActorTrans.Translate(new Vector3(0f, 0f,  Mathf.Abs(m_vInputMove.x) * SMoveSpeed * Time.deltaTime));
     }
 
     public bool CheckMoveBoundaryBlock(float extra = 0f) 

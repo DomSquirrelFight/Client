@@ -1,0 +1,284 @@
+fileFormatVersion: 2
+guid: 02d35c498c636044d858c9b3bd657ff9
+timeCreated: 1488780511
+licenseType: Pro
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: beijing01
+    21300002: 2005_shuzhi01
+    21300004: 2005_shuzhi02
+    21300006: 2005_shuzhi03
+    21300008: 2005_tengman01
+    21300010: 2005_tengman02
+    21300012: 2005_shuye01
+    21300014: 2005_zhizhuwang01
+    21300016: 2005_cao01
+    21300018: 2005_wu01
+    21300020: 2005_wu02
+    21300022: 2005_fangzi01
+    21300024: 2005_qiao01
+    21300026: 2005_shu01
+    21300028: 2005_luoye01
+    21300030: 2005_shu02
+    21300032: 2005_fangzi02
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: beijing01
+      rect:
+        serializedVersion: 2
+        x: 2
+        y: 0
+        width: 1548
+        height: 653
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_shuzhi01
+      rect:
+        serializedVersion: 2
+        x: 1999
+        y: 559
+        width: 49
+        height: 447
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_shuzhi02
+      rect:
+        serializedVersion: 2
+        x: 641
+        y: 949
+        width: 382
+        height: 58
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_shuzhi03
+      rect:
+        serializedVersion: 2
+        x: 1665
+        y: 546
+        width: 184
+        height: 477
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_tengman01
+      rect:
+        serializedVersion: 2
+        x: 236
+        y: 659
+        width: 403
+        height: 363
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_shuye01
+      rect:
+        serializedVersion: 2
+        x: 644
+        y: 661
+        width: 244
+        height: 245
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_zhizhuwang01
+      rect:
+        serializedVersion: 2
+        x: 901
+        y: 659
+        width: 162
+        height: 163
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_cao01
+      rect:
+        serializedVersion: 2
+        x: 1434
+        y: 664
+        width: 228
+        height: 188
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_wu01
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 679
+        width: 227
+        height: 102
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_wu02
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 876
+        width: 112
+        height: 55
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_fangzi01
+      rect:
+        serializedVersion: 2
+        x: 1563
+        y: 5
+        width: 359
+        height: 204
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_qiao01
+      rect:
+        serializedVersion: 2
+        x: 1557
+        y: 212
+        width: 488
+        height: 325
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_shu01
+      rect:
+        serializedVersion: 2
+        x: 1066
+        y: 658
+        width: 147
+        height: 304
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_luoye01
+      rect:
+        serializedVersion: 2
+        x: 1221
+        y: 664
+        width: 194
+        height: 217
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_shu02
+      rect:
+        serializedVersion: 2
+        x: 1884
+        y: 801
+        width: 73
+        height: 220
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: 2005_fangzi02
+      rect:
+        serializedVersion: 2
+        x: 1885
+        y: 544
+        width: 68
+        height: 238
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
