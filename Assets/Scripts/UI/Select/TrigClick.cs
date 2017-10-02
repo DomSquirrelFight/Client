@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 
-public class TrigClick : MonoBehaviour
+public class TrigClick : UIScene
 {
     //主要是为了告诉监听事件是触发了哪个按钮
 

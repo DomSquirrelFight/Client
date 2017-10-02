@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
 
-public class Drag : MonoBehaviour {
+public class Drag : UIScene {
     #region 成员变量
     #region bool值的成员变量
     //是否触摸
@@ -17,39 +17,38 @@ public class Drag : MonoBehaviour {
     //是不是点击时刻
     bool IsClick = true;
     //是否确定最终位置
-    bool IsFinalPos;
+    //bool IsFinalPos;
 
     #endregion
 
     UIScene_SelecteV1 select;
     GameObject Grid;
     int Grid_Count;
-    int Grid_Currentindex;
-    StateUI e_State;
+    //int Grid_Currentindex;
+    
     float Grid_PerSize;
     #endregion
 
 
     #region 系统接口
-    private void Start()
+    public void OnStart(int Count,float PerSize)
     {
         select = gameObject.GetComponentInParent<UIScene_SelecteV1>();
         Grid = select.Grid;
        
-        Grid_Count = select.Grid_Count;
-        Grid_PerSize = select.Grid_PerSize;
+        Grid_Count = Count;
+        Grid_PerSize = PerSize;
         //初始化双击事件
         ResetClick();
     }
 
     private void Update()
     {
-        Debug.Log(Grid_Currentindex);
         if (e_State == StateUI.State_Move)
         {
-            select. MoveOutDrag(Grid_Currentindex);
+            select. MoveOutDrag(Grid_CurrentIndex);
         }
-        if ((Mathf.Abs(Grid.transform.localPosition.x + (Grid_Currentindex * Grid_PerSize))) < 10f)
+        if ((Mathf.Abs(Grid.transform.localPosition.x + (Grid_CurrentIndex * Grid_PerSize))) < 10f)
         {
             e_State = StateUI.State_Stay;
         }
@@ -102,16 +101,17 @@ public class Drag : MonoBehaviour {
         {
             float Dis = Grid.transform.localPosition.x - Pos.x;
             //判断当是第一个或者是最后一个ui的时候
-            if (Grid_Currentindex == Grid_Count - 1 || Grid_Currentindex == 0)
+            if (Grid_CurrentIndex == Grid_Count - 1 || Grid_CurrentIndex == 0)
             {
-                select. MoveInmarginal(Grid_Currentindex);
+                select. MoveInmarginal(Grid_CurrentIndex);
             }
-            if (Grid_Currentindex < Grid_Count - 1 && IsLeft)
+            if (Grid_CurrentIndex < Grid_Count - 1 && IsLeft)
             {
                 //if (drag.x > Dis)
-                if (Dis < -Screen.width / 2)
+               // if (Dis < -Screen.width / 2)
+               if(Dis<0)
                 {
-                    Grid_Currentindex++;
+                    Grid_CurrentIndex++;
                     //Global.Grid.transform.localPosition = new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0);
                     //IsFinalPos = true;
                     e_State = StateUI.State_Move;
@@ -119,17 +119,17 @@ public class Drag : MonoBehaviour {
 
             }
 
-            if (Grid_Currentindex > 0 && IsRight)
+            if (Grid_CurrentIndex > 0 && IsRight)
             {
                 if (Dis > Screen.width / 2)
                 {
-                    Grid_Currentindex--;
+                    Grid_CurrentIndex--;
                     // Global.Grid.transform.localPosition = new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0);
                     //IsFinalPos = true;
                     e_State = StateUI.State_Move;
                 }
             }
-            select. MoveInmarginal(Grid_Currentindex);
+            select. MoveInmarginal(Grid_CurrentIndex);
             IsDrag = false;
             IsRight = false;
             IsLeft = false;
