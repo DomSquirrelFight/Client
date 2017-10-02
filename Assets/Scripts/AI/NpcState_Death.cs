@@ -22,7 +22,7 @@ public class NpcState_Death : FSMState
 
     public override void Reason(BaseActor target)
     {
-        Owner.ActorTrans.Translate(dir * Owner.BaseAtt.RoleInfo.RoleMoveSpeed * Time.deltaTime * 5, Space.World);
+        Owner.ActorTrans.Translate(dir * Owner.RoleBehaInfos.RoleMoveSpeed * Time.deltaTime * 5, Space.World);
     }
 
 

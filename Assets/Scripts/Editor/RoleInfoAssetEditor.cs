@@ -49,18 +49,18 @@ namespace Assets.Scripts.AssetInfoEditor
 
         #endregion
 
-        void CalculateInitSpeed()
-        {
-            if (null == _data) return;
-            _data.fInitJumpSpeed = 0 - _data.fInitAccel * _data.fJumpUpDuration;
-        }
+        //void CalculateInitSpeed()
+        //{
+        //    if (null == _data) return;
+        //    _data.fInitJumpSpeed = 0 - _data.fInitAccel * _data.fJumpUpDuration;
+        //}
 
-        void CalculateJumpHeight()
-        {
-            if (null == _data) return;
-            _data.fJumpHeight = _data.fInitJumpSpeed * _data.fJumpUpDuration + 0.5f * _data.fInitAccel * _data.fJumpUpDuration * _data.fJumpUpDuration;
-           // JumpData.m_fJumpHeight = JumpData.m_fJumpInitSpeed * JumpData.m_fJumpDuration + 0.5f * JumpData.m_fJumpAccel * JumpData.m_fJumpDuration * JumpData.m_fJumpDuration;
-        }
+        //void CalculateJumpHeight()
+        //{
+        //    if (null == _data) return;
+        //    _data.fJumpHeight = _data.fInitJumpSpeed * _data.fJumpUpDuration + 0.5f * _data.fInitAccel * _data.fJumpUpDuration * _data.fJumpUpDuration;
+        //   // JumpData.m_fJumpHeight = JumpData.m_fJumpInitSpeed * JumpData.m_fJumpDuration + 0.5f * JumpData.m_fJumpAccel * JumpData.m_fJumpDuration * JumpData.m_fJumpDuration;
+        //}
 
         void OnGUI()
         {
@@ -159,55 +159,7 @@ namespace Assets.Scripts.AssetInfoEditor
             }
             #endregion
 
-            #region 跳跃加速度
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("跳跃加速度");
-            fValue = EditorGUILayout.FloatField(_data.fInitAccel);
-            if (fValue != _data.fInitAccel)
-            {
-                _data.fInitAccel = fValue;
-                CalculateInitSpeed();
-                CalculateJumpHeight();
-            }
-            EditorGUILayout.EndHorizontal();
-            #endregion
-
-            #region 跳跃上升时间
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("跳跃上升时间");
-            fValue = EditorGUILayout.FloatField(_data.fJumpUpDuration);
-            if (fValue != _data.fJumpUpDuration)
-            {
-                _data.fJumpUpDuration = fValue;
-                CalculateInitSpeed();
-                CalculateJumpHeight();
-            }
-            EditorGUILayout.EndHorizontal();
-            #endregion 
-
-            #region 跳跃初速度
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("跳跃初速度");
-            EditorGUILayout.LabelField(_data.fInitJumpSpeed.ToString());
-            EditorGUILayout.EndHorizontal();
-            #endregion
-
-            #region 跳跃高度
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("跳跃高度");
-            EditorGUILayout.LabelField(_data.fJumpHeight.ToString());
-            EditorGUILayout.EndHorizontal();
-            #endregion
-
-            #region 是否可以发射子弹
-            EditorGUILayout.BeginHorizontal();
-            bValue = EditorGUILayout.Toggle("是否可以发射子弹", _data.bFire);
-            if (bValue != _data.bFire)
-            {
-                _data.bFire = bValue;
-            }
-            EditorGUILayout.EndHorizontal();
-            #endregion
+         
 
             #region 总血量
             EditorGUILayout.BeginHorizontal();
@@ -219,38 +171,38 @@ namespace Assets.Scripts.AssetInfoEditor
             EditorGUILayout.EndHorizontal();
             #endregion
 
-            #region 角色移动速度
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("角色移动速度");
-            fValue = EditorGUILayout.FloatField(_data.RoleMoveSpeed);
-            if (fValue != _data.RoleMoveSpeed)
-            {
-                _data.RoleMoveSpeed = fValue;
-            }
-            EditorGUILayout.EndHorizontal();
-            #endregion
+            //#region 角色移动速度
+            //EditorGUILayout.BeginHorizontal();
+            //EditorGUILayout.LabelField("角色移动速度");
+            //fValue = EditorGUILayout.FloatField(_data.RoleMoveSpeed);
+            //if (fValue != _data.RoleMoveSpeed)
+            //{
+            //    _data.RoleMoveSpeed = fValue;
+            //}
+            //EditorGUILayout.EndHorizontal();
+            //#endregion
 
-            #region 角色后退速度
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("角色后退速度");
-            fValue = EditorGUILayout.FloatField(_data.RoleBackSpeed);
-            if (fValue != _data.RoleBackSpeed)
-            {
-                _data.RoleBackSpeed = fValue;
-            }
-            EditorGUILayout.EndHorizontal();
-            #endregion
+            //#region 角色后退速度
+            //EditorGUILayout.BeginHorizontal();
+            //EditorGUILayout.LabelField("角色后退速度");
+            //fValue = EditorGUILayout.FloatField(_data.RoleBackSpeed);
+            //if (fValue != _data.RoleBackSpeed)
+            //{
+            //    _data.RoleBackSpeed = fValue;
+            //}
+            //EditorGUILayout.EndHorizontal();
+            //#endregion
 
-            #region 角色旋转速度
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("角色旋转速度");
-            fValue = EditorGUILayout.FloatField(_data.RoleRotSpeed);
-            if (fValue != _data.RoleRotSpeed)
-            {
-                _data.RoleRotSpeed = fValue;
-            }
-            EditorGUILayout.EndHorizontal();
-            #endregion
+            //#region 角色旋转速度
+            //EditorGUILayout.BeginHorizontal();
+            //EditorGUILayout.LabelField("角色旋转速度");
+            //fValue = EditorGUILayout.FloatField(_data.RoleRotSpeed);
+            //if (fValue != _data.RoleRotSpeed)
+            //{
+            //    _data.RoleRotSpeed = fValue;
+            //}
+            //EditorGUILayout.EndHorizontal();
+            //#endregion
 
             #region 提交数据
             GUI.color = Color.green;
@@ -278,3 +230,53 @@ namespace Assets.Scripts.AssetInfoEditor
     }
 }
 
+
+//#region 跳跃加速度
+//EditorGUILayout.BeginHorizontal();
+//EditorGUILayout.LabelField("跳跃加速度");
+//fValue = EditorGUILayout.FloatField(_data.fInitAccel);
+//if (fValue != _data.fInitAccel)
+//{
+//    _data.fInitAccel = fValue;
+//    CalculateInitSpeed();
+//    CalculateJumpHeight();
+//}
+//EditorGUILayout.EndHorizontal();
+//#endregion
+
+//#region 跳跃上升时间
+//EditorGUILayout.BeginHorizontal();
+//EditorGUILayout.LabelField("跳跃上升时间");
+//fValue = EditorGUILayout.FloatField(_data.fJumpUpDuration);
+//if (fValue != _data.fJumpUpDuration)
+//{
+//    _data.fJumpUpDuration = fValue;
+//    CalculateInitSpeed();
+//    CalculateJumpHeight();
+//}
+//EditorGUILayout.EndHorizontal();
+//#endregion 
+
+//#region 跳跃初速度
+//EditorGUILayout.BeginHorizontal();
+//EditorGUILayout.LabelField("跳跃初速度");
+//EditorGUILayout.LabelField(_data.fInitJumpSpeed.ToString());
+//EditorGUILayout.EndHorizontal();
+//#endregion
+
+//#region 跳跃高度
+//EditorGUILayout.BeginHorizontal();
+//EditorGUILayout.LabelField("跳跃高度");
+//EditorGUILayout.LabelField(_data.fJumpHeight.ToString());
+//EditorGUILayout.EndHorizontal();
+//#endregion
+
+//#region 是否可以发射子弹
+//EditorGUILayout.BeginHorizontal();
+//bValue = EditorGUILayout.Toggle("是否可以发射子弹", _data.bFire);
+//if (bValue != _data.bFire)
+//{
+//    _data.bFire = bValue;
+//}
+//EditorGUILayout.EndHorizontal();
+//#endregion

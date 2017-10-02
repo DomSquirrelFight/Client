@@ -21,23 +21,23 @@ namespace Assets.Scripts.AssetInfoEditor
 
         public eMoveType MoveType;
 
-        public float fInitAccel;
+        //public float fInitAccel;
 
-        public float fJumpUpDuration;
+        //public float fJumpUpDuration;
 
-        public float fInitJumpSpeed;
+        //public float fInitJumpSpeed;
 
-        public float fJumpHeight;
+        //public float fJumpHeight;
 
-        public bool bFire;
+        //public bool bFire;
 
         public int nTotalHP;
 
-        public float RoleMoveSpeed;                                                                 //角色移动速度
+        //public float RoleMoveSpeed;                                                                 //角色移动速度
 
-        public float RoleBackSpeed;                                                                  //角色后退速度
+        //public float RoleBackSpeed;                                                                  //角色后退速度
 
-        public float RoleRotSpeed;                                                                    //角色旋转速度
+        //public float RoleRotSpeed;                                                                    //角色旋转速度
 
         public void OnValidate()
         {

@@ -242,7 +242,7 @@ namespace Assets.Scripts.AssetInfoEditor
                 //    AssetDatabase.RemoveAssetBundleName(b[0], true);
                 //}
 
-                AssetDatabase.RenameAsset(DataPath, "RoleBehav" + _data.RoleID.ToString() + ".asset");
+                AssetDatabase.RenameAsset(DataPath,   _data.RoleID.ToString() + "1.asset");
                 AssetDatabase.SaveAssets();
                 Close();
 

@@ -232,16 +232,15 @@ public class PlayerManager : MonoBehaviour
         //m_curJumpData = Owner.SmallJumpDataStore;
 
         //角色垂直上跳，碰到brick的距离
-        m_fUpDisForBrick = Owner.BaseAtt.RoleInfo.fJumpHeight - 0.2f - Owner.ActorHeight + 0.1f;
+        m_fUpDisForBrick = Owner.RoleBehaInfos.SmallJumpHeight - 0.2f - Owner.ActorHeight + 0.1f;
 
-        float tmp = Owner.BaseAtt.RoleInfo.fJumpHeight + 0.1f;
+        float tmp = Owner.RoleBehaInfos.SmallJumpHeight + 0.1f;
         float dis = Mathf.Sqrt(tmp * tmp * 2);
         //float halfDiagonal = Mathf.Sqrt(Owner.ActorHeight * Owner.ActorHeight * 2) * 0.5f;
         m_fBiasDisForBrick = dis;// -halfDiagonal + 0.1f;
         //CalculateSlideDis();
-        SMoveSpeed = Owner.BaseAtt.RoleInfo.RoleMoveSpeed;
-        SBackSpeed = Owner.BaseAtt.RoleInfo.RoleBackSpeed;
-        SRotSpeed = Owner.BaseAtt.RoleInfo.RoleRotSpeed;
+        SMoveSpeed = Owner.RoleBehaInfos.RoleMoveSpeed;
+        SBackSpeed = Owner.RoleBehaInfos.RoleInjureBackSpeed;
 
         InitializePathFind(birthArea);          //初始化寻路数据
      
@@ -278,7 +277,7 @@ public class PlayerManager : MonoBehaviour
             if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
             {
                 if (Input.GetKeyDown(KeyCode.K) || Input.GetKey(KeyCode.K))
-                    CalJumpUp();
+                    CalJumpSmallUp();
                 else if (Input.GetKeyDown(KeyCode.J))
                     CalJumpDown();
 
@@ -343,11 +342,15 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    public bool CalJumpUp()                                              //获取跳跃输入
+    public bool CalJumpSmallUp()                                              //获取跳跃输入
     {
+
+        if (!Owner.RoleBehaInfos.CanSmallJump)
+            return false;
+
         if (m_bGounded == true && m_ePlayerNormalBehav == ePlayerNormalBeha.eNormalBehav_Grounded )
         {
-            DoBeforeJump(ePlayerNormalBeha.eNormalBehav_SmallJump, Owner.BaseAtt.RoleInfo.fInitJumpSpeed, false);
+            DoBeforeJump(ePlayerNormalBeha.eNormalBehav_SmallJump, Owner.RoleBehaInfos.SmallJumpInitSpeed, false);
                 return true;
         }
         return false;
@@ -471,7 +474,7 @@ public class PlayerManager : MonoBehaviour
 
         //检测到了下面有box
         if (Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.4f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.down, out hitInfo, Quaternion.identity
-            , Owner.BaseAtt.RoleInfo.fJumpHeight - SBoxSize + 0.1f, BoxMask))
+            , Owner.RoleBehaInfos.SmallJumpHeight- SBoxSize + 0.1f, BoxMask))
         {
             return false;
         }
@@ -689,7 +692,7 @@ public class PlayerManager : MonoBehaviour
             {
                 //检测上方是否有box
                 if (!Physics.BoxCast(Owner.ActorTrans.position, new Vector3(Owner.ActorHeight * 0.5f, 0.1f, Owner.ActorHeight * 0.5f), Vector3.up, out hitInfo, Quaternion.Euler(Vector3.up),
-                   Owner.BaseAtt.RoleInfo.fJumpHeight + SBoxSize + 0.1f,
+                   Owner.RoleBehaInfos.SmallJumpHeight + SBoxSize + 0.1f,
                     BoxMask))                                  
                     {
                         JumpThroughState = true;
@@ -950,7 +953,7 @@ public class PlayerManager : MonoBehaviour
                     //return;
                     if (n > 70 )             //跳过盒子
                     {
-                        CalJumpUp();
+                        CalJumpSmallUp();
                     }
                     else if (n <= 70 && n > 30 && m_bIsHoldBox == false && null == m_bcCurBox)                     //举起盒子
                     {
