@@ -82,4 +82,26 @@ public class GlobalHelper
         return target;
     }
 
+    #region 跳跃信息计算
+
+
+    public static float  CalculateInitSpeed(float initAccel/*跳跃加速度*/, float jumpduration/*上跳时长*/)
+    {
+        return 0 - initAccel * jumpduration;
+    }
+
+    public static sRoleJump CalculateJumpInfos(float fInitAccel/*跳跃加速度*/, float fJumpUpDuration/*上跳时长*/)
+    {
+        return new sRoleJump(fInitAccel, fJumpUpDuration);
+    }
+
+    public static float CalculateJumpHeight(float initSpeed/*上跳初速度*/, float fInitAccel/*跳跃加速度*/, float fJumpUpDuration/*上跳时长*/)
+    {
+        return initSpeed * fJumpUpDuration + 0.5f * fInitAccel * fJumpUpDuration * fJumpUpDuration;
+    }
+
+
+    #endregion
+
+
 }

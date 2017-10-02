@@ -217,7 +217,6 @@ namespace AttTypeDefine
 
     #endregion
 
-
     #region way finding
     public enum eBezierLineConstrainedMode
     {
@@ -240,5 +239,56 @@ namespace AttTypeDefine
 
     #endregion
 
+    #region Role Behaviour
+
+    public enum eRunMode
+    {
+        eRun_Horizontal,
+        eRun_Vertical,
+    }
+
+    public struct sRoleBehaviour            //保存角色行为参数
+    {
+
+        public eRunMode RunMode;                    //跑步模式
+
+        public sRoleJump HorizontalJump;            //横向跳跃
+
+        public sRoleJump VerticalSmallJump;       //纵向小跳
+
+        public sRoleJump VerticalBigJump;           //纵向大条
+
+        public bool CanFire;                //是否可以开火
+
+        public bool CanPickUpBox;     //是否可以举箱子
+
+        public float RoleMoveSpeed;
+
+        public float RoleRotSpeed;
+
+        public float RoleInjureBackSpeed;
+
+    }
+
+    public struct sRoleJump
+    {
+
+        public sRoleJump(float fInitAccel/*跳跃加速度*/, float _fJumpUpDuration/*上跳时长*/)
+        {
+            CanJump = false;
+            JumpAccel = fInitAccel;
+            JumpUpDuration = _fJumpUpDuration;
+            JumpHeight = (JumpInitSpeed = GlobalHelper.CalculateInitSpeed(fInitAccel, _fJumpUpDuration)) * _fJumpUpDuration + 0.5f * fInitAccel * _fJumpUpDuration * _fJumpUpDuration;
+        }
+
+        public bool CanJump;        //是否可以跳跃
+        public float JumpHeight;    //跳跃高度
+        public float JumpInitSpeed; //跳跃初速度
+        public float JumpAccel;     //跳跃加速度
+        public float JumpUpDuration;  //上跳持续时间.
+    }
+
+
+    #endregion
 
 }
