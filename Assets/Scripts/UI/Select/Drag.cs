@@ -24,7 +24,7 @@ public class Drag : MonoBehaviour {
     UIScene_SelecteV1 select;
     GameObject Grid;
     int Grid_Count;
-    int Grid_CurrentIndex;
+    int Grid_Currentindex;
     StateUI e_State;
     float Grid_PerSize;
     #endregion
@@ -35,7 +35,7 @@ public class Drag : MonoBehaviour {
     {
         select = gameObject.GetComponentInParent<UIScene_SelecteV1>();
         Grid = select.Grid;
-        Grid_CurrentIndex = select.Grid_CurrentIndex;
+       
         Grid_Count = select.Grid_Count;
         Grid_PerSize = select.Grid_PerSize;
         //初始化双击事件
@@ -44,12 +44,12 @@ public class Drag : MonoBehaviour {
 
     private void Update()
     {
-        Debug.Log(Grid_CurrentIndex);
+        Debug.Log(Grid_Currentindex);
         if (e_State == StateUI.State_Move)
         {
-            select. MoveOutDrag(Grid_CurrentIndex);
+            select. MoveOutDrag(Grid_Currentindex);
         }
-        if ((Mathf.Abs(Grid.transform.localPosition.x + (Grid_CurrentIndex * Grid_PerSize))) < 10f)
+        if ((Mathf.Abs(Grid.transform.localPosition.x + (Grid_Currentindex * Grid_PerSize))) < 10f)
         {
             e_State = StateUI.State_Stay;
         }
@@ -102,16 +102,16 @@ public class Drag : MonoBehaviour {
         {
             float Dis = Grid.transform.localPosition.x - Pos.x;
             //判断当是第一个或者是最后一个ui的时候
-            if (Grid_CurrentIndex == Grid_Count - 1 || Grid_CurrentIndex == 0)
+            if (Grid_Currentindex == Grid_Count - 1 || Grid_Currentindex == 0)
             {
-                select. MoveInmarginal(Grid_CurrentIndex);
+                select. MoveInmarginal(Grid_Currentindex);
             }
-            if (Grid_CurrentIndex < Grid_Count - 1 && IsLeft)
+            if (Grid_Currentindex < Grid_Count - 1 && IsLeft)
             {
                 //if (drag.x > Dis)
                 if (Dis < -Screen.width / 2)
                 {
-                    Grid_CurrentIndex++;
+                    Grid_Currentindex++;
                     //Global.Grid.transform.localPosition = new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0);
                     //IsFinalPos = true;
                     e_State = StateUI.State_Move;
@@ -119,17 +119,17 @@ public class Drag : MonoBehaviour {
 
             }
 
-            if (Grid_CurrentIndex > 0 && IsRight)
+            if (Grid_Currentindex > 0 && IsRight)
             {
                 if (Dis > Screen.width / 2)
                 {
-                    Grid_CurrentIndex--;
+                    Grid_Currentindex--;
                     // Global.Grid.transform.localPosition = new Vector3(-(Global.Grid_CurrentIndex * Global.Grid_PerSize), 0, 0);
                     //IsFinalPos = true;
                     e_State = StateUI.State_Move;
                 }
             }
-            select. MoveInmarginal(Grid_CurrentIndex);
+            select. MoveInmarginal(Grid_Currentindex);
             IsDrag = false;
             IsRight = false;
             IsLeft = false;

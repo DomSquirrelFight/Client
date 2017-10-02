@@ -24,7 +24,7 @@ public class UIScene_SelecteV1 : UIScene {
     public GameObject[] m_Card;
     public int Grid_Count;
     public float Grid_PerSize;
-    public int Grid_CurrentIndex;
+    public  int Grid_CurrentIndex;
     protected string Scene_Go;
 
     protected StateUI e_State = StateUI.State_Stay;
