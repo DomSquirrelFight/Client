@@ -63,6 +63,7 @@ public class UIScene_Login : UIScene {
         //GlobalHelper.LoadLevel("Register");
         //弹出注册的场景的ui
         AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strRegisterAudioName);
+        Destroy(gameObject);
         Helpers.UIScene<UIScene_Register>();
     }
     #endregion
@@ -74,6 +75,7 @@ public class UIScene_Login : UIScene {
         //跳转到找回密码场景
         //GlobalHelper.LoadLevel("BackPwd");
         //弹出找回密码的ui
+        Destroy(gameObject);
         Helpers.UIScene<UIScene_BackPwd>();
     }
     #endregion

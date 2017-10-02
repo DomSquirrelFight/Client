@@ -47,6 +47,7 @@ public class UIScene_Register : MonoBehaviour {
     {
         //两次输入的密码一致，手机验证码正确，可以成功注册,弹出注册成功的ui
         Helpers.UIScene<UIScene_GetNum>();
+        Destroy(gameObject);
         //密码不一致，弹出“密码不一致的ui界面UIScene_WrongPwd”
         //手机验证码错误，弹出“手机验证码错误的ui界面UIScene_MobileCode"
 
@@ -58,6 +59,7 @@ public class UIScene_Register : MonoBehaviour {
     void GoBack(GameObject obj)
     {
         AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strBackBtn);
+        Helpers.UIScene<UIScene_Login>();
         Destroy(gameObject);
     }
     #endregion

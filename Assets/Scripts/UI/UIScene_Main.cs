@@ -26,6 +26,7 @@ public class UIScene_Main : UIScene {
     void Login(GameObject obj)
     {
         AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strLoginAudioName);
+        Destroy(gameObject);
         Helpers.UIScene<UIScene_Login>();
     }
 #endregion
