@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using AttTypeDefine;
+using Assets.Scripts.Helper;
 
 public class UIScene_Custompass : UIScene {
 
@@ -28,5 +29,10 @@ public class UIScene_Custompass : UIScene {
             pb.OnStart(i, m_oSelect);
         }
     }
-#endregion
+    #endregion
+    protected override void ClickBtn(GameObject obj)
+    {
+        base.ClickBtn(obj);
+        Helpers.UIScene<UIScene_SelecteV1>();
+    }
 }

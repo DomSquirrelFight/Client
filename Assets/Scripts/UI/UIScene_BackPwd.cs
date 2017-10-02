@@ -28,8 +28,6 @@ public class UIScene_BackPwd : MonoBehaviour {
         UIEventListener.Get(m_Back).onClick = Back;
         //获得验证码
         UIEventListener.Get(m_oGetCode).onClick = GetCode;
-        UIPanel up = gameObject.GetComponent<UIPanel>();
-        up.depth = 2;
     }
     #endregion
 
@@ -51,7 +49,8 @@ public class UIScene_BackPwd : MonoBehaviour {
     {
         //如果数据库信息和输入的信息相符，进入loading场景，进入select界面
         //GlobalHelper.LoadLevel("Loading");
-        Helpers.UIScene<UIScene_ResetPwd>();
+        //Helpers.UIScene<UIScene_ResetPwd>();
+        Destroy(gameObject);
         //如果数据库信息和输入的信息不一致，弹出用户名和密码不一致的ui界面
         //Helpers.UIScene<UIScene_WrongPwd>();
     }
@@ -65,6 +64,7 @@ public class UIScene_BackPwd : MonoBehaviour {
         //返回到登录场景
         //GlobalHelper.LoadLevel("Login");
         Destroy(gameObject);
+        Helpers.UIScene<UIScene_Login>();
     }
     #endregion
 

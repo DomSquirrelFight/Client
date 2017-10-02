@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using AttTypeDefine;
+using Assets.Scripts.Helper;
 
 public class UIScene_ResetPwd : UIScene {
 
@@ -39,6 +40,7 @@ public class UIScene_ResetPwd : UIScene {
     {
         AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strExit);
         Destroy(gameObject);
+        Helpers.UIScene<UIScene_Login>();
     }
     #endregion
 

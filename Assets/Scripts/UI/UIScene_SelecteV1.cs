@@ -35,11 +35,11 @@ public class UIScene_SelecteV1 : UIScene {
     public GameObject m_oBack;
     public string m_strOK;
     public string m_strBack;
+
     #endregion
 
     // Use this for initialization
     void Start () {
-
         UIEventListener.Get(m_oOk).onClick = PressOK;
         UIEventListener.Get(m_oBack).onClick = PressBack;
       
@@ -56,6 +56,7 @@ public class UIScene_SelecteV1 : UIScene {
         eState = LoadingState.e_LoadLevel;
         //GlobalHelper.LoadLevel("Loading");
         Helpers.UIScene<UIScene_Custompass>();
+        Destroy(gameObject);
     }
     void PressBack(GameObject obj)
     {
