@@ -50,13 +50,27 @@ namespace AttTypeDefine
         State_PicAnim,
         State_ProgressBar,
     }
-    //用于判断双击
-    //public enum ClickState
-    //{
-    //    Click_First,
-    //    Click_Scecond,
-    //    Click_Null,
-    //}
+//<<<<<<< HEAD
+//<<<<<<< HEAD
+//    //用于在关卡选择界面 判断是不是可以移动pass
+//    public enum DragState
+//=======
+ // 关卡选择中判断是不是可以拖动
+// public enum DragState
+////>>>>>>> master
+//    {
+//        State_Drag,
+//        State_Stop,
+//    }
+//=======
+//    //用于判断双击
+//    //public enum ClickState
+//    //{
+//    //    Click_First,
+//    //    Click_Scecond,
+//    //    Click_Null,
+//    //}
+//>>>>>>> master
     #endregion
 
     #region Character Behaviour

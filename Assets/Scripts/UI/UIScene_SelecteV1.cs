@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using AttTypeDefine;
+using Assets.Scripts.Helper;
 
 public class UIScene_SelecteV1 : UIScene {
 
@@ -24,10 +25,10 @@ public class UIScene_SelecteV1 : UIScene {
     public GameObject[] m_Card;
     public int Grid_Count;
     public float Grid_PerSize;
-    public  int Grid_CurrentIndex;
+    //public  int Grid_CurrentIndex;
     protected string Scene_Go;
 
-    protected StateUI e_State = StateUI.State_Stay;
+    //protected StateUI e_State = StateUI.State_Stay;
 
 
     public GameObject m_oOk;
@@ -38,23 +39,29 @@ public class UIScene_SelecteV1 : UIScene {
 
     // Use this for initialization
     void Start () {
+
+        UIEventListener.Get(m_oOk).onClick = PressOK;
+        UIEventListener.Get(m_oBack).onClick = PressBack;
+      
         Grid_CurrentIndex = 0;
         Grid_Count = m_Card.Length;
         Scene_Go = "loading";
         eState = LoadingState.e_LoadLevel;
-        UIEventListener.Get(m_oOk).onClick = PressOK;
-        UIEventListener.Get(m_oBack).onClick = PressBack;
-	}
+        IniteButton();
+        CardInited();
+    }
 	void PressOK(GameObject obj)
     {
         AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strOK);
         eState = LoadingState.e_LoadLevel;
-        GlobalHelper.LoadLevel("Loading");
+        //GlobalHelper.LoadLevel("Loading");
+        Helpers.UIScene<UIScene_Custompass>();
     }
     void PressBack(GameObject obj)
     {
         AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strBack);
-        GlobalHelper.LoadLevel("Login");
+        GlobalHelper.LoadLevel("Begin");
+       // Helpers.UIScene<UIScene_Login>();
     }
 	// Update is called once per frame
 	void Update () {
@@ -66,6 +73,7 @@ public class UIScene_SelecteV1 : UIScene {
         {
             e_State = StateUI.State_Stay;
         }
+        CurBtn.transform.localPosition = UI[Grid_CurrentIndex].transform.localPosition;
     }
 
     #region 初始化button
@@ -80,7 +88,7 @@ public class UIScene_SelecteV1 : UIScene {
             tc.OnStart(i);
         }
         //GameObject CurButton = Instantiate(Resources.Load(path)) as GameObject;
-        CurBtn.transform.parent = Button.transform;
+
         CurBtn.transform.localPosition = UI[0].transform.localPosition;
         CurBtn.transform.localScale = UI[0].transform.localScale;
     }
@@ -112,6 +120,8 @@ public class UIScene_SelecteV1 : UIScene {
             //设置初始化
             card.transform.localPosition = new Vector3(i * Grid_PerSize, 0, 0);
             card.transform.localScale = Vector3.one;
+            Drag drag = card.GetComponent<Drag>();
+            drag.OnStart(Grid_Count, Grid_PerSize);
             ////加载label信息
             //UserData data = LabelInfo[i];
             ////遍历子游戏对象，给label赋值

@@ -16,16 +16,13 @@ public class UIScene_Custompass : UIScene {
         UIEventListener.Get(m_oBack).onClick = ClickBtn;
         InitePass();
     }
-    private void Update()
-    {
-        Debug.Log(dragstate);
-    }
     #endregion
 
     #region 初始化关卡
     void InitePass()
     {
-        for(int i=0;i< m_oPass.Length;i++)
+        dragstate = DragState.State_Drag;
+        for (int i=0;i< m_oPass.Length;i++)
         {
              PassBehavior pb= m_oPass[i].AddComponent<PassBehavior>();
             pb.OnStart(i, m_oSelect);
