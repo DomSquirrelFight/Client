@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Terrain_2005
+  m_Shader: {fileID: 4800000, guid: dd3d0de1fafd8064cb214f88df105f76, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _Control
+      second:
+        m_Texture: {fileID: 2800000, guid: 3133395d5fc5caa4eb1cb14d48346ae8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _Splat0
+      second:
+        m_Texture: {fileID: 2800000, guid: 686213fcd5f63de40bb668a00027474b, type: 3}
+        m_Scale: {x: 44.5, y: 44.5}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _Splat1
+      second:
+        m_Texture: {fileID: 2800000, guid: f611007ee6e91604cbba93dbc0083118, type: 3}
+        m_Scale: {x: 65, y: 65}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _Splat2
+      second:
+        m_Texture: {fileID: 2800000, guid: 5a8a96a929a27f04e8aab570d19d852d, type: 3}
+        m_Scale: {x: 45, y: 45}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _Splat3
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors:
+    - first:
+        name: _Tiling3
+      second: {r: 1, g: 1, b: 0, a: 0}

@@ -1,0 +1,608 @@
+fileFormatVersion: 2
+guid: b282d960a2ac34f42b7f1d4ae40b7c52
+timeCreated: 1486522431
+licenseType: Pro
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: shu_0
+    21300002: yezi_0
+    21300004: yezi_1
+    21300006: yezi_2
+    21300008: shu_1
+    21300010: shu_2
+    21300012: cao_0
+    21300014: bu_0
+    21300016: bu_1
+    21300018: zujian_9
+    21300020: tengman_0
+    21300022: tengman_1
+    21300024: cao_1
+    21300026: bu_3
+    21300028: tengman_2
+    21300030: tengman_3
+    21300032: tengman_4
+    21300034: tengman_5
+    21300036: tengman_6
+    21300038: tengman_7
+    21300040: tengman_8
+    21300042: tengman_9
+    21300044: shu_3
+    21300046: bu_4
+    21300048: shu_3
+    21300050: zujian_0
+    21300052: cao_2
+    21300054: zujian_1
+    21300056: zujian_2
+    21300058: zujian_3
+    21300060: zujian_4
+    21300062: zujian_5
+    21300064: beijing_0
+    21300066: zujian_6
+    21300068: zujian_7
+    21300070: zujian_8
+    21300072: cao_3
+    21300074: zujian_10
+    21300076: zujian_11
+    21300078: zujian_12
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  buildTargetSettings:
+  - buildTarget: Standalone
+    maxTextureSize: 2048
+    textureFormat: -1
+    compressionQuality: 50
+    allowsAlphaSplitting: 0
+  - buildTarget: iPhone
+    maxTextureSize: 2048
+    textureFormat: -1
+    compressionQuality: 50
+    allowsAlphaSplitting: 0
+  - buildTarget: Android
+    maxTextureSize: 2048
+    textureFormat: -1
+    compressionQuality: 50
+    allowsAlphaSplitting: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: shu_0
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 782
+        width: 119
+        height: 235
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: yezi_0
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 783
+        width: 242
+        height: 241
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: yezi_1
+      rect:
+        serializedVersion: 2
+        x: 375
+        y: 781
+        width: 217
+        height: 243
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: yezi_2
+      rect:
+        serializedVersion: 2
+        x: 592
+        y: 908
+        width: 231
+        height: 116
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: shu_1
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 383
+        height: 501
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: cao_0
+      rect:
+        serializedVersion: 2
+        x: 700
+        y: 0
+        width: 90
+        height: 84
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: bu_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 565
+        width: 61
+        height: 216
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: bu_1
+      rect:
+        serializedVersion: 2
+        x: 61
+        y: 564
+        width: 123
+        height: 216
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_9
+      rect:
+        serializedVersion: 2
+        x: 186
+        y: 617
+        width: 110
+        height: 165
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: tengman_0
+      rect:
+        serializedVersion: 2
+        x: 943
+        y: 790
+        width: 81
+        height: 233
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: tengman_1
+      rect:
+        serializedVersion: 2
+        x: 915
+        y: 490
+        width: 109
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: cao_1
+      rect:
+        serializedVersion: 2
+        x: 618
+        y: 0
+        width: 82
+        height: 98
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: bu_3
+      rect:
+        serializedVersion: 2
+        x: 296
+        y: 564
+        width: 53
+        height: 215
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: tengman_2
+      rect:
+        serializedVersion: 2
+        x: 864
+        y: 489
+        width: 51
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: tengman_3
+      rect:
+        serializedVersion: 2
+        x: 781
+        y: 489
+        width: 83
+        height: 300
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: tengman_4
+      rect:
+        serializedVersion: 2
+        x: 593
+        y: 789
+        width: 305
+        height: 118
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: tengman_5
+      rect:
+        serializedVersion: 2
+        x: 350
+        y: 742
+        width: 306
+        height: 36
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: tengman_6
+      rect:
+        serializedVersion: 2
+        x: 350
+        y: 728
+        width: 306
+        height: 14
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: tengman_7
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 619
+        width: 97
+        height: 108
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: tengman_8
+      rect:
+        serializedVersion: 2
+        x: 657
+        y: 490
+        width: 124
+        height: 289
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: tengman_9
+      rect:
+        serializedVersion: 2
+        x: 577
+        y: 490
+        width: 80
+        height: 128
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: shu_3
+      rect:
+        serializedVersion: 2
+        x: 421
+        y: 488
+        width: 137
+        height: 241
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: bu_4
+      rect:
+        serializedVersion: 2
+        x: 349
+        y: 501
+        width: 72
+        height: 227
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_0
+      rect:
+        serializedVersion: 2
+        x: 790
+        y: 1
+        width: 234
+        height: 244
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: cao_2
+      rect:
+        serializedVersion: 2
+        x: 823
+        y: 970
+        width: 120
+        height: 54
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_1
+      rect:
+        serializedVersion: 2
+        x: 390
+        y: 113
+        width: 278
+        height: 375
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_2
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 521
+        width: 249
+        height: 74
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_3
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 912
+        width: 596
+        height: 112
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_4
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 812
+        width: 521
+        height: 100
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_5
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 595
+        width: 432
+        height: 217
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: beijing_0
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 0
+        width: 1024
+        height: 312
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_6
+      rect:
+        serializedVersion: 2
+        x: 669
+        y: 288
+        width: 355
+        height: 200
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_7
+      rect:
+        serializedVersion: 2
+        x: 1023
+        y: 310
+        width: 606
+        height: 207
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_8
+      rect:
+        serializedVersion: 2
+        x: 1621
+        y: 912
+        width: 192
+        height: 112
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: cao_3
+      rect:
+        serializedVersion: 2
+        x: 1813
+        y: 827
+        width: 235
+        height: 197
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_10
+      rect:
+        serializedVersion: 2
+        x: 1608
+        y: 812
+        width: 82
+        height: 99
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_11
+      rect:
+        serializedVersion: 2
+        x: 1456
+        y: 642
+        width: 592
+        height: 170
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    - serializedVersion: 2
+      name: zujian_12
+      rect:
+        serializedVersion: 2
+        x: 1629
+        y: 354
+        width: 419
+        height: 287
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: -1
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
