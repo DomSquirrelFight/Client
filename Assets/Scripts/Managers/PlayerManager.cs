@@ -714,7 +714,7 @@ public class PlayerManager : MonoBehaviour
     Vector3[] m_vCurPoints;
     float m_fCurPercent = 0.04f;
     float m_fPer;
-    float m_fSpeed = 0.2f;
+    float m_fSpeed = 0.15f;
     float lookAheadAmount = 0.01f;
     float min = 0.04f;
     PathArea m_CurPathArea;
