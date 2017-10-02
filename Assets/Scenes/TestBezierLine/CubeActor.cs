@@ -39,7 +39,7 @@ public class CubeActor : MonoBehaviour {
     void Update () {
         
         GetInput();
-        bl.RotatePlayerAlongBezier(path, gameObject, input, speed);
+        //bl.RotatePlayerAlongBezier(path, gameObject, input, speed);
 	}
     private void OnTriggerEnter(Collider other)
     {
