@@ -10,7 +10,7 @@ public class PlayerState_Injure : FSMState {
     {
         Owner.RB.isKinematic = true;
         Owner.BC.enabled = false;
-        RoleBackSpeed = Owner.BaseAtt.RoleInfo.RoleBackSpeed;
+        RoleBackSpeed = Owner.RoleBehaInfos.RoleInjureBackSpeed;
         Owner.AM.SetTrigger(NameToHashScript.InjuredId);
         Owner.StartChangingAlpha();
     }

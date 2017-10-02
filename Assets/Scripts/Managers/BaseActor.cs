@@ -111,12 +111,22 @@ public class BaseActor : MonoBehaviour
 
         #region 加载Asset文件
 
+        //角色信息
         RoleInfos roleInfos = DataRecordManager.GetDataInstance<RoleInfos>(roldid);
         if (null == roleInfos)
         {
             Debug.LogErrorFormat("Fail to find asset in route ({0})", roleInfos.strRolePath);
             return null;
         }
+
+        //角色行为信息
+        RoleBehavInfos rolebehainfos = DataRecordManager.GetDataInstance<RoleBehavInfos>(roldid * 10 + 1);
+        if (null == rolebehainfos)
+        {
+            Debug.LogErrorFormat("Fail to find asset in RoleBehavInfos id ({0})", roldid * 10 + 1);
+            return null;
+        }
+
         #endregion
 
         #region 创建外层对象
@@ -134,6 +144,7 @@ public class BaseActor : MonoBehaviour
 
         #region 角色属性
         ba.roleid = roldid;
+        ba.rolebehainfo = rolebehainfos;//初始化角色行为信息
         switch (roleInfos.CharacType)
         {
             case eCharacType.Type_Major:
@@ -445,6 +456,18 @@ public class BaseActor : MonoBehaviour
         Destroy(BC);
         Destroy(RB);
     }
+    #endregion
+
+    #region 角色行为信息
+    private RoleBehavInfos rolebehainfo;
+    public RoleBehavInfos RoleBehaInfos
+    {
+        get
+        {
+            return rolebehainfo;
+        }
+    }
+
     #endregion
 
 

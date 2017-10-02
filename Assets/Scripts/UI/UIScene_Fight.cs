@@ -247,7 +247,7 @@ public class UIScene_Fight : UIScene
     void Update()
     {
         if (m_bPressedJumpUp)
-            ba.PlayerMgr.CalJumpUp();       //上跳
+            ba.PlayerMgr.CalJumpSmallUp();       //上跳
         else if (m_bPressedJumpDown)
             ba.PlayerMgr.CalJumpDown();  // 下跳
 
