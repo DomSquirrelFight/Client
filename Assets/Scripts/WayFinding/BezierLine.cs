@@ -79,6 +79,7 @@ public class BezierLine : MonoBehaviour {
             //获得路线上所有的点
             DesignBezierPath dbp = line.GetComponent<DesignBezierPath>();
             m_vBezierPoints = new Vector3[dbp.PointNum];
+            Debug.Log(dbp.m_vPoints[0]);
             for(int i=0;i<dbp.m_vPoints.Length;i++)
             {
                 m_vBezierPoints[i] = dbp.transform.TransformPoint(dbp.m_vPoints[i]);
