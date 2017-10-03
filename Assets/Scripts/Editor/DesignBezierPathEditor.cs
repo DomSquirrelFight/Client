@@ -1,20 +1,21 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using AttTypeDefine;
-[CustomEditor(typeof(BezierLine))]
-public class BezierLineForTurningEditor : Editor {
+[CustomEditor(typeof(DesignBezierPath))]
+public class DesignBezierPathEditor : Editor {
+
     #region 成员变量
     int m_nSelectedIndex = -1;
-    BezierLine curve;
+    DesignBezierPath curve;
 
     #endregion
 
     #region 系统接口
     public void OnSceneGUI()
     {
-        curve = target as BezierLine;
+        curve = target as DesignBezierPath;
         Vector3 p0 = ShowPoint(0);
-        
+
         for (int i = 1; i < curve.PointNum; i += 3)
         {
             Vector3 p1 = ShowPoint(i);
@@ -31,15 +32,22 @@ public class BezierLineForTurningEditor : Editor {
     }
     public override void OnInspectorGUI()
     {
-        curve = target as BezierLine;
-        if (m_nSelectedIndex!=-1)
+        curve = target as DesignBezierPath;
+        if (m_nSelectedIndex != -1)
         {
             DrawSelectedIndexPoint();
         }
-    }
-#endregion
 
-     Vector3 ShowPoint(int index)
+        if (GUILayout.Button("Add Curve"))
+        {
+            Undo.RecordObject(curve, "Add Curve");
+            curve.AddCurve();
+            EditorUtility.SetDirty(curve);
+        }
+    }
+    #endregion
+
+    Vector3 ShowPoint(int index)
     {
 
         //获得curve中的点坐标
@@ -52,7 +60,7 @@ public class BezierLineForTurningEditor : Editor {
         }
         if (index == m_nSelectedIndex)
         {
-             p = Handles.DoPositionHandle(p, curve.transform.rotation);
+            p = Handles.DoPositionHandle(p, curve.transform.rotation);
             if (EditorGUI.EndChangeCheck())
             {
                 Undo.RecordObject(curve, "Move Point");
@@ -67,12 +75,23 @@ public class BezierLineForTurningEditor : Editor {
     {
         GUILayout.Label("Selected Point");
         EditorGUI.BeginChangeCheck();
-        Vector3 p = EditorGUILayout.Vector3Field("point position", curve[m_nSelectedIndex]);
+        Vector3 select = curve.transform.TransformPoint(curve[m_nSelectedIndex]);
+        Vector3 p = EditorGUILayout.Vector3Field("point position", select);
         if (EditorGUI.EndChangeCheck())
         {
             Undo.RecordObject(curve, "Change Point");
             curve[m_nSelectedIndex] = p;
             EditorUtility.SetDirty(curve);
         }
+
+        EditorGUI.BeginChangeCheck();
+        eBezierLineConstrainedMode mode = (eBezierLineConstrainedMode)EditorGUILayout.EnumPopup(curve.GetModeByPointIndex(m_nSelectedIndex));
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(curve, "Change Mode");
+            curve.SetBezierLineConstrainedMode(m_nSelectedIndex, mode);
+            EditorUtility.SetDirty(curve);
+        }
     }
+
 }

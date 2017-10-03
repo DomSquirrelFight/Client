@@ -13,7 +13,7 @@ public class CubeActor : MonoBehaviour {
     void Start () {
   
    
-        path = "Prefabs/Paths/Line0";
+        path = "Prefabs/Path/Line0";
         bl = gameObject.AddComponent<BezierLine>();
         speed = 5f;
        // gameObject.transform.position = Vector3.zero;
@@ -39,18 +39,13 @@ public class CubeActor : MonoBehaviour {
     void Update () {
         
         GetInput();
-//<<<<<<< HEAD
-//      //  bl.RotatePlayerAlongBezier(path, gameObject, input, speed);
-//=======
-//        //bl.RotatePlayerAlongBezier(path, gameObject, input, speed);
-//>>>>>>> master
-	}
-    private void OnTriggerEnter(Collider other)
-    {
 
-    }
+        bl.RotatePlayerAlongBezier(path, gameObject, input, speed);
+
+	}
+
     public void  ChangerMyPath()
     {
-        path = "Prefabs/Paths/Line1";
+        path = "Prefabs/Path/Line1";
     }
 }

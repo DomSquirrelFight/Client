@@ -17,10 +17,10 @@ public class BezierLine : MonoBehaviour {
     Vector2 m_vInputMove;
 
     Transform[] ArrtTPoints;
-    BaseActor Owner;
+    GameObject Owner;
     //切线，朝向
     Vector3 dir;
-
+    string LinePath;
     #endregion
 
     #region 系统接口
@@ -34,38 +34,100 @@ public class BezierLine : MonoBehaviour {
 
 
     #region 外部调用接口
-    public void RotatePlayerAlongBezier(Transform[] InArrtTPoints, BaseActor owner, Vector2 m_vInput)
+    //public void RotatePlayerAlongBezier(Transform[] InArrtTPoints, BaseActor owner, Vector2 m_vInput)
+    //{
+    //    //Debug.Log(PathPercent);
+    //    if (PathPercent >= 1)
+    //        return;
+    //    m_vInputMove = m_vInput;
+    //    ArrtTPoints = InArrtTPoints;
+    //    Owner = owner;
+    //    //初始化点
+    //    GetBezierPoints(ArrtTPoints);
+    //    CaculatePercent();
+    //    dir = GetVelocity(PathPercent);
+    //    CaculateDir();
+    //    PlayerMove();
+
+
+    //}
+    public void RotatePlayerAlongBezier(string path, GameObject owner, Vector2 m_vInput, float speed)
     {
+        Owner = owner;
+        ResetPath(path);
         //Debug.Log(PathPercent);
         if (PathPercent >= 1)
             return;
         m_vInputMove = m_vInput;
-        ArrtTPoints = InArrtTPoints;
-        Owner = owner;
+        //ArrtTPoints = InArrtTPoints;
+        Length = speed;
+
         //初始化点
-        GetBezierPoints(ArrtTPoints);
+        //GetBezierPoints(ArrtTPoints);
         CaculatePercent();
         dir = GetVelocity(PathPercent);
         CaculateDir();
         PlayerMove();
-        
-
     }
+
+    #endregion
+
+    #region 初始化路线
+    bool IsHavedPath = false;
+    GameObject Lines;
+    Vector3 m_oFinalPos;
+    void ResetPath(string path)
+    {
+   
+        //给路线创建一个父级，统一管理路线
+        if (!IsHavedPath)
+        {
+            Lines = new GameObject("Lines");
+            Lines.transform.position = Vector3.zero;
+            IsHavedPath = true;
+        }
+        if (path != LinePath || LinePath == null)
+        {
+            PathPercent = 0;
+
+            LinePath = path;
+         
+            //加载路线，进行初始化
+            GameObject line = Instantiate(Resources.Load(LinePath)) as GameObject;
+             line.transform.parent = Lines.transform;
+            //获得路线上所有的点
+            DesignBezierPath dbp = line.GetComponent<DesignBezierPath>();
+            // m_vBezierPoints = dbp.m_vPoints;
+            //m_vBezierPoints[0] = dbp.transform.TransformPoint(dbp.m_vPoints[0]);
+            m_vBezierPoints = new Vector3[dbp.PointNum];
+            for(int i=0;i<dbp.m_vPoints.Length;i++)
+            {
+                m_vBezierPoints[i] = dbp.transform.TransformPoint(dbp.m_vPoints[i]);
+            }
+            Debug.Log(dbp.m_vPoints[PointNum - 1]);
+            //m_vBezierPoints[0] = line.transform.localPosition;
+            //Debug.Log(m_oFinalPos);
+            Owner.transform.position = m_oFinalPos;
+            //Debug.Log(Owner.transform.position);
+          
+        }
+    }
+
     #endregion
 
     #region 初始化点
-    public Vector3[] GetBezierPoints(Transform[] points)
-    {
-        m_vBezierPoints = new Vector3[points.Length];
+    //public Vector3[] GetBezierPoints(Transform[] points)
+    //{
+    //    m_vBezierPoints = new Vector3[points.Length];
 
-        for (int i = 0; i < points.Length; i++)
-        {
-            m_vBezierPoints[i] = points[i].position;
-            //EnforceMode(i, points.Length, eBezierLineConstrainedMode.Mirror);
-        }
-        //EnforceMode(1, points.Length - 1, eBezierLineConstrainedMode.Mirror);
-        return m_vBezierPoints;
-    }
+    //    for (int i = 0; i < points.Length; i++)
+    //    {
+    //        m_vBezierPoints[i] = points[i].position;
+    //        //EnforceMode(i, points.Length, eBezierLineConstrainedMode.Mirror);
+    //    }
+    //    //EnforceMode(1, points.Length - 1, eBezierLineConstrainedMode.Mirror);
+    //    return m_vBezierPoints;
+    //}
     #endregion
 
     #region 属性
@@ -79,7 +141,22 @@ public class BezierLine : MonoBehaviour {
         set
         {
             if (value != m_vBezierPoints[index])
+            {
+
+                if (index % 3 == 0)
+                {
+                    Vector3 delta = m_vBezierPoints[index] - value;
+                    if (index > 0 && index < m_vBezierPoints.Length - 1)
+                    {
+                        m_vBezierPoints[index + 1] += delta;
+                        m_vBezierPoints[index - 1] += delta;
+                    }
+                }
+
                 m_vBezierPoints[index] = value;
+                
+            }
+
         }
     }
     //点的数量
@@ -163,47 +240,6 @@ public class BezierLine : MonoBehaviour {
     }
     #endregion
 
-    #region 添加点的限制模式
-    //添加点的限制模式
-      void EnforceMode(int index, int PointNum, eBezierLineConstrainedMode eMode)
-    {
-        //只有一条曲线的时候直接返回
-        if (PointNum <= 4)
-            return;
-        if (index <= 0 || index >=  PointNum-1)
-            return;
-        int modeIndex = (index + 1) / 3;
-        if (modeIndex == 0)
-            return;
-
-        if (eMode == eBezierLineConstrainedMode.Free)
-            return;
-        else if (eMode == eBezierLineConstrainedMode.Mirror)
-        {
-            int middleIndex = modeIndex * 3;
-            Vector3 middlePoint, fixedPoint, enforcedPoint;
-            int fixedIndex, enforcedIndex;
-            middlePoint = m_vBezierPoints[middleIndex];
-            if (index > middleIndex)
-            {
-
-                fixedIndex = middleIndex + 1;
-                enforcedIndex = middleIndex - 1;
-            }
-            else
-            {
-                fixedIndex = middleIndex - 1;
-                enforcedIndex = middleIndex + 1;
-            }
-
-            fixedPoint = m_vBezierPoints[fixedIndex];
-            enforcedPoint = middlePoint + (middlePoint - fixedPoint).normalized * Vector3.Distance(middlePoint, fixedPoint);
-            enforcedPoint = middlePoint + (middlePoint - fixedPoint).normalized;
-            m_vBezierPoints[enforcedIndex] = enforcedPoint;
-        }
-    }
-    #endregion
-
     #region 进度值计算
     void CaculatePercent()
     {
@@ -231,9 +267,9 @@ public class BezierLine : MonoBehaviour {
         //    Owner.ActorTrans.position.y,
         //    floorPosition.z
         //    ), SMoveSpeed*Time.deltaTime );
-        Owner.ActorTrans.position = new Vector3(
+        Owner.transform.position = new Vector3(
             floorPosition.x,
-            Owner.ActorTrans.position.y,
+            Owner.transform.position.y,
             floorPosition.z
             );
     }
@@ -244,14 +280,14 @@ public class BezierLine : MonoBehaviour {
     {
         if (PathPercent - LookAheadAmount >= float.Epsilon && PathPercent + LookAheadAmount <= 1f)
         {
-            Vector3 m_vOwnerPosition = Owner.ActorTrans.position;
+            Vector3 m_vOwnerPosition = Owner.transform.position;
             if (m_vInputMove.x > 0f)
             {
-                Owner.ActorTrans.LookAt2D(m_vOwnerPosition + dir.normalized);
+                Owner.transform.LookAt2D(m_vOwnerPosition + dir.normalized);
             }
             else if (m_vInputMove.x < 0f)
             {
-                Owner.ActorTrans.LookAt2D(m_vOwnerPosition - dir.normalized);
+                Owner.transform.LookAt2D(m_vOwnerPosition - dir.normalized);
             }
         }
     }
