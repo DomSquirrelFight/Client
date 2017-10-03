@@ -101,6 +101,26 @@ public class BaseActor : MonoBehaviour
     }
     #endregion
 
+    #region 角色行为参数
+    RoleBehavInfos[] ArrRoleBehaInfos;
+    public void SetCurRoleBehavInfos(eRunMode mode)
+    {
+        switch (mode)
+        {
+            case eRunMode.eRun_Horizontal:
+                {
+                    rolebehainfo = ArrRoleBehaInfos[0];
+                    break;
+                }
+            case eRunMode.eRun_Vertical:
+                {
+                    rolebehainfo = ArrRoleBehaInfos[1];
+                    break;
+                }
+        }
+    }
+    #endregion
+
     #region 加载角色
     /// <summary>
     /// 创建角色，并将角色实例返回
@@ -127,6 +147,13 @@ public class BaseActor : MonoBehaviour
             return null;
         }
 
+        RoleBehavInfos rolebehainfos1 = DataRecordManager.GetDataInstance<RoleBehavInfos>(roldid * 10 + 2);
+        if (null == rolebehainfos)
+        {
+            Debug.LogErrorFormat("Fail to find asset in RoleBehavInfos id ({0})", roldid * 10 + 2);
+            return null;
+        }
+
         #endregion
 
         #region 创建外层对象
@@ -144,7 +171,22 @@ public class BaseActor : MonoBehaviour
 
         #region 角色属性
         ba.roleid = roldid;
-        ba.rolebehainfo = rolebehainfos;//初始化角色行为信息
+        ba.ArrRoleBehaInfos = new RoleBehavInfos[2];
+        ba.ArrRoleBehaInfos[0] = rolebehainfos;
+        ba.ArrRoleBehaInfos[1] = rolebehainfos1;
+        switch (roleInfos.RunMode)
+        {
+            case eRunMode.eRun_Horizontal:
+                {
+                    ba.rolebehainfo = rolebehainfos;//初始化角色行为信息
+                    break;
+                }
+            case eRunMode.eRun_Vertical:{
+                    ba.rolebehainfo = rolebehainfos1;//初始化角色行为信息
+                    break;
+                }
+        }
+       
         switch (roleInfos.CharacType)
         {
             case eCharacType.Type_Major:
@@ -470,6 +512,11 @@ public class BaseActor : MonoBehaviour
 
     #endregion
 
-
+    #region 数据回收
+    void OnDisable()
+    {
+        ArrRoleBehaInfos = null;
+    }
+    #endregion
 
 }

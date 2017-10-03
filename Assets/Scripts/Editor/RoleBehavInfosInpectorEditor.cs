@@ -27,32 +27,8 @@ public class RoleBehavInfosInpectorEditor : Editor {
     }
 
 
-    public override void OnInspectorGUI()
+    void CommonMove()
     {
-
-        #region Role ID
-        EditorGUILayout.BeginHorizontal();
-        nValue = EditorGUILayout.IntField("角色ID", _data.RoleID);
-        if (nValue != _data.RoleID)
-        {
-            _data.RoleID = nValue;
-        }
-        EditorGUILayout.EndHorizontal();
-        #endregion
-
-        #region 运动模式
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("运动模式");
-        nValue = EditorGUILayout.IntPopup((int)_data.RunMode, arrRunMode, arrNRunMode);
-
-        if (nValue != (int)_data.RunMode)
-        {
-            _data.RunMode = (eRunMode)nValue;
-        }
-        EditorGUILayout.EndHorizontal();
-
-        #endregion
-
         #region 是否可以小跳跃
         EditorGUILayout.BeginHorizontal();
         bValue = EditorGUILayout.Toggle("是否可以小跳跃", _data.CanSmallJump);
@@ -103,6 +79,57 @@ public class RoleBehavInfosInpectorEditor : Editor {
         EditorGUILayout.EndHorizontal();
         #endregion
 
+        #region 角色移动速度
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("角色移动速度");
+        fValue = EditorGUILayout.FloatField(_data.RoleMoveSpeed);
+        if (fValue != _data.RoleMoveSpeed)
+        {
+            _data.RoleMoveSpeed = fValue;
+        }
+        EditorGUILayout.EndHorizontal();
+        #endregion
+
+    }
+
+    void HorizontalMove()
+    {
+        CommonMove();
+
+        #region 是否可以发射子弹
+        EditorGUILayout.BeginHorizontal();
+        bValue = EditorGUILayout.Toggle("是否可以发射子弹", _data.CanFire);
+        if (bValue != _data.CanFire)
+        {
+            _data.CanFire = bValue;
+        }
+        EditorGUILayout.EndHorizontal();
+        #endregion
+
+        #region 是否可以举箱子
+        EditorGUILayout.BeginHorizontal();
+        bValue = EditorGUILayout.Toggle("是否可以举箱子", _data.CanPickUpBox);
+        if (bValue != _data.CanPickUpBox)
+        {
+            _data.CanPickUpBox = bValue;
+        }
+        EditorGUILayout.EndHorizontal();
+        #region 角色后退速度
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("角色后退速度");
+        fValue = EditorGUILayout.FloatField(_data.RoleInjureBackSpeed);
+        if (fValue != _data.RoleInjureBackSpeed)
+        {
+            _data.RoleInjureBackSpeed = fValue;
+        }
+        EditorGUILayout.EndHorizontal();
+        #endregion
+        #endregion
+    }
+
+    void VerticalMove()
+    {
+        CommonMove();
         #region 是否可以大跳跃
         EditorGUILayout.BeginHorizontal();
         bValue = EditorGUILayout.Toggle("是否可以大跳跃", _data.CanBigJump);
@@ -139,61 +166,60 @@ public class RoleBehavInfosInpectorEditor : Editor {
         EditorGUILayout.EndHorizontal();
         #endregion
 
-        #region 大跳跃初速度
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("大跳跃初速度");
-        EditorGUILayout.LabelField(_data.BigJumpInitSpeed.ToString());
-        EditorGUILayout.EndHorizontal();
-        #endregion
+        //#region 大跳跃初速度
+        //EditorGUILayout.BeginHorizontal();
+        //EditorGUILayout.LabelField("大跳跃初速度");
+        //EditorGUILayout.LabelField(_data.BigJumpInitSpeed.ToString());
+        //EditorGUILayout.EndHorizontal();
+        //#endregion
 
-        #region 大跳跃高度
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("大跳跃高度");
-        EditorGUILayout.LabelField(_data.BigJumpHeight.ToString());
-        EditorGUILayout.EndHorizontal();
-        #endregion
+        //#region 大跳跃高度
+        //EditorGUILayout.BeginHorizontal();
+        //EditorGUILayout.LabelField("大跳跃高度");
+        //EditorGUILayout.LabelField(_data.BigJumpHeight.ToString());
+        //EditorGUILayout.EndHorizontal();
+        //#endregion
+    }
 
-        #region 是否可以发射子弹
+    public override void OnInspectorGUI()
+    {
+
+        #region Role ID
         EditorGUILayout.BeginHorizontal();
-        bValue = EditorGUILayout.Toggle("是否可以发射子弹", _data.CanFire);
-        if (bValue != _data.CanFire)
+        nValue = EditorGUILayout.IntField("角色ID", _data.RoleID);
+        if (nValue != _data.RoleID)
         {
-            _data.CanFire = bValue;
+            _data.RoleID = nValue;
         }
         EditorGUILayout.EndHorizontal();
         #endregion
 
-        #region 是否可以举箱子
+        #region 运动模式
         EditorGUILayout.BeginHorizontal();
-        bValue = EditorGUILayout.Toggle("是否可以举箱子", _data.CanPickUpBox);
-        if (bValue != _data.CanPickUpBox)
+        EditorGUILayout.LabelField("运动模式");
+        nValue = EditorGUILayout.IntPopup((int)_data.RunMode, arrRunMode, arrNRunMode);
+
+        if (nValue != (int)_data.RunMode)
         {
-            _data.CanPickUpBox = bValue;
+            _data.RunMode = (eRunMode)nValue;
         }
         EditorGUILayout.EndHorizontal();
+
         #endregion
 
-        #region 角色移动速度
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("角色移动速度");
-        fValue = EditorGUILayout.FloatField(_data.RoleMoveSpeed);
-        if (fValue != _data.RoleMoveSpeed)
+        switch (_data.RunMode)
         {
-            _data.RoleMoveSpeed = fValue;
+            case eRunMode.eRun_Horizontal:
+                {
+                    HorizontalMove();
+                    break;
+                }
+            case eRunMode.eRun_Vertical:
+                {
+                    VerticalMove();
+                    break;
+                }
         }
-        EditorGUILayout.EndHorizontal();
-        #endregion
-
-        #region 角色后退速度
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("角色后退速度");
-        fValue = EditorGUILayout.FloatField(_data.RoleInjureBackSpeed);
-        if (fValue != _data.RoleInjureBackSpeed)
-        {
-            _data.RoleInjureBackSpeed = fValue;
-        }
-        EditorGUILayout.EndHorizontal();
-        #endregion
 
     }
 

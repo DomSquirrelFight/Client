@@ -243,8 +243,10 @@ namespace AttTypeDefine
 
     public enum eRunMode
     {
+        eRun_NULL = 0,
         eRun_Horizontal,
         eRun_Vertical,
+        eRun_Size,
     }
 
     public struct sRoleBehaviour            //保存角色行为参数

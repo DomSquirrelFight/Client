@@ -682,6 +682,8 @@ public class PlayerManager : MonoBehaviour
         {
             m_CurPathArea = pa;
             m_vCurPoints = PathFinding.InitializePointPath(pa.RoutePoints);
+
+            m_fSpeed = Owner.RoleBehaInfos.RoleMoveSpeed;
         }
 
         #region 寻路变量
@@ -832,7 +834,11 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 纵向运动接口
-    void VerticalMove() { }
+    void VerticalMove() {
+        RotatePlayer();
+
+        TranslatePlayer();
+    }
     #endregion
 
     #region 非主角NPC状态机驱动接口
@@ -850,18 +856,19 @@ public class PlayerManager : MonoBehaviour
             {
                 case eMonsterType.MonType_GroundNpc:
                     {
-                        switch (m_RoleInfos.MoveType)
-                        {
-                            case eMoveType.eMove_Straight:                          //地面怪兽，直线行走
-                                {
-                                    GoundMonsterStraight();
-                                    break;
-                                }
-                            case eMoveType.eMove_Track:                             //面怪兽，追击主角
-                                {
-                                    break;
-                                }
-                        }
+                        GoundMonsterStraight();
+                        //switch (m_RoleInfos.MoveType)
+                        //{
+                        //    case eMoveType.eMove_Straight:                          //地面怪兽，直线行走
+                        //        {
+                                 
+                        //            break;
+                        //        }
+                        //    case eMoveType.eMove_Track:                             //面怪兽，追击主角
+                        //        {
+                        //            break;
+                        //        }
+                        //}
                         break;
                     }
                 case eMonsterType.MonType_FlyBat:

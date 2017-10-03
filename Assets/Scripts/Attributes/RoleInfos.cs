@@ -19,7 +19,7 @@ namespace Assets.Scripts.AssetInfoEditor
 
         public eMonsterType MonsterType;
 
-        public eMoveType MoveType;
+        public eRunMode RunMode = eRunMode.eRun_Horizontal;
 
         //public float fInitAccel;
 
@@ -44,7 +44,7 @@ namespace Assets.Scripts.AssetInfoEditor
             if (CharacType == eCharacType.Type_Major)
             {
                 MonsterType = eMonsterType.MonType_Null;
-                MoveType = eMoveType.eMove_NULL;
+               
             }
         }
 
