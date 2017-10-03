@@ -40,7 +40,7 @@ public class CubeActor : MonoBehaviour {
         
         GetInput();
 
-        bl.RotatePlayerAlongBezier(path, gameObject, input, speed);
+        bl.RotatePlayerAlongBezier(path, gameObject, input.x, speed);
 
 	}
 

@@ -34,37 +34,20 @@ public class BezierLine : MonoBehaviour {
 
 
     #region 外部调用接口
-    //public void RotatePlayerAlongBezier(Transform[] InArrtTPoints, BaseActor owner, Vector2 m_vInput)
-    //{
-    //    //Debug.Log(PathPercent);
-    //    if (PathPercent >= 1)
-    //        return;
-    //    m_vInputMove = m_vInput;
-    //    ArrtTPoints = InArrtTPoints;
-    //    Owner = owner;
-    //    //初始化点
-    //    GetBezierPoints(ArrtTPoints);
-    //    CaculatePercent();
-    //    dir = GetVelocity(PathPercent);
-    //    CaculateDir();
-    //    PlayerMove();
-
-
-    //}
-    public void RotatePlayerAlongBezier(string path, GameObject owner, Vector2 m_vInput, float speed)
+    public void RotatePlayerAlongBezier(string path, GameObject owner, float m_Dir, float speed)//Vector2 m_vInput,
     {
         Owner = owner;
         ResetPath(path);
         //Debug.Log(PathPercent);
         if (PathPercent >= 1)
             return;
-        m_vInputMove = m_vInput;
+        
         //ArrtTPoints = InArrtTPoints;
         Length = speed;
 
         //初始化点
         //GetBezierPoints(ArrtTPoints);
-        CaculatePercent();
+        CaculatePercent(m_Dir);
         dir = GetVelocity(PathPercent);
         CaculateDir();
         PlayerMove();
@@ -89,27 +72,18 @@ public class BezierLine : MonoBehaviour {
         if (path != LinePath || LinePath == null)
         {
             PathPercent = 0;
-
             LinePath = path;
-         
             //加载路线，进行初始化
             GameObject line = Instantiate(Resources.Load(LinePath)) as GameObject;
              line.transform.parent = Lines.transform;
             //获得路线上所有的点
             DesignBezierPath dbp = line.GetComponent<DesignBezierPath>();
-            // m_vBezierPoints = dbp.m_vPoints;
-            //m_vBezierPoints[0] = dbp.transform.TransformPoint(dbp.m_vPoints[0]);
             m_vBezierPoints = new Vector3[dbp.PointNum];
             for(int i=0;i<dbp.m_vPoints.Length;i++)
             {
                 m_vBezierPoints[i] = dbp.transform.TransformPoint(dbp.m_vPoints[i]);
             }
-            Debug.Log(dbp.m_vPoints[PointNum - 1]);
-            //m_vBezierPoints[0] = line.transform.localPosition;
-            //Debug.Log(m_oFinalPos);
             Owner.transform.position = m_oFinalPos;
-            //Debug.Log(Owner.transform.position);
-          
         }
     }
 
@@ -241,15 +215,15 @@ public class BezierLine : MonoBehaviour {
     #endregion
 
     #region 进度值计算
-    void CaculatePercent()
+    void CaculatePercent(float direction)
     {
         if (dir.magnitude == 0)
             return;
-        if (m_vInputMove.x > 0f)
+        if (direction > 0f)
         {
             PathPercent = PathPercent + (Length * Time.deltaTime)/dir.magnitude;
         }
-        else if (m_vInputMove.x < 0f)
+        else if (direction < 0f)
         {
             PathPercent = PathPercent - (Length * Time.deltaTime) / dir.magnitude;
         }
