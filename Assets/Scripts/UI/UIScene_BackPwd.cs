@@ -49,7 +49,7 @@ public class UIScene_BackPwd : MonoBehaviour {
     {
         //如果数据库信息和输入的信息相符，进入loading场景，进入select界面
         //GlobalHelper.LoadLevel("Loading");
-        //Helpers.UIScene<UIScene_ResetPwd>();
+        Helpers.UIScene<UIScene_ResetPwd>();
         Destroy(gameObject);
         //如果数据库信息和输入的信息不一致，弹出用户名和密码不一致的ui界面
         //Helpers.UIScene<UIScene_WrongPwd>();

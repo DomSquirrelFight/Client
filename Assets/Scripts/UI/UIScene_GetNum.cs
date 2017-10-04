@@ -19,7 +19,7 @@ public class UIScene_GetNum : UIScene {
         UIEventListener.Get(m_Login).onClick = Login;
         //当前跳转到selectedloading
         eState = LoadingState.e_LoadSelect;
-        eScene = SceneType.SelecteLoading;
+        //eScene = SceneType.SelecteLoading;
 	}
 	//跳转到人物选择界面
     void Login(GameObject obj)

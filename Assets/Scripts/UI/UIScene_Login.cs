@@ -45,8 +45,10 @@ public class UIScene_Login : UIScene {
     //接受服务器的返回数据
     void ServerLogin(string data)
     {
-        //如果数据库信息和输入的信息相符，进入loading场景
-        GlobalHelper.LoadLevel("Loading");
+        //如果数据库信息和输入的信息相符，进入人物选择界面
+        Destroy(gameObject);
+        Helpers.UIScene<UIScene_SelecteV1>();
+        //GlobalHelper.LoadLevel("Loading");
 
         //如果数据库信息和输入的信息不一致，弹出用户名和密码不一致的ui界面
         //Helpers.UIScene<UIScene_WrongPwd>();
@@ -63,8 +65,9 @@ public class UIScene_Login : UIScene {
         //GlobalHelper.LoadLevel("Register");
         //弹出注册的场景的ui
         AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strRegisterAudioName);
-        Destroy(gameObject);
+        
         Helpers.UIScene<UIScene_Register>();
+        Destroy(gameObject);
     }
     #endregion
 

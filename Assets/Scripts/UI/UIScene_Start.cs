@@ -9,6 +9,7 @@ public class UIScene_Start : MonoBehaviour {
     AnimState anim;
     //动画播放速度、
     public float m_fPlaySpeed;
+    bool m_bIsFirstLoaf = true;
 
 	// Use this for initialization
 	void Start () {
@@ -20,9 +21,15 @@ public class UIScene_Start : MonoBehaviour {
 
             if(m_Bg.fillAmount>=1f)
             {
+
             //播放完毕，切换状态
             //anim = AnimState.Start_PicAnim;
-            Invoke("LoadLevel", 2f);
+            if(m_bIsFirstLoaf)
+            {
+                Invoke("LoadLevel", 2f);
+                m_bIsFirstLoaf = false;
+            }
+           
             }
             else
             {

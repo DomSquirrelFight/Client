@@ -28,13 +28,13 @@ namespace AttTypeDefine
         e_Null,
     }
 
-    //通过不同的场景，预加载不同的资源
-    public enum SceneType
-    {
-        SelecteLoading,
-        Null,
-        FightLoading,
-    }
+    ////通过不同的场景，预加载不同的资源
+    //public enum SceneType
+    //{
+    //    SelecteLoading,
+    //    Null,
+    //    FightLoading,
+    //}
 
     //任务选择界面的，拖动，滑动
     public  enum StateUI

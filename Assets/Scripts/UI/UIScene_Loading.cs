@@ -26,15 +26,15 @@ public class UIScene_Loading : UIScene {
     #region 系统接口
     void Start()
     {
-        if (eState == LoadingState.e_LoadLevel)
-        {
-            eScene = SceneType.FightLoading;
-        }
-        else if (eState == LoadingState.e_LoadSelect)
-        {
-            eScene = SceneType.SelecteLoading;
-        }
-        StartCoroutine(SceneChange(eScene));
+        //if (eState == LoadingState.e_LoadLevel)
+        //{
+        //    eScene = SceneType.FightLoading;
+        //}
+        //else if (eState == LoadingState.e_LoadSelect)
+        //{
+        //    eScene = SceneType.SelecteLoading;
+        //}
+        StartCoroutine(SceneChange());
         DontDestroy();
         animState = AnimState.State_BgAnim;
     }
@@ -72,7 +72,7 @@ public class UIScene_Loading : UIScene {
         if (animState == AnimState.State_null)
         {
             //资源预加载
-            LoadRes(eScene);
+            LoadRes();
             //进度条推进
             Invoke("ProcessBar", 2f);
             
@@ -94,18 +94,18 @@ public class UIScene_Loading : UIScene {
 
     #region 资源预加载
     //场景资源预加载
-    void LoadRes(SceneType type)
+    void LoadRes()
     {
         GC.Collect();
         Resources.UnloadUnusedAssets();
         //复位所有全局引用
         //清理策划表实例缓存
-        if (type == SceneType.SelecteLoading)
-        {
-        }
-        if (type == SceneType.FightLoading)
-        {
-        }
+        //if (type == SceneType.SelecteLoading)
+        //{
+        //}
+        //if (type == SceneType.FightLoading)
+        //{
+        //}
     }
     #endregion
 
@@ -143,20 +143,20 @@ public class UIScene_Loading : UIScene {
 
     #region 场景异步加载
     AsyncOperation asyn;
-    IEnumerator SceneChange(SceneType type)
+    IEnumerator SceneChange()
     {
         //异步加载新的场景
-        if (type == SceneType.FightLoading)
-        {
+        //if (type == SceneType.FightLoading)
+        //{
             asyn = GlobalHelper.LoadLevelAsync("Map_Test_Fight");
             // type = SceneType.Null;
-        }
-        if (type == SceneType.SelecteLoading)
-        {
-            // asyn = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("SelecteV1");
-            asyn = GlobalHelper.LoadLevelAsync("SelecteV1");
-            // type = SceneType.Null;
-        }
+        //}
+        //if (type == SceneType.SelecteLoading)
+        //{
+        //    // asyn = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("SelecteV1");
+        //    asyn = GlobalHelper.LoadLevelAsync("SelecteV1");
+        //    // type = SceneType.Null;
+        //}
         yield return asyn;
     }
     #endregion

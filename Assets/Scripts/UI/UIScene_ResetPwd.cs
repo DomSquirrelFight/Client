@@ -20,7 +20,7 @@ public class UIScene_ResetPwd : UIScene {
     void Start()
     {
         eState = LoadingState.e_LoadSelect;
-        eScene = SceneType.SelecteLoading;
+        //eScene = SceneType.SelecteLoading;
         UIEventListener.Get(m_Login).onClick = Loading;
         UIEventListener.Get(m_oExit).onClick = Exit;
     }
@@ -31,7 +31,7 @@ public class UIScene_ResetPwd : UIScene {
     void Loading(GameObject obj)
     {
         AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strLogin);
-        GlobalHelper.LoadLevel("Loading");
+        //GlobalHelper.LoadLevel("Loading");
     }
     #endregion
 
