@@ -14,16 +14,16 @@ namespace Assets.Scripts.WayFinding
     public class PathFinding
     {
 
-        public static Vector3[] InitializePointPath(Transform[] points)
+        public static Vector3[] InitializePointPath(Transform points)
         {
 
-            Vector3[] source = new Vector3[points.Length];
+            Vector3[] source = new Vector3[points.childCount];
             for (int i = 0; i < source.Length; i++)
             {
-                source[i] = points[i].transform.position;
+                source[i] = points.GetChild(i).position;
             }
 
-            Vector3[] outputs = new Vector3[points.Length + 2];
+            Vector3[] outputs = new Vector3[source.Length + 2];
 
             Array.Copy(source, 0, outputs, 1, source.Length);
 

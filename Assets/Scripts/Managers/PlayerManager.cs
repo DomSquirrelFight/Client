@@ -683,7 +683,7 @@ public class PlayerManager : MonoBehaviour
         void InitializePathFind(PathArea pa)
         {
             m_CurPathArea = pa;
-            m_vCurPoints = PathFinding.InitializePointPath(pa.RoutePoints);
+            m_vCurPoints = PathFinding.InitializePointPath(pa.transform);
 
             m_fSpeed = Owner.RoleBehaInfos.RoleMoveSpeed;
         }
