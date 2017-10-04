@@ -966,7 +966,7 @@ public class PlayerManager : MonoBehaviour
         Vector3 GetCurPos()
         {
             Vector3 curpos = GetCurCurvePos();
-            if (!IsInTransition())
+            //if (!IsInTransition())
             {
                 switch (m_eLastRunState)
                 {
@@ -1061,12 +1061,12 @@ public class PlayerManager : MonoBehaviour
 
     eVRunState m_eRunState = eVRunState.eRun_Middle;
     eVRunState m_eLastRunState = eVRunState.eRun_Middle;
-    float movespeed = 5f;
-    float movedistance = 2.5f;
+    float movespeed = 20f;
+    float movedistance = 5f;
     bool bIsMoving = false;
     float speed = 0f;
-    float duration = 0.5f;
-    float tmpdur = 0.5f;
+    float duration = 0.25f;
+    float tmpdur = 0.25f;
     int index = 1;
     void DetectSwipe()
     {
