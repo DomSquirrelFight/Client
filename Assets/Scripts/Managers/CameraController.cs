@@ -201,21 +201,21 @@ public class CameraController : MonoBehaviour
         #endregion
 
         #region 系统接口 外部接口
-        void Awake()
-        {
-            //m_fHalfFOVRad = Camera.main.fieldOfView * 0.5f * Mathf.Deg2Rad;
+        //void Awake()
+        //{
+        //    //m_fHalfFOVRad = Camera.main.fieldOfView * 0.5f * Mathf.Deg2Rad;
 
-            //m_fAspect = Camera.main.aspect;
+        //    //m_fAspect = Camera.main.aspect;
 
-            //height = m_fCamDis * Mathf.Tan(m_fHalfFOVRad);
+        //    //height = m_fCamDis * Mathf.Tan(m_fHalfFOVRad);
 
-            //width = height * m_fAspect;
+        //    //width = height * m_fAspect;
 
-            //vLastPos = transform.position;
+        //    //vLastPos = transform.position;
 
-            //vLastRot = transform.rotation.eulerAngles;
+        //    //vLastRot = transform.rotation.eulerAngles;
 
-        }
+        //}
   
         void OnDisable()
         {
@@ -242,10 +242,6 @@ public class CameraController : MonoBehaviour
             //CamState = CamBirthState;
         }
         #endregion
-
-
-
-
 
 
         #region 变量

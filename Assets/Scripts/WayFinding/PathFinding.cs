@@ -180,7 +180,7 @@ namespace Assets.Scripts.WayFinding
             //获取曲线当前点的速度方向.
             Vector3 dir = GetCurCurveDir(curposints, percent);
 
-            tplayer.rotation = Quaternion.Euler(dir);
+            tplayer.forward = dir;
 
             //获取角色当前的位置.
             Vector3 curpos = GetCurPos(curposints, percent);
