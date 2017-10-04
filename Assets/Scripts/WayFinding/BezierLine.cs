@@ -49,7 +49,7 @@ public class BezierLine : MonoBehaviour {
         //GetBezierPoints(ArrtTPoints);
         CaculatePercent(m_Dir);
         dir = GetVelocity(PathPercent);
-        CaculateDir();
+        CaculateDir(m_Dir);
         PlayerMove();
     }
 
@@ -251,16 +251,17 @@ public class BezierLine : MonoBehaviour {
     #endregion
 
     #region 朝向控制
-    void CaculateDir()
+    void CaculateDir(float direction)
     {
-        if (PathPercent - LookAheadAmount >= float.Epsilon && PathPercent + LookAheadAmount <= 1f)
+        //  if (PathPercent - LookAheadAmount >= float.Epsilon && PathPercent + LookAheadAmount <= 1f)
+        if (PathPercent - LookAheadAmount >= 0 && PathPercent + LookAheadAmount <= 1f)
         {
             Vector3 m_vOwnerPosition = Owner.transform.position;
-            if (m_vInputMove.x > 0f)
+            if (direction > 0f)
             {
                 Owner.transform.LookAt2D(m_vOwnerPosition + dir.normalized);
             }
-            else if (m_vInputMove.x < 0f)
+            else if (direction < 0f)
             {
                 Owner.transform.LookAt2D(m_vOwnerPosition - dir.normalized);
             }
