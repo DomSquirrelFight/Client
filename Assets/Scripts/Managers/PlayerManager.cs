@@ -196,6 +196,9 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 外部接口 / 系统接口
+
+    
+
     public void OnStart(BaseActor owner, PathArea birthArea)
     {
         NpcMaskGlossy = LayerMask.NameToLayer("NPC");
@@ -714,8 +717,12 @@ public class PlayerManager : MonoBehaviour
                     Target = PathFinding.Interp(m_vCurPoints, m_fPer - lookAheadAmount);
                 }
 
+                    transform.LookAt2D(Target);
+             
+
+
                 //OldRot = transform.rotation;
-                transform.LookAt2D(Target);
+              
                 //CurRot = transform.rotation;
                 //transform.rotation = OldRot;
                 //transform.rotation = Quaternion.Lerp(transform.rotation, CurRot, 10 * Time.deltaTime);
@@ -834,11 +841,297 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 纵向运动接口
-    void VerticalMove() {
-        RotatePlayer();
 
-        TranslatePlayer();
+        bool IsInTransition()
+        {
+            return bIsMoving;
+        }
+
+        void SetTransition()
+        {  
+            switch (m_eLastRunState)
+            {
+                case eVRunState.eRun_Left:
+                    {
+                        if (m_vInputMove.x > 0)
+                        {
+                            m_eRunState += 1;
+                            speed = movespeed;
+                            bIsMoving = true;
+                        }
+                        break;
+                    }
+                case eVRunState.eRun_Middle:
+                    {
+                        m_eRunState += (int)m_vInputMove.x;
+                        speed = ((int)m_vInputMove.x) * movespeed;
+                        bIsMoving = true;
+                        break;
+                    }
+                case eVRunState.eRun_Right:{
+                        if (m_vInputMove.x < 0)
+                        {
+                            m_eRunState -= 1;
+                            speed = 0 - movespeed;
+                            bIsMoving = true;
+                        }
+                        break;
+                    }
+            }
+
+            if(bIsMoving)
+                tmpdur = duration;
+        }
+
+        public void VCalMoveInput()                                              //获取平移输入
+        {
+
+            m_vInputMove = Vector2.zero;
+
+            if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                m_vInputMove = m_UISceneFight.DirPos; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
+            }
+            else
+            {
+                he = Input.GetAxis("Horizontal");
+                if (0f == he && (m_UISceneFight))
+                {
+                    m_vInputMove = m_UISceneFight.DirPos; //否则 用摇杆数据
+                }
+                else if (0f != he)
+                {
+                    m_vInputMove.x = GlobalHelper.GetDIr(he);
+                }
+            }
+        }
+        
+        Vector3 GetCurCurvePos()                    //获取当前曲线的位置坐标
+        {
+
+            m_fCurPercent += Owner.RoleBehaInfos.RoleMoveSpeed * Time.deltaTime;
+        
+            m_fPer = m_fCurPercent % 1f;
+
+            return PathFinding.Interp(m_vCurPoints, m_fPer);
+
+        }
+
+        bool IsTransitionOver()
+        {
+            if (IsInTransition())
+            {
+                if (tmpdur > 0f)
+                    return false;
+                else
+                    return true;
+            }
+            return false;
+        }
+
+        void CloseTransition()
+        {
+            float dis = speed * (duration - tmpdur);
+            bIsMoving = false; tmpdur = 0f;
+
+            m_eLastRunState = m_eRunState;
+        }
+
+        float GetCurShiftDis()
+        {
+            float dis = 0f;// GlobalHelper.GetDIr(speed) * movedistance;
+            if (IsInTransition())
+            {
+                tmpdur -= Time.deltaTime;
+                dis = speed * (duration - tmpdur);
+                float tmp = Mathf.Abs(dis);
+                if ( tmp > movedistance)
+                {
+                    dis = GlobalHelper.GetDIr(speed) * tmp; 
+                }
+            }
+            return dis;
+        }
+
+        Vector3 GetFinalPos(Vector3 curpos, float dis)
+        {
+            return curpos + transform.right * dis;
+        }
+
+        Vector3 GetCurCurveDir()
+        {
+            return PathFinding.GetDir(m_vCurPoints, m_fPer);
+        }
+
+        Vector3 GetCurPos()
+        {
+            Vector3 curpos = GetCurCurvePos();
+            if (!IsInTransition())
+            {
+                switch (m_eLastRunState)
+                {
+                    case eVRunState.eRun_Left:
+                        {
+                            curpos +=   transform.right * (0 - movedistance);
+                            break;
+                        }
+                    case eVRunState.eRun_Right:
+                        {
+                            curpos += transform.right* (movedistance);
+                            break;
+                        }
+                }
+            }
+            return curpos;
+        }
+        
+        void VerticalMove() {
+
+
+            //接受输入，状态切换
+            VCalMoveInput();
+
+            if (!IsInTransition())      //判断是否在转换状态
+            {
+                if (m_vInputMove.x != 0f)
+                {
+                    SetTransition();            //设置转换
+                }
+            }
+
+            //获取曲线当前点的速度方向.
+            Vector3 dir = GetCurCurveDir();
+
+            transform.rotation = Quaternion.Euler(dir);
+
+            //获取角色当前的位置.
+            Vector3 curpos = GetCurPos();
+
+            //偏移数值 如果是在切换状态下，那么偏移的数值会和非偏移情况下有所不同
+            float dis = GetCurShiftDis();
+
+            //计算偏移后的角色位置
+            Vector3 finalpos = GetFinalPos(curpos, dis);
+
+            transform.position = new Vector3(finalpos.x, transform.position.y, finalpos.z);
+
+            if (IsTransitionOver())
+                CloseTransition();
+
+         
+
+        }
+
+    public void VRotatePlayer()
+    {
+        #region 旋转角色
+        if ( m_fPer + lookAheadAmount <= 1f)
+        {
+            Target = PathFinding.Interp(m_vCurPoints, m_fPer + lookAheadAmount);
+            
+            //获取曲线上当前角色的位置
+            Vector3 t0 = PathFinding.Interp(m_vCurPoints, m_fPer);
+            //角色当前位置
+            Vector3 playerpos = Owner.ActorTrans.position;
+
+            Vector3 dir = (playerpos - t0).normalized;
+
+            float dis = Vector3.Distance(playerpos, t0);
+
+            Vector3 t1 = Target + dir * dis;
+            transform.LookAt2D(t1);
+        }
+        #endregion
     }
+
+    void VTranslatePlayer()
+    {
+
+        m_fCurPercent += m_fSpeed * Time.deltaTime;
+        m_fPer = m_fCurPercent % 1f;
+
+        Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
+
+        transform.position = Vector3.Lerp(transform.position, new Vector3(
+            pos.x,
+            transform.position.y,
+            pos.z
+            ), 10 * Time.deltaTime);
+    }
+
+    eVRunState m_eRunState = eVRunState.eRun_Middle;
+    eVRunState m_eLastRunState = eVRunState.eRun_Middle;
+    float movespeed = 5f;
+    float movedistance = 2.5f;
+    bool bIsMoving = false;
+    float speed = 0f;
+    float duration = 0.5f;
+    float tmpdur = 0.5f;
+    int index = 1;
+    void DetectSwipe()
+    {
+        CalMoveInput();
+        if (!bIsMoving)
+        {
+            if (m_vInputMove.x < 0)
+            {
+                if (m_eRunState <= eVRunState.eRun_Left)
+                    m_eRunState = eVRunState.eRun_Left;
+                else
+                    m_eRunState -= 1;
+            }
+            else if (m_vInputMove.x > 0)
+            {
+                if (m_eRunState >= eVRunState.eRun_Right)
+                    m_eRunState = eVRunState.eRun_Right;
+                else
+                    m_eRunState += 1;
+            }
+
+            if (m_eLastRunState != m_eRunState)
+            {
+                if (m_eLastRunState > m_eRunState)//左移
+                {
+                    speed = 0 - movespeed;
+                }
+                else//右移
+                {
+                    speed = movespeed;
+                }
+
+                bIsMoving = true;
+                tmpdur = duration;
+                index = 1;
+            }
+        }
+        else
+        {
+            if (tmpdur >= 0f)
+            {
+                //获取当前点坐标
+                m_fCurPercent += m_fSpeed * Time.deltaTime;
+                m_fPer = m_fCurPercent % 1f;
+                Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
+                transform.position = Vector3.Lerp(transform.position, new Vector3(
+                    pos.x,
+                    transform.position.y,
+                    pos.z
+                    ), 10 * Time.deltaTime);
+                //获取横向平移之后的坐标
+                Owner.ActorTrans.Translate(Owner.ActorTrans.right * speed * Time.deltaTime * index, Space.Self);
+                index++;
+                tmpdur -= Time.deltaTime;
+            }
+            else
+            {
+                bIsMoving = false;
+            }
+        }
+      
+        m_eLastRunState = m_eRunState;
+
+    }
+
     #endregion
 
     #region 非主角NPC状态机驱动接口
@@ -1032,3 +1325,25 @@ public class PlayerManager : MonoBehaviour
 //            }
 //        return false;
 //    }
+
+
+       //if (tmpdur >= 0f)
+       //     {
+       //         //获取当前点坐标
+       //         m_fCurPercent += m_fSpeed * Time.deltaTime;
+       //         m_fPer = m_fCurPercent % 1f;
+       //         Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
+       //         transform.position = Vector3.Lerp(transform.position, new Vector3(
+       //             pos.x,
+       //             transform.position.y,
+       //             pos.z
+       //             ), 10 * Time.deltaTime);
+       //         //获取横向平移之后的坐标
+       //         Owner.ActorTrans.Translate(Owner.ActorTrans.right * speed * Time.deltaTime * index, Space.Self);
+       //         index++;
+       //         tmpdur -= Time.deltaTime;
+       //     }
+       //     else
+       //     {
+       //         bIsMoving = false;
+       //     }

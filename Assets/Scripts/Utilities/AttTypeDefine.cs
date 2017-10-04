@@ -243,35 +243,12 @@ namespace AttTypeDefine
 
     public enum eRunMode
     {
-        eRun_NULL = 0,
-        eRun_Horizontal,
+        eRun_Horizontal = 0,
         eRun_Vertical,
         eRun_Size,
     }
 
-    public struct sRoleBehaviour            //保存角色行为参数
-    {
-
-        public eRunMode RunMode;                    //跑步模式
-
-        public sRoleJump HorizontalJump;            //横向跳跃
-
-        public sRoleJump VerticalSmallJump;       //纵向小跳
-
-        public sRoleJump VerticalBigJump;           //纵向大条
-
-        public bool CanFire;                //是否可以开火
-
-        public bool CanPickUpBox;     //是否可以举箱子
-
-        public float RoleMoveSpeed;
-
-        public float RoleRotSpeed;
-
-        public float RoleInjureBackSpeed;
-
-    }
-
+    
     public struct sRoleJump
     {
 
@@ -288,6 +265,13 @@ namespace AttTypeDefine
         public float JumpInitSpeed; //跳跃初速度
         public float JumpAccel;     //跳跃加速度
         public float JumpUpDuration;  //上跳持续时间.
+    }
+
+    public enum eVRunState
+    {
+        eRun_Left,
+        eRun_Middle,
+        eRun_Right,
     }
 
 

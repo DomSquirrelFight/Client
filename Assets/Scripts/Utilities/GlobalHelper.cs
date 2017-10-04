@@ -19,6 +19,15 @@ public class GlobalHelper
         }
     }
 
+    public static float GetDIr(float he)
+    {
+        if (he < 0f)
+            return -1;
+        else if (he > 0f)
+            return 1;
+        return 0f;
+    }
+
     public static bool CheckMoveBoundaryBlock(Vector3 pos,float size)
     {
 

@@ -69,6 +69,11 @@ public class PathFinding : MonoBehaviour
                 + .5f * c - .5f * a;
     }
 
+    public static Vector3 GetDir(Vector3[] source, float t)
+    {
+        return Velocity(source, t).normalized;
+    }
+
     public static void RecalculatePath(ref Vector3[] source, Vector3[] nextArea, ref float fRealPercent)             //重新计算路线
     {
         float per = fRealPercent % 1f;
