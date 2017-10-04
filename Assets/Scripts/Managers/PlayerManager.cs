@@ -5,6 +5,7 @@ using AttTypeDefine;
 using System.Linq;
 using Assets.Scripts.Helper;
 using Assets.Scripts.AssetInfoEditor;
+using Assets.Scripts.WayFinding;
 using System;
 public class PlayerManager : MonoBehaviour
 {
@@ -196,8 +197,6 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 外部接口 / 系统接口
-
-    
 
     public void OnStart(BaseActor owner, PathArea birthArea)
     {
@@ -841,297 +840,44 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 纵向运动接口
-
-        bool IsInTransition()
-        {
-            return bIsMoving;
-        }
-
-        void SetTransition()
-        {  
-            switch (m_eLastRunState)
-            {
-                case eVRunState.eRun_Left:
-                    {
-                        if (m_vInputMove.x > 0)
-                        {
-                            m_eRunState += 1;
-                            speed = movespeed;
-                            bIsMoving = true;
-                        }
-                        break;
-                    }
-                case eVRunState.eRun_Middle:
-                    {
-                        m_eRunState += (int)m_vInputMove.x;
-                        speed = ((int)m_vInputMove.x) * movespeed;
-                        bIsMoving = true;
-                        break;
-                    }
-                case eVRunState.eRun_Right:{
-                        if (m_vInputMove.x < 0)
-                        {
-                            m_eRunState -= 1;
-                            speed = 0 - movespeed;
-                            bIsMoving = true;
-                        }
-                        break;
-                    }
-            }
-
-            if(bIsMoving)
-                tmpdur = duration;
-        }
-
-        public void VCalMoveInput()                                              //获取平移输入
-        {
-
-            m_vInputMove = Vector2.zero;
-
-            if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
-            {
-                m_vInputMove = m_UISceneFight.DirPos; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
-            }
-            else
-            {
-                he = Input.GetAxis("Horizontal");
-                if (0f == he && (m_UISceneFight))
-                {
-                    m_vInputMove = m_UISceneFight.DirPos; //否则 用摇杆数据
-                }
-                else if (0f != he)
-                {
-                    m_vInputMove.x = GlobalHelper.GetDIr(he);
-                }
-            }
-        }
-        
-        Vector3 GetCurCurvePos()                    //获取当前曲线的位置坐标
-        {
-
-            m_fCurPercent += Owner.RoleBehaInfos.RoleMoveSpeed * Time.deltaTime;
-        
-            m_fPer = m_fCurPercent % 1f;
-
-            return PathFinding.Interp(m_vCurPoints, m_fPer);
-
-        }
-
-        bool IsTransitionOver()
-        {
-            if (IsInTransition())
-            {
-                if (tmpdur > 0f)
-                    return false;
-                else
-                    return true;
-            }
-            return false;
-        }
-
-        void CloseTransition()
-        {
-            float dis = speed * (duration - tmpdur);
-            bIsMoving = false; tmpdur = 0f;
-
-            m_eLastRunState = m_eRunState;
-        }
-
-        float GetCurShiftDis()
-        {
-            float dis = 0f;// GlobalHelper.GetDIr(speed) * movedistance;
-            if (IsInTransition())
-            {
-                tmpdur -= Time.deltaTime;
-                dis = speed * (duration - tmpdur);
-                float tmp = Mathf.Abs(dis);
-                if ( tmp > movedistance)
-                {
-                    dis = GlobalHelper.GetDIr(speed) * tmp; 
-                }
-            }
-            return dis;
-        }
-
-        Vector3 GetFinalPos(Vector3 curpos, float dis)
-        {
-            return curpos + transform.right * dis;
-        }
-
-        Vector3 GetCurCurveDir()
-        {
-            return PathFinding.GetDir(m_vCurPoints, m_fPer);
-        }
-
-        Vector3 GetCurPos()
-        {
-            Vector3 curpos = GetCurCurvePos();
-            //if (!IsInTransition())
-            {
-                switch (m_eLastRunState)
-                {
-                    case eVRunState.eRun_Left:
-                        {
-                            curpos +=   transform.right * (0 - movedistance);
-                            break;
-                        }
-                    case eVRunState.eRun_Right:
-                        {
-                            curpos += transform.right* (movedistance);
-                            break;
-                        }
-                }
-            }
-            return curpos;
-        }
-        
-        void VerticalMove() {
-
-
-            //接受输入，状态切换
-            VCalMoveInput();
-
-            if (!IsInTransition())      //判断是否在转换状态
-            {
-                if (m_vInputMove.x != 0f)
-                {
-                    SetTransition();            //设置转换
-                }
-            }
-
-            //获取曲线当前点的速度方向.
-            Vector3 dir = GetCurCurveDir();
-
-            transform.rotation = Quaternion.Euler(dir);
-
-            //获取角色当前的位置.
-            Vector3 curpos = GetCurPos();
-
-            //偏移数值 如果是在切换状态下，那么偏移的数值会和非偏移情况下有所不同
-            float dis = GetCurShiftDis();
-
-            //计算偏移后的角色位置
-            Vector3 finalpos = GetFinalPos(curpos, dis);
-
-            transform.position = new Vector3(finalpos.x, transform.position.y, finalpos.z);
-
-            if (IsTransitionOver())
-                CloseTransition();
-
-         
-
-        }
-
-    public void VRotatePlayer()
+    void VerticalMove()
     {
-        #region 旋转角色
-        if ( m_fPer + lookAheadAmount <= 1f)
-        {
-            Target = PathFinding.Interp(m_vCurPoints, m_fPer + lookAheadAmount);
-            
-            //获取曲线上当前角色的位置
-            Vector3 t0 = PathFinding.Interp(m_vCurPoints, m_fPer);
-            //角色当前位置
-            Vector3 playerpos = Owner.ActorTrans.position;
+        VCalMoveInput();        //计算输入
 
-            Vector3 dir = (playerpos - t0).normalized;
+        CalCurvePercent();      //计算曲线进度
 
-            float dis = Vector3.Distance(playerpos, t0);
+        Owner.CRunFor.VerticalMove((int)m_vInputMove.x, m_vCurPoints, m_fPer);
+    }                                                         //根据外界输入，转换输入数据格式
 
-            Vector3 t1 = Target + dir * dis;
-            transform.LookAt2D(t1);
-        }
-        #endregion
-    }
-
-    void VTranslatePlayer()
+    void CalCurvePercent()
     {
+        m_fCurPercent += Owner.RoleBehaInfos.RoleMoveSpeed * Time.deltaTime;
 
-        m_fCurPercent += m_fSpeed * Time.deltaTime;
         m_fPer = m_fCurPercent % 1f;
+    }                                                    //计算当前曲线进度
 
-        Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
-
-        transform.position = Vector3.Lerp(transform.position, new Vector3(
-            pos.x,
-            transform.position.y,
-            pos.z
-            ), 10 * Time.deltaTime);
-    }
-
-    eVRunState m_eRunState = eVRunState.eRun_Middle;
-    eVRunState m_eLastRunState = eVRunState.eRun_Middle;
-    float movespeed = 20f;
-    float movedistance = 5f;
-    bool bIsMoving = false;
-    float speed = 0f;
-    float duration = 0.25f;
-    float tmpdur = 0.25f;
-    int index = 1;
-    void DetectSwipe()
+    public void VCalMoveInput()                                              //获取平移输入
     {
-        CalMoveInput();
-        if (!bIsMoving)
+
+        m_vInputMove = Vector2.zero;
+
+        if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
         {
-            if (m_vInputMove.x < 0)
-            {
-                if (m_eRunState <= eVRunState.eRun_Left)
-                    m_eRunState = eVRunState.eRun_Left;
-                else
-                    m_eRunState -= 1;
-            }
-            else if (m_vInputMove.x > 0)
-            {
-                if (m_eRunState >= eVRunState.eRun_Right)
-                    m_eRunState = eVRunState.eRun_Right;
-                else
-                    m_eRunState += 1;
-            }
-
-            if (m_eLastRunState != m_eRunState)
-            {
-                if (m_eLastRunState > m_eRunState)//左移
-                {
-                    speed = 0 - movespeed;
-                }
-                else//右移
-                {
-                    speed = movespeed;
-                }
-
-                bIsMoving = true;
-                tmpdur = duration;
-                index = 1;
-            }
+            m_vInputMove = m_UISceneFight.DirPos; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
         }
         else
         {
-            if (tmpdur >= 0f)
+            he = Input.GetAxis("Horizontal");
+            if (0f == he && (m_UISceneFight))
             {
-                //获取当前点坐标
-                m_fCurPercent += m_fSpeed * Time.deltaTime;
-                m_fPer = m_fCurPercent % 1f;
-                Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
-                transform.position = Vector3.Lerp(transform.position, new Vector3(
-                    pos.x,
-                    transform.position.y,
-                    pos.z
-                    ), 10 * Time.deltaTime);
-                //获取横向平移之后的坐标
-                Owner.ActorTrans.Translate(Owner.ActorTrans.right * speed * Time.deltaTime * index, Space.Self);
-                index++;
-                tmpdur -= Time.deltaTime;
+                m_vInputMove = m_UISceneFight.DirPos; //否则 用摇杆数据
             }
-            else
+            else if (0f != he)
             {
-                bIsMoving = false;
+                m_vInputMove.x = GlobalHelper.GetDIr(he);
             }
         }
-      
-        m_eLastRunState = m_eRunState;
-
     }
-
     #endregion
 
     #region 非主角NPC状态机驱动接口
@@ -1251,99 +997,3 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
 }
-
-//#region Pick up box, Throw box, Destroy box
-
-//void DestroyBox()
-//{
-//    Destroy(m_bcCurBox);
-//    m_bcCurBox = null;
-//}
-
-//void DoBeforePickUpBox()
-//{
-//    m_bcCurBox.gameObject.layer = HoldBoxMaskGlossy;
-//    m_bcCurBox.isTrigger = true;                                                                                            //将盒子变成触发器           
-//    float radius = m_bcCurBox.size.y + Owner.ActorHeight * 0.5f ;                             //确认运动半径
-//    m_bcCurBox.transform.parent = Owner.ActorTrans.transform;                                          //将盒子变成主角的孩子
-//    m_bIsHoldBox = true;                                                                                                       //标识当前是举着箱子的状态
-//    StartCoroutine(PickUpBoxBehaviour(radius));                                                                             //播放举箱子动画
-//}
-
-//IEnumerator PickUpBoxBehaviour(float radius)
-//{
-//    //盒子繞著指定的半徑，圍繞主角做圓周運動
-//    while (m_bcCurBox.transform.localPosition.y < radius - 0.1f)
-//    {
-//        m_bcCurBox.transform.localPosition = Vector3.Lerp(m_bcCurBox.transform.localPosition, new Vector3(0f, radius, 0f), 30 * Time.deltaTime);
-
-//         yield return null;
-//    }
-
-//    m_bcCurBox.gameObject.transform.localRotation = Quaternion.identity;
-
-//}
-
-//#endregion
-//    public bool CalPickUpBox()
-//    {
-
-//            if (m_bIsHoldBox == false && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide && m_vInputMove.x != 0f && null == m_bcCurBox)
-//            {
-//                float y = Owner.ActorTrans.position.y + Owner.ActorHeight * 0.5f;
-//                pos = new Vector3(Owner.ActorTrans.position.x, y, Owner.ActorTrans.position.z);
-
-//                //拿到所有的盒子，然后判定盒子位置最低的<判定的依据，做多有两个盒子> todo_erric ： 如何有多个盒子，或者尺寸出现了变化，那么就无法判定了
-//                RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3 (0.1f, Owner.ActorHeight * 0.4f, Owner.ActorHeight * 0.5f), Owner.ActorTrans.forward, Quaternion.Euler (Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f + 0.2f, BoxMask);
-//                if (hits.Length > 0)
-//                {
-//                    if (hits.Length > 1)
-//                        m_bcCurBox = (hits[0].transform.position.y > hits[1].transform.position.y ? (BoxCollider)(hits[1].collider) : (BoxCollider)(hits[0].collider));
-//                    else
-//                        m_bcCurBox = (BoxCollider)(hits[0].collider);
-//#if UNITY_EDITOR
-//                    Debug.Log("Successfully Pick up the Box");
-//#endif
-//                    DoBeforePickUpBox();
-//                    return true;
-//                }
-//                else
-//                {
-//#if UNITY_EDITOR
-//                    Debug.Log("Fail to pick up the box");
-//#endif
-//                }
-//            }
-//            else if (m_bIsHoldBox == true && m_bcCurBox != null && m_ePlayerNormalBehav < ePlayerNormalBeha.eNormalBehav_Hide)
-//            {
-//                m_bIsHoldBox = false;                                                                                               //复位托举状态
-//                m_bcCurBox.transform.parent = null;                                                                        // 将箱子的父亲设置为空
-//                BoxController boxCon = m_bcCurBox.transform.GetComponent<BoxController>();   // 启动箱子的运动
-//                boxCon.OnStart();
-//                m_bcCurBox = null;                                                                                                  //这样接下来就可以在举箱子
-//                return true;
-//            }
-//        return false;
-//    }
-
-
-       //if (tmpdur >= 0f)
-       //     {
-       //         //获取当前点坐标
-       //         m_fCurPercent += m_fSpeed * Time.deltaTime;
-       //         m_fPer = m_fCurPercent % 1f;
-       //         Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
-       //         transform.position = Vector3.Lerp(transform.position, new Vector3(
-       //             pos.x,
-       //             transform.position.y,
-       //             pos.z
-       //             ), 10 * Time.deltaTime);
-       //         //获取横向平移之后的坐标
-       //         Owner.ActorTrans.Translate(Owner.ActorTrans.right * speed * Time.deltaTime * index, Space.Self);
-       //         index++;
-       //         tmpdur -= Time.deltaTime;
-       //     }
-       //     else
-       //     {
-       //         bIsMoving = false;
-       //     }

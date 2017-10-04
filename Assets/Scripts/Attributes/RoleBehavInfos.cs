@@ -14,9 +14,17 @@ namespace Assets.Scripts.AssetInfoEditor
 
         public bool CanPickUpBox;     //是否可以举箱子
 
-        public float RoleMoveSpeed;
+        public float RoleMoveSpeed; //角色前进毒素
 
-        public float RoleInjureBackSpeed;
+        public float RoleInjureBackSpeed;   //角色受伤后退速度
+
+        public float RoleMoveHorizontalSpeed;       //角色横向运动速度
+
+        public float RoleMoveHorizontalDuration;        //角色横向运动持续时间
+
+        public float RoleMoveHorizontalDistance;              
+
+        public eVRunState RunState;//   横向运动位置 (Left, Middle, Right)
 
         public eRunMode RunMode = eRunMode.eRun_Horizontal;
 

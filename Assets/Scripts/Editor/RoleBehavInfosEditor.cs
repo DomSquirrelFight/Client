@@ -38,6 +38,10 @@ namespace Assets.Scripts.AssetInfoEditor
 
         string[] arrRunMode = new string[] { "横向运动", "纵向运动" };
         int[] arrNRunMode = new int[] { 0, 1};
+
+        string[] arrVRunState = new string[] { "横向-左", "横向-中", "横向-右" };
+        int[] arrNvRunState = new int[] { 0, 1, 2 };
+
         #endregion
 
 
@@ -180,19 +184,52 @@ namespace Assets.Scripts.AssetInfoEditor
             EditorGUILayout.EndHorizontal();
             #endregion
 
-            //#region 大跳跃初速度
-            //EditorGUILayout.BeginHorizontal();
-            //EditorGUILayout.LabelField("大跳跃初速度");
-            //EditorGUILayout.LabelField(_data.BigJumpInitSpeed.ToString());
-            //EditorGUILayout.EndHorizontal();
-            //#endregion
+            #region 横向运动速度
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("横向运动速度");
+            fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalSpeed);
+            if (fValue != _data.RoleMoveHorizontalSpeed)
+            {
+                _data.RoleMoveHorizontalSpeed = fValue;
+                _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+                EditorUtility.SetDirty(_data);
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
 
-            //#region 大跳跃高度
-            //EditorGUILayout.BeginHorizontal();
-            //EditorGUILayout.LabelField("大跳跃高度");
-            //EditorGUILayout.LabelField(_data.BigJumpHeight.ToString());
-            //EditorGUILayout.EndHorizontal();
-            //#endregion
+            #region 角色横向运动持续时间
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("角色横向运动持续时间");
+            fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalDuration);
+            if (fValue != _data.RoleMoveHorizontalDuration)
+            {
+                _data.RoleMoveHorizontalDuration = fValue;
+                _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+                EditorUtility.SetDirty(_data);
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
+
+            #region 角色横向运动距离
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("角色横向运动距离");
+            _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+            EditorGUILayout.LabelField(_data.RoleMoveHorizontalDistance.ToString());
+            EditorGUILayout.EndHorizontal();
+            #endregion
+
+            #region 横向运动位置
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("横向运动位置");
+            nValue = EditorGUILayout.IntPopup((int)_data.RunState, arrVRunState, arrNvRunState);
+
+            if (nValue != (int)_data.RunState)
+            {
+                _data.RunState = (eVRunState)nValue;
+                EditorUtility.SetDirty(_data);
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
         }
 
         void OnGUI()

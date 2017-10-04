@@ -4,6 +4,7 @@ using UnityEngine;
 using AttTypeDefine;
 using System;
 using Assets.Scripts.AssetInfoEditor;
+using Assets.Scripts.WayFinding;
 public class BaseActor : MonoBehaviour
 {
 
@@ -102,6 +103,14 @@ public class BaseActor : MonoBehaviour
     #endregion
 
     #region 角色行为参数
+    CRunningForward rf;
+    public CRunningForward CRunFor
+    {
+        get
+        {
+            return rf;
+        }
+    }
     RoleBehavInfos[] ArrRoleBehaInfos;
     public void SetCurRoleBehavInfos(eRunMode mode)
     {
@@ -115,6 +124,10 @@ public class BaseActor : MonoBehaviour
             case eRunMode.eRun_Vertical:
                 {
                     rolebehainfo = ArrRoleBehaInfos[1];
+                    if (null == rf)
+                    {
+                        rf = new CRunningForward(Actor.transform, rolebehainfo.RunState, rolebehainfo.RoleMoveHorizontalSpeed, rolebehainfo.RoleMoveHorizontalDuration, rolebehainfo.RoleMoveHorizontalDistance);
+                    }
                     break;
                 }
         }
@@ -516,6 +529,7 @@ public class BaseActor : MonoBehaviour
     void OnDisable()
     {
         ArrRoleBehaInfos = null;
+        rf.ClearData(); rf = null;
     }
     #endregion
 

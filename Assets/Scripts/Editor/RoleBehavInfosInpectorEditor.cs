@@ -21,6 +21,9 @@ public class RoleBehavInfosInpectorEditor : Editor {
     string[] arrRunMode = new string[] { "横向运动", "纵向运动" };
     int[] arrNRunMode = new int[] { 0, 1 };
 
+    string[] arrVRunState = new string[] { "横向-左", "横向-中", "横向-右"};
+    int[] arrNvRunState = new int[] { 0, 1, 2 };
+
     void OnEnable()
     {
         _data = target as RoleBehavInfos;
@@ -35,6 +38,7 @@ public class RoleBehavInfosInpectorEditor : Editor {
         if (bValue != _data.CanSmallJump)
         {
             _data.CanSmallJump = bValue;
+            EditorUtility.SetDirty(_data);
         }
         EditorGUILayout.EndHorizontal();
         #endregion
@@ -48,6 +52,7 @@ public class RoleBehavInfosInpectorEditor : Editor {
             _data.SmallJumpAccel = fValue;
             _data.SmallJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.SmallJumpAccel, _data.SmallJumpUpDuration);
             _data.SmallJumpHeight = GlobalHelper.CalculateJumpHeight(_data.SmallJumpInitSpeed, _data.SmallJumpAccel, _data.SmallJumpUpDuration);
+            EditorUtility.SetDirty(_data);
         }
         EditorGUILayout.EndHorizontal();
         #endregion
@@ -61,6 +66,7 @@ public class RoleBehavInfosInpectorEditor : Editor {
             _data.SmallJumpUpDuration = fValue;
             _data.SmallJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.SmallJumpAccel, _data.SmallJumpUpDuration);
             _data.SmallJumpHeight = GlobalHelper.CalculateJumpHeight(_data.SmallJumpInitSpeed, _data.SmallJumpAccel, _data.SmallJumpUpDuration);
+            EditorUtility.SetDirty(_data);
         }
         EditorGUILayout.EndHorizontal();
         #endregion
@@ -86,6 +92,7 @@ public class RoleBehavInfosInpectorEditor : Editor {
         if (fValue != _data.RoleMoveSpeed)
         {
             _data.RoleMoveSpeed = fValue;
+            EditorUtility.SetDirty(_data);
         }
         EditorGUILayout.EndHorizontal();
         #endregion
@@ -102,6 +109,7 @@ public class RoleBehavInfosInpectorEditor : Editor {
         if (bValue != _data.CanFire)
         {
             _data.CanFire = bValue;
+            EditorUtility.SetDirty(_data);
         }
         EditorGUILayout.EndHorizontal();
         #endregion
@@ -112,6 +120,7 @@ public class RoleBehavInfosInpectorEditor : Editor {
         if (bValue != _data.CanPickUpBox)
         {
             _data.CanPickUpBox = bValue;
+            EditorUtility.SetDirty(_data);
         }
         EditorGUILayout.EndHorizontal();
         #region 角色后退速度
@@ -121,6 +130,7 @@ public class RoleBehavInfosInpectorEditor : Editor {
         if (fValue != _data.RoleInjureBackSpeed)
         {
             _data.RoleInjureBackSpeed = fValue;
+            EditorUtility.SetDirty(_data);
         }
         EditorGUILayout.EndHorizontal();
         #endregion
@@ -130,12 +140,14 @@ public class RoleBehavInfosInpectorEditor : Editor {
     void VerticalMove()
     {
         CommonMove();
+
         #region 是否可以大跳跃
         EditorGUILayout.BeginHorizontal();
         bValue = EditorGUILayout.Toggle("是否可以大跳跃", _data.CanBigJump);
         if (bValue != _data.CanBigJump)
         {
             _data.CanBigJump = bValue;
+            EditorUtility.SetDirty(_data);
         }
         EditorGUILayout.EndHorizontal();
         #endregion
@@ -149,6 +161,7 @@ public class RoleBehavInfosInpectorEditor : Editor {
             _data.BigJumpAccel = fValue;
             _data.BigJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.BigJumpAccel, _data.BigJumpUpDuration);
             _data.BigJumpHeight = GlobalHelper.CalculateJumpHeight(_data.BigJumpInitSpeed, _data.BigJumpAccel, _data.BigJumpUpDuration);
+            EditorUtility.SetDirty(_data);
         }
         EditorGUILayout.EndHorizontal();
         #endregion
@@ -162,23 +175,57 @@ public class RoleBehavInfosInpectorEditor : Editor {
             _data.BigJumpUpDuration = fValue;
             _data.BigJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.BigJumpAccel, _data.BigJumpUpDuration);
             _data.BigJumpHeight = GlobalHelper.CalculateJumpHeight(_data.BigJumpInitSpeed, _data.BigJumpAccel, _data.BigJumpUpDuration);
+            EditorUtility.SetDirty(_data);
         }
         EditorGUILayout.EndHorizontal();
         #endregion
 
-        //#region 大跳跃初速度
-        //EditorGUILayout.BeginHorizontal();
-        //EditorGUILayout.LabelField("大跳跃初速度");
-        //EditorGUILayout.LabelField(_data.BigJumpInitSpeed.ToString());
-        //EditorGUILayout.EndHorizontal();
-        //#endregion
+        #region 横向运动速度
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("横向运动速度");
+        fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalSpeed);
+        if (fValue != _data.RoleMoveHorizontalSpeed)
+        {
+            _data.RoleMoveHorizontalSpeed = fValue;
+            _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+            EditorUtility.SetDirty(_data);
+        }
+        EditorGUILayout.EndHorizontal();
+        #endregion
 
-        //#region 大跳跃高度
-        //EditorGUILayout.BeginHorizontal();
-        //EditorGUILayout.LabelField("大跳跃高度");
-        //EditorGUILayout.LabelField(_data.BigJumpHeight.ToString());
-        //EditorGUILayout.EndHorizontal();
-        //#endregion
+        #region 角色横向运动持续时间
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("角色横向运动持续时间");
+        fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalDuration);
+        if (fValue != _data.RoleMoveHorizontalDuration)
+        {
+            _data.RoleMoveHorizontalDuration = fValue;
+            _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+            EditorUtility.SetDirty(_data);
+        }
+        EditorGUILayout.EndHorizontal();
+        #endregion
+
+        #region 角色横向运动距离
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("角色横向运动距离");
+        _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+        EditorGUILayout.LabelField(_data.RoleMoveHorizontalDistance.ToString());
+        EditorGUILayout.EndHorizontal();
+        #endregion
+
+        #region 横向运动位置
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("横向运动位置");
+        nValue = EditorGUILayout.IntPopup((int)_data.RunState, arrVRunState, arrNvRunState);
+
+        if (nValue != (int)_data.RunState)
+        {
+            _data.RunState = (eVRunState)nValue;
+            EditorUtility.SetDirty(_data);
+        }
+        EditorGUILayout.EndHorizontal();
+        #endregion
     }
 
     public override void OnInspectorGUI()
@@ -202,6 +249,7 @@ public class RoleBehavInfosInpectorEditor : Editor {
         if (nValue != (int)_data.RunMode)
         {
             _data.RunMode = (eRunMode)nValue;
+            EditorUtility.SetDirty(_data);
         }
         EditorGUILayout.EndHorizontal();
 
