@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using AttTypeDefine;
+using Assets.Scripts.Helper;
 
 public class UIScene_GetNum : UIScene {
     //登陆按钮
@@ -17,15 +18,13 @@ public class UIScene_GetNum : UIScene {
 	void Start () {
         //注册成功，点击login，登录成功，进入人物选择界面
         UIEventListener.Get(m_Login).onClick = Login;
-        //当前跳转到selectedloading
-        eState = LoadingState.e_LoadSelect;
-        //eScene = SceneType.SelecteLoading;
 	}
 	//跳转到人物选择界面
     void Login(GameObject obj)
     {
         AudioManager.PlayAudio(null, eAudioType.Audio_UI, m_strLogin);
         //做一次判断，当前用户名和密码是不是和数据库相符
-        GlobalHelper.LoadLevel("Loading");
+        Helpers.UIScene<UIScene_SelecteV1>();
+        Destroy(gameObject);
     }
 }

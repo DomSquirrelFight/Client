@@ -23,7 +23,6 @@ namespace AttTypeDefine
     {
         e_LoadLevel,
         e_ProcessBar,
-        e_LoadSelect,
         e_StartTime,
         e_Null,
     }

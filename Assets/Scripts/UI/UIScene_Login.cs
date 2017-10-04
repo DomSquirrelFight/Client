@@ -25,7 +25,7 @@ public class UIScene_Login : UIScene {
         UIEventListener.Get(m_oLogin).onClick = Login;
         UIEventListener.Get(m_oRegister).onClick = Register;
         UIEventListener.Get(m_LostPwd).onClick = BackPwd;
-        eState = LoadingState.e_LoadSelect;
+      
     }
     #endregion
 
