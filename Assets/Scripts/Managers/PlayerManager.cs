@@ -713,30 +713,11 @@ public class PlayerManager : MonoBehaviour
 
         public void RotatePlayer()
         {
-            #region 旋转角色
-            if (m_fPer - lookAheadAmount >= float.Epsilon && m_fPer + lookAheadAmount <= 1f)
-            {
-                if (m_vInputMove.x > 0f)
-                {
-                    Target = PathFinding.Interp(m_vCurPoints, m_fPer + lookAheadAmount);
-                }
-                else if (m_vInputMove.x < 0f)
-                {
-                    Target = PathFinding.Interp(m_vCurPoints, m_fPer - lookAheadAmount);
-                }
-
-                    transform.LookAt2D(Target);
-             
-
-
-                //OldRot = transform.rotation;
-              
-                //CurRot = transform.rotation;
-                //transform.rotation = OldRot;
-                //transform.rotation = Quaternion.Lerp(transform.rotation, CurRot, 10 * Time.deltaTime);
-
-            }
-            #endregion
+            Vector3 dir = PathFinding.GetDir(m_vCurPoints, m_fPer);
+            if (m_vInputMove.x > 0f)
+                transform.forward = dir;
+            else if (m_vInputMove.x < 0f)
+                transform.forward = new Vector3(0 - dir.x, dir.y, 0 - dir.z);
         }
 
         public void TranslatePlayer()
