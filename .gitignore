@@ -13,3 +13,4 @@ Client.Plugins.csproj
 *.csproj
 *.user
 Client.CSharp.csproj.user
+Client.userprefs

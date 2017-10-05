@@ -232,7 +232,8 @@ public class BaseActor : MonoBehaviour
                     if (
                      null != ba.RB/*加载刚体*/ ||
                      null != ba.SkillMgr ||
-                     null != ba.AnimMgr
+                     null != ba.AnimMgr ||
+                     null != ba.PlayerMgr
                      )
                     {
                         ba.SkillMgr.OnStart(ba);
