@@ -23,7 +23,7 @@ public class SelfRotation : MonoBehaviour {
                 //播放特效
                 GameObject obj = Instantiate(Resources.Load("IGSoft_Projects/Projects/Projects_1/PT_Baodian010"), (transform.position + Vector3.up*3.5f), transform.rotation) as GameObject;
                 //播放音乐
-
+                AudioManager.PlayAudio(ba.gameObject, AttTypeDefine.eAudioType.Audio_Skill, "SpawnSuccess");
                 //销毁金币
                 Destroy(gameObject);
             }
