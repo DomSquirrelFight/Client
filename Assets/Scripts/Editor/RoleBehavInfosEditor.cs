@@ -38,47 +38,15 @@ namespace Assets.Scripts.AssetInfoEditor
 
         string[] arrRunMode = new string[] { "横向运动", "纵向运动" };
         int[] arrNRunMode = new int[] { 0, 1};
+
+        string[] arrVRunState = new string[] { "横向-左", "横向-中", "横向-右" };
+        int[] arrNvRunState = new int[] { 0, 1, 2 };
+
         #endregion
 
-        void OnGUI()
+
+        void CommonMove()
         {
-
-            #region 初始化数据
-            if (null == _data)
-            {
-                _data = AssetDatabase.LoadAssetAtPath(DataPath, typeof(RoleBehavInfos)) as RoleBehavInfos;
-                if (null == _data)
-                {
-                    _data = CreateInstance<RoleBehavInfos>() as RoleBehavInfos;
-                    AssetDatabase.CreateAsset(_data, DataPath);
-                    AssetDatabase.Refresh();
-                }
-            }
-            #endregion
-
-            #region Role ID
-            EditorGUILayout.BeginHorizontal();
-            nValue = EditorGUILayout.IntField("角色ID", _data.RoleID);
-            if (nValue != _data.RoleID)
-            {
-                _data.RoleID = nValue;
-            }
-            EditorGUILayout.EndHorizontal();
-            #endregion
-
-            #region 运动模式
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("运动模式");
-            nValue = EditorGUILayout.IntPopup((int)_data.RunMode, arrRunMode, arrNRunMode);
-
-            if (nValue != (int)_data.RunMode)
-            {
-                _data.RunMode = (eRunMode)nValue;
-            }
-            EditorGUILayout.EndHorizontal();
-
-            #endregion
-
             #region 是否可以小跳跃
             EditorGUILayout.BeginHorizontal();
             bValue = EditorGUILayout.Toggle("是否可以小跳跃", _data.CanSmallJump);
@@ -129,6 +97,57 @@ namespace Assets.Scripts.AssetInfoEditor
             EditorGUILayout.EndHorizontal();
             #endregion
 
+            #region 角色移动速度
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("角色移动速度");
+            fValue = EditorGUILayout.FloatField(_data.RoleMoveSpeed);
+            if (fValue != _data.RoleMoveSpeed)
+            {
+                _data.RoleMoveSpeed = fValue;
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
+
+        }
+
+        void HorizontalMove()
+        {
+            CommonMove();
+
+            #region 是否可以发射子弹
+            EditorGUILayout.BeginHorizontal();
+            bValue = EditorGUILayout.Toggle("是否可以发射子弹", _data.CanFire);
+            if (bValue != _data.CanFire)
+            {
+                _data.CanFire = bValue;
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
+
+            #region 是否可以举箱子
+            EditorGUILayout.BeginHorizontal();
+            bValue = EditorGUILayout.Toggle("是否可以举箱子", _data.CanPickUpBox);
+            if (bValue != _data.CanPickUpBox)
+            {
+                _data.CanPickUpBox = bValue;
+            }
+            EditorGUILayout.EndHorizontal();
+            #region 角色后退速度
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("角色后退速度");
+            fValue = EditorGUILayout.FloatField(_data.RoleInjureBackSpeed);
+            if (fValue != _data.RoleInjureBackSpeed)
+            {
+                _data.RoleInjureBackSpeed = fValue;
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
+            #endregion
+        }
+
+        void VerticalMove()
+        {
+            CommonMove();
             #region 是否可以大跳跃
             EditorGUILayout.BeginHorizontal();
             bValue = EditorGUILayout.Toggle("是否可以大跳跃", _data.CanBigJump);
@@ -165,61 +184,104 @@ namespace Assets.Scripts.AssetInfoEditor
             EditorGUILayout.EndHorizontal();
             #endregion
 
-            #region 大跳跃初速度
+            #region 横向运动速度
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("大跳跃初速度");
-            EditorGUILayout.LabelField(_data.BigJumpInitSpeed.ToString());
-            EditorGUILayout.EndHorizontal();
-            #endregion
-
-            #region 大跳跃高度
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("大跳跃高度");
-            EditorGUILayout.LabelField(_data.BigJumpHeight.ToString());
-            EditorGUILayout.EndHorizontal();
-            #endregion
-
-            #region 是否可以发射子弹
-            EditorGUILayout.BeginHorizontal();
-            bValue = EditorGUILayout.Toggle("是否可以发射子弹", _data.CanFire);
-            if (bValue != _data.CanFire)
+            EditorGUILayout.LabelField("横向运动速度");
+            fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalSpeed);
+            if (fValue != _data.RoleMoveHorizontalSpeed)
             {
-                _data.CanFire = bValue;
+                _data.RoleMoveHorizontalSpeed = fValue;
+                _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #endregion
 
-            #region 是否可以举箱子
+            #region 角色横向运动持续时间
             EditorGUILayout.BeginHorizontal();
-            bValue = EditorGUILayout.Toggle("是否可以举箱子", _data.CanPickUpBox);
-            if (bValue != _data.CanPickUpBox)
+            EditorGUILayout.LabelField("角色横向运动持续时间");
+            fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalDuration);
+            if (fValue != _data.RoleMoveHorizontalDuration)
             {
-                _data.CanPickUpBox = bValue;
+                _data.RoleMoveHorizontalDuration = fValue;
+                _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #endregion
 
-            #region 角色移动速度
+            #region 角色横向运动距离
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("角色移动速度");
-            fValue = EditorGUILayout.FloatField(_data.RoleMoveSpeed);
-            if (fValue != _data.RoleMoveSpeed)
+            EditorGUILayout.LabelField("角色横向运动距离");
+            _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+            EditorGUILayout.LabelField(_data.RoleMoveHorizontalDistance.ToString());
+            EditorGUILayout.EndHorizontal();
+            #endregion
+
+            #region 横向运动位置
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("横向运动位置");
+            nValue = EditorGUILayout.IntPopup((int)_data.RunState, arrVRunState, arrNvRunState);
+
+            if (nValue != (int)_data.RunState)
             {
-                _data.RoleMoveSpeed = fValue;
+                _data.RunState = (eVRunState)nValue;
+                EditorUtility.SetDirty(_data);
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
+        }
+
+        void OnGUI()
+        {
+
+            #region 初始化数据
+            if (null == _data)
+            {
+                _data = AssetDatabase.LoadAssetAtPath(DataPath, typeof(RoleBehavInfos)) as RoleBehavInfos;
+                if (null == _data)
+                {
+                    _data = CreateInstance<RoleBehavInfos>() as RoleBehavInfos;
+                    AssetDatabase.CreateAsset(_data, DataPath);
+                    AssetDatabase.Refresh();
+                }
+            }
+            #endregion
+
+            #region Role ID
+            EditorGUILayout.BeginHorizontal();
+            nValue = EditorGUILayout.IntField("角色ID", _data.RoleID);
+            if (nValue != _data.RoleID)
+            {
+                _data.RoleID = nValue;
             }
             EditorGUILayout.EndHorizontal();
             #endregion
 
-            #region 角色后退速度
+            #region 运动模式
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("角色后退速度");
-            fValue = EditorGUILayout.FloatField(_data.RoleInjureBackSpeed);
-            if (fValue != _data.RoleInjureBackSpeed)
+            EditorGUILayout.LabelField("运动模式");
+            nValue = EditorGUILayout.IntPopup((int)_data.RunMode, arrRunMode, arrNRunMode);
+            if (nValue != (int)_data.RunMode)
             {
-                _data.RoleInjureBackSpeed = fValue;
+                _data.RunMode = (eRunMode)nValue;
             }
             EditorGUILayout.EndHorizontal();
+
             #endregion
+
+            switch (_data.RunMode)
+            {
+                case eRunMode.eRun_Horizontal:
+                    {
+                        HorizontalMove();
+                        break;
+                    }
+                case eRunMode.eRun_Vertical : {
+                        VerticalMove();
+                        break;
+                    }
+            }
 
             #region 提交数据
             GUI.color = Color.green;
@@ -241,8 +303,12 @@ namespace Assets.Scripts.AssetInfoEditor
                 //{
                 //    AssetDatabase.RemoveAssetBundleName(b[0], true);
                 //}
-
-                AssetDatabase.RenameAsset(DataPath,   _data.RoleID.ToString() + "1.asset");
+                string name = _data.RoleID.ToString() + "1.asset";
+                if (_data.RunMode == eRunMode.eRun_Vertical)
+                {
+                    name = _data.RoleID.ToString() + "2.asset";
+                }
+                AssetDatabase.RenameAsset(DataPath, name);
                 AssetDatabase.SaveAssets();
                 Close();
 

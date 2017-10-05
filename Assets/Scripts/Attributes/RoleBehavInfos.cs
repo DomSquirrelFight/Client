@@ -7,21 +7,26 @@ namespace Assets.Scripts.AssetInfoEditor
     [System.Serializable]
     public class RoleBehavInfos : ScriptableObject
     {
-
-
+        
         public int RoleID;
 
         public bool CanFire;                //是否可以开火
 
         public bool CanPickUpBox;     //是否可以举箱子
 
-        public float RoleMoveSpeed;
+        public float RoleMoveSpeed; //角色前进毒素
 
-        //public float RoleRotSpeed;
+        public float RoleInjureBackSpeed;   //角色受伤后退速度
 
-        public float RoleInjureBackSpeed;
+        public float RoleMoveHorizontalSpeed;       //角色横向运动速度
 
-        public eRunMode RunMode;
+        public float RoleMoveHorizontalDuration;        //角色横向运动持续时间
+
+        public float RoleMoveHorizontalDistance;              
+
+        public eVRunState RunState;//   横向运动位置 (Left, Middle, Right)
+
+        public eRunMode RunMode = eRunMode.eRun_Horizontal;
 
         public bool CanSmallJump;        //是否可以跳跃
         public float SmallJumpHeight;    //跳跃高度
