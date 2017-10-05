@@ -152,80 +152,98 @@ public class RoleBehavInfosInpectorEditor : Editor {
         EditorGUILayout.EndHorizontal();
         #endregion
 
-        #region 大跳跃加速度
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("大跳跃加速度");
-        fValue = EditorGUILayout.FloatField(_data.BigJumpAccel);
-        if (fValue != _data.BigJumpAccel)
+        if (_data.CanBigJump)
         {
-            _data.BigJumpAccel = fValue;
-            _data.BigJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.BigJumpAccel, _data.BigJumpUpDuration);
-            _data.BigJumpHeight = GlobalHelper.CalculateJumpHeight(_data.BigJumpInitSpeed, _data.BigJumpAccel, _data.BigJumpUpDuration);
+            #region 大跳跃加速度
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("大跳跃加速度");
+            fValue = EditorGUILayout.FloatField(_data.BigJumpAccel);
+            if (fValue != _data.BigJumpAccel)
+            {
+                _data.BigJumpAccel = fValue;
+                _data.BigJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.BigJumpAccel, _data.BigJumpUpDuration);
+                _data.BigJumpHeight = GlobalHelper.CalculateJumpHeight(_data.BigJumpInitSpeed, _data.BigJumpAccel, _data.BigJumpUpDuration);
+                EditorUtility.SetDirty(_data);
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
+
+            #region 大跳跃上升时间
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("大跳跃上升时间");
+            fValue = EditorGUILayout.FloatField(_data.BigJumpUpDuration);
+            if (fValue != _data.BigJumpUpDuration)
+            {
+                _data.BigJumpUpDuration = fValue;
+                _data.BigJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.BigJumpAccel, _data.BigJumpUpDuration);
+                _data.BigJumpHeight = GlobalHelper.CalculateJumpHeight(_data.BigJumpInitSpeed, _data.BigJumpAccel, _data.BigJumpUpDuration);
+                EditorUtility.SetDirty(_data);
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
+        }
+
+        #region 是否可以横向运动
+        EditorGUILayout.BeginHorizontal();
+        bValue = EditorGUILayout.Toggle("是否可以横向运动", _data.CanRoleMoveHorizontal);
+        if (bValue != _data.CanRoleMoveHorizontal)
+        {
+            _data.CanRoleMoveHorizontal = bValue;
             EditorUtility.SetDirty(_data);
         }
         EditorGUILayout.EndHorizontal();
         #endregion
 
-        #region 大跳跃上升时间
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("大跳跃上升时间");
-        fValue = EditorGUILayout.FloatField(_data.BigJumpUpDuration);
-        if (fValue != _data.BigJumpUpDuration)
+        if (_data.CanRoleMoveHorizontal)
         {
-            _data.BigJumpUpDuration = fValue;
-            _data.BigJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.BigJumpAccel, _data.BigJumpUpDuration);
-            _data.BigJumpHeight = GlobalHelper.CalculateJumpHeight(_data.BigJumpInitSpeed, _data.BigJumpAccel, _data.BigJumpUpDuration);
-            EditorUtility.SetDirty(_data);
-        }
-        EditorGUILayout.EndHorizontal();
-        #endregion
+            #region 横向运动速度
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("横向运动速度");
+            fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalSpeed);
+            if (fValue != _data.RoleMoveHorizontalSpeed)
+            {
+                _data.RoleMoveHorizontalSpeed = fValue;
+                _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+                EditorUtility.SetDirty(_data);
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
 
-        #region 横向运动速度
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("横向运动速度");
-        fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalSpeed);
-        if (fValue != _data.RoleMoveHorizontalSpeed)
-        {
-            _data.RoleMoveHorizontalSpeed = fValue;
+            #region 角色横向运动持续时间
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("角色横向运动持续时间");
+            fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalDuration);
+            if (fValue != _data.RoleMoveHorizontalDuration)
+            {
+                _data.RoleMoveHorizontalDuration = fValue;
+                _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+                EditorUtility.SetDirty(_data);
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
+
+            #region 角色横向运动距离
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("角色横向运动距离");
             _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
-            EditorUtility.SetDirty(_data);
+            EditorGUILayout.LabelField(_data.RoleMoveHorizontalDistance.ToString());
+            EditorGUILayout.EndHorizontal();
+            #endregion
+
+            #region 横向运动位置
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("横向运动位置");
+            nValue = EditorGUILayout.IntPopup((int)_data.RunState, arrVRunState, arrNvRunState);
+
+            if (nValue != (int)_data.RunState)
+            {
+                _data.RunState = (eVRunState)nValue;
+                EditorUtility.SetDirty(_data);
+            }
+            EditorGUILayout.EndHorizontal();
+            #endregion
         }
-        EditorGUILayout.EndHorizontal();
-        #endregion
 
-        #region 角色横向运动持续时间
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("角色横向运动持续时间");
-        fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalDuration);
-        if (fValue != _data.RoleMoveHorizontalDuration)
-        {
-            _data.RoleMoveHorizontalDuration = fValue;
-            _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
-            EditorUtility.SetDirty(_data);
-        }
-        EditorGUILayout.EndHorizontal();
-        #endregion
-
-        #region 角色横向运动距离
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("角色横向运动距离");
-        _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
-        EditorGUILayout.LabelField(_data.RoleMoveHorizontalDistance.ToString());
-        EditorGUILayout.EndHorizontal();
-        #endregion
-
-        #region 横向运动位置
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("横向运动位置");
-        nValue = EditorGUILayout.IntPopup((int)_data.RunState, arrVRunState, arrNvRunState);
-
-        if (nValue != (int)_data.RunState)
-        {
-            _data.RunState = (eVRunState)nValue;
-            EditorUtility.SetDirty(_data);
-        }
-        EditorGUILayout.EndHorizontal();
-        #endregion
     }
 
     public override void OnInspectorGUI()

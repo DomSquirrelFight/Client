@@ -254,6 +254,8 @@ public class PlayerManager : MonoBehaviour
         if (null == Owner)
             return;
 
+        if (!CanMajorMove())
+            return;
         switch (Owner.RoleBehaInfos.RunMode)
         {
             case eRunMode.eRun_Horizontal:
@@ -272,26 +274,33 @@ public class PlayerManager : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if(null == Owner)
-            return;
-        switch (Owner.RoleBehaInfos.RunMode)
-        {
-            case eRunMode.eRun_Horizontal:
-                {
-                    HDrawGizmos();
-                    break;
-                }
-            case eRunMode.eRun_Vertical:{
-                    break;
-                }
-        }
+        //if(null == Owner)
+        //    return;
+
+        //if (null != m_vCurPoints && m_vCurPoints.Length > 1)
+        //{
+        //    PathFinding.GizmoDraw(m_vCurPoints, m_fPer);
+        //}
+       
+
+        //switch (Owner.RoleBehaInfos.RunMode)
+        //{
+        //    case eRunMode.eRun_Horizontal:
+        //        {
+        //            //HDrawGizmos();
+        //            break;
+        //        }
+        //    case eRunMode.eRun_Vertical:{
+        //            break;
+        //        }
+        //}
        
     }
 
     #endregion
 
     #region 横向运动接口
-        void HorizontalMove()
+   void HorizontalMove()
     {
         if (!CanMajorMove())
             return;
@@ -767,12 +776,12 @@ public class PlayerManager : MonoBehaviour
             //}
             //#endregion
 
-            if (m_bIsFirst)
-            {
-                m_bIsFirst = false;
-                if (m_fCurPercent < min)
-                    return;
-            }
+            //if (m_bIsFirst)
+            //{
+            //    m_bIsFirst = false;
+            //    if (m_fCurPercent < min)
+            //        return;
+            //}
 
             #region 计算位置
             //if (PathFinding.CheckRecalculatePath(m_vCurPoints, m_fPer))
@@ -787,11 +796,17 @@ public class PlayerManager : MonoBehaviour
 
             Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
 
-            transform.position = Vector3.Lerp(transform.position, new Vector3(
+            transform.position = new Vector3(
                 pos.x,
                 transform.position.y,
                 pos.z
-                ), 10 * Time.deltaTime);
+                );
+
+            //transform.position = Vector3.Lerp(transform.position, new Vector3(
+            //    pos.x,
+            //    transform.position.y,
+            //    pos.z
+            //    ), 10 * Time.deltaTime);
             #endregion
         }
 
@@ -846,7 +861,7 @@ public class PlayerManager : MonoBehaviour
 
         CalCurvePercent();      //计算曲线进度
 
-        Owner.CRunFor.VerticalMove((int)m_vInputMove.x, m_vCurPoints, m_fPer);
+        Owner.CRunFor.VerticalMove((int)(m_vInputMove.x), m_vCurPoints, m_fPer, Owner.RoleBehaInfos.CanRoleMoveHorizontal);
     }                                                         //根据外界输入，转换输入数据格式
 
     void CalCurvePercent()
@@ -863,7 +878,7 @@ public class PlayerManager : MonoBehaviour
 
         if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
         {
-            m_vInputMove = m_UISceneFight.DirPos; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
+            m_vInputMove = m_UISceneFight.VRunDir; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
         }
         else
         {
@@ -896,18 +911,6 @@ public class PlayerManager : MonoBehaviour
                 case eMonsterType.MonType_GroundNpc:
                     {
                         GoundMonsterStraight();
-                        //switch (m_RoleInfos.MoveType)
-                        //{
-                        //    case eMoveType.eMove_Straight:                          //地面怪兽，直线行走
-                        //        {
-                                 
-                        //            break;
-                        //        }
-                        //    case eMoveType.eMove_Track:                             //面怪兽，追击主角
-                        //        {
-                        //            break;
-                        //        }
-                        //}
                         break;
                     }
                 case eMonsterType.MonType_FlyBat:
@@ -935,13 +938,18 @@ public class PlayerManager : MonoBehaviour
         {
             //判定是否走出了视野范围
 
-            if (CheckMoveBoundaryBlock(Owner.ActorHeight))
+            if (m_fPer > 0.95f)
             {
                 Destroy(transform.parent.gameObject);
                 return;
             }
 
-            RotatePlayer();
+            if (m_fPer + lookAheadAmount <= 1f)
+            {
+                Target = PathFinding.Interp(m_vCurPoints, m_fPer + lookAheadAmount);
+            }
+
+            transform.LookAt2D(Target);
 
             m_vInputMove = transform.forward;
 
@@ -951,46 +959,36 @@ public class PlayerManager : MonoBehaviour
             //返回true ： 则表示前方有box
             //返回false :   表示可以前进
             if (Physics.BoxCast(Owner.ActorTrans.position + Owner.BC.center, new Vector3(Owner.ActorHeight * 0.5f, Owner.ActorHeight * 0.4f, 0.1f),
-                                     Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f, BoxMask + WallMask))
+                                     Owner.ActorTrans.forward, out hitInfo, Quaternion.LookRotation(Owner.ActorTrans.forward), Owner.ActorHeight * 0.5f, BoxMask))
             {
                 m_bIsBlocked = true;
+                n = UnityEngine.Random.Range(0, 100);
 
-                if (hitInfo.collider.gameObject.layer == WallMaskGlossy)
+                //m_vInputMove.x = 0 - m_vInputMove.x;
+                //return;
+                if (n > 50)
                 {
-                    m_vInputMove.x = 0 - m_vInputMove.x;
+                    CalJumpSmallUp();
                 }
                 else
                 {
-                    /*
-              * 怪兽有可能有三种行为
-              * 1 : 跳过盒子
-              * 2 : 举起盒子
-              * 3 : 朝着反方向运动
-              * 
-              * 如果举着盒子，当和主角满足一定条件，那么扔掉盒子，否则一直举着盒子
-              * 
-              * */
-                    n = UnityEngine.Random.Range(0, 100);
-
-                    //m_vInputMove.x = 0 - m_vInputMove.x;
-                    //return;
-                    if (n > 70 )             //跳过盒子
-                    {
-                        CalJumpSmallUp();
-                    }
-                    else if (n <= 70 && n > 30 && m_bIsHoldBox == false && null == m_bcCurBox)                     //举起盒子
-                    {
-                        SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
-                    }
-                    else                                                        //朝着反方向行走
-                    {
-                        m_vInputMove.x = 0 - m_vInputMove.x;
-                    }
+                    SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
                 }
             }
             else
             {
-                TranslatePlayer();
+                    m_fCurPercent += m_fSpeed * Time.deltaTime;
+
+                    m_fPer = m_fCurPercent % 1f;
+
+
+                    Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
+
+                    transform.position = new Vector3(
+                        pos.x,
+                        transform.position.y,
+                        pos.z
+                        );
             }
         }
 

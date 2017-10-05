@@ -18,19 +18,26 @@ namespace Assets.Scripts.Action
         public virtual void Awake()
         {
             if (CountTimeType == eCoutTimeType.CountType_Auto)
+            {
                 m_bStartCounting = true;
+                m_fStartTime = Time.time;
+            }
+              
         }
 
         public virtual void OnStart()
         {
             if (CountTimeType == eCoutTimeType.CountType_Condition)
+            {
                 m_bStartCounting = true;
+                m_fConStartTime = Time.time;
+            }
+               
         }
 
         protected void Reset()
         {
-            m_fConStartTime = 0f;
-            m_fStartTime = 0f;
+            m_bStartCounting = false;
             m_bSend = false;
         }
 

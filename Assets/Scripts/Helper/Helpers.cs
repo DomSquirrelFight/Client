@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.Scripts.Helper
+namespace Assets.Scripts.Helper 
 {
     public class Helpers
     {

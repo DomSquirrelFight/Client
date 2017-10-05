@@ -33,7 +33,7 @@ public class TestRunningForward : MonoBehaviour {
 
         int dir = (int)GlobalHelper.GetDIr(he);
 
-        Owner.CRunFor.VerticalMove(dir, PathArea.GetVectorArray(area), m_fPer);
+        Owner.CRunFor.VerticalMove(dir, PathArea.GetVectorArray(area), m_fPer, Owner.RoleBehaInfos.CanRoleMoveHorizontal);
 
 	}
 

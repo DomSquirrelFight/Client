@@ -254,6 +254,16 @@ namespace AttTypeDefine
 
     #region Role Behaviour
 
+
+    public enum eSwitchRunInfosDoor
+    {
+        eSwitch_NULL,
+        eSwitch_DoorMode,       //改变门的模式
+        eSwitch_RunSpeed,        //改变运动速度
+        eSwitch_OpenHorizontalMove, //权限，是否允许在酷跑模式下横向运动
+        eSwitch_CameraZoomMode, //是否开启相机zoom 功能
+    }
+
     public enum eRunMode
     {
         eRun_Horizontal = 0,

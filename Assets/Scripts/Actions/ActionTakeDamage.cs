@@ -26,6 +26,10 @@ namespace Assets.Scripts.Action
                 AudioManager.PlayAudio(Defenser.gameObject, eAudioType.Audio_Skill, "HitEnemy");
                 if (null != Attacker)
                 {
+                    if (null == Attacker.PlayerMgr.UISceneFight)
+                    {
+                        return;
+                    }
                     Attacker.PlayerMgr.UISceneFight.GetScore(10);
                     // m_delGetscore(10);
                 }

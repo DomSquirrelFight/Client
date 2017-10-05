@@ -185,13 +185,14 @@ public class BaseActor : MonoBehaviour
         #region 角色属性
         ba.roleid = roldid;
         ba.ArrRoleBehaInfos = new RoleBehavInfos[2];
-        ba.ArrRoleBehaInfos[0] = rolebehainfos;
-        ba.ArrRoleBehaInfos[1] = rolebehainfos1;
+        ba.ArrRoleBehaInfos[0] = Instantiate(rolebehainfos);
+        ba.ArrRoleBehaInfos[1] = Instantiate(rolebehainfos1);
         switch (roleInfos.RunMode)
         {
             case eRunMode.eRun_Horizontal:
                 {
                     ba.rolebehainfo = rolebehainfos;//初始化角色行为信息
+                    
                     break;
                 }
             case eRunMode.eRun_Vertical:{
@@ -231,7 +232,8 @@ public class BaseActor : MonoBehaviour
                     if (
                      null != ba.RB/*加载刚体*/ ||
                      null != ba.SkillMgr ||
-                     null != ba.AnimMgr
+                     null != ba.AnimMgr ||
+                     null != ba.PlayerMgr
                      )
                     {
                         ba.SkillMgr.OnStart(ba);
@@ -529,7 +531,26 @@ public class BaseActor : MonoBehaviour
     void OnDisable()
     {
         ArrRoleBehaInfos = null;
-        rf.ClearData(); rf = null;
+        if (null != rf)
+        {
+            rf.ClearData(); rf = null;
+        }
+
+        if (null != ArrRoleBehaInfos)
+        {
+            for (int i = 0; i < ArrRoleBehaInfos.Length; i++)
+            {
+                RoleBehavInfos tmp = ArrRoleBehaInfos[i];
+                if (null != tmp)
+                {
+                    Destroy(tmp); tmp = null;
+                }
+            }
+            ArrRoleBehaInfos = null;
+        }
+
+
+      
     }
     #endregion
 

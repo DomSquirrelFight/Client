@@ -13,6 +13,9 @@ public class NpcType :  BaseAction{
     
     public bool TriggerOnce = false;
 
+    public PathArea area;
+
+
     void OnDrawGizmos()
     {
         switch (MonsterType)
@@ -44,10 +47,6 @@ public class NpcType :  BaseAction{
                     obj = _obj;
                     break;
                 }
-            //case eMonsterType.MonType_GroundPig:
-            //    {
-            //        break;
-            //    }
         }
         OnStart();
     }
@@ -64,7 +63,10 @@ public class NpcType :  BaseAction{
                 }
             case eMonsterType.MonType_GroundNpc:
                 {
-                    BaseActor.CreatePlayer(RoleId, transform.position, transform.rotation, Vector3.one);
+                    BaseActor ba = BaseActor.CreatePlayer(RoleId, transform.position, transform.rotation, Vector3.one);
+                    ba.PlayerMgr.OnStart(ba, area);
+                    if (TriggerOnce)
+                    Destroy(gameObject);
                     break;
                 }
         }

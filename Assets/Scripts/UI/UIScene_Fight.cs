@@ -6,7 +6,7 @@ using AttTypeDefine;
 public class UIScene_Fight : UIScene
 {
     #region 摇杆，跳跃，具箱子事件处理
-    BaseActor ba;
+    BaseActor Owner;
     //摇杆处理
     public GameObject m_oJoyBack;                                                                                  //摇杆背景对象
     public GameObject m_oJoyFront;                                                                                 //摇杆方向对象
@@ -52,7 +52,7 @@ public class UIScene_Fight : UIScene
 
     public void OnStart(BaseActor _owner)
     {
-        ba = _owner;
+        Owner = _owner;
        
     }
 
@@ -70,7 +70,7 @@ public class UIScene_Fight : UIScene
 
     void PressPickUpBox(GameObject obj)
     {
-        ba.SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
+        Owner.SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
     }
 
     //认为最多不会超过10个
@@ -120,8 +120,9 @@ public class UIScene_Fight : UIScene
                 case TouchPhase.Ended:
                     {
                         dirpos = Vector2.zero;
-                        if (!m_bCanJoy[i]) return;
                         m_oJoyBack.SetActive(false);//关闭活性
+                        //if (!m_bCanJoy[i]) return;
+                        
                         Debug.Log("TouchController :: TouchPhase.Ended");
                         //bpressed = false;
                         break;
@@ -208,12 +209,162 @@ public class UIScene_Fight : UIScene
         }
     }
 
-    void OnDisable()
+
+    #endregion
+
+    #region 纵向酷跑 滑屏逻辑
+    const float Drag_DISTANCE_REQUIRED = 50f;
+    Vector2 vrundir = Vector2.zero;
+    public Vector2 VRunDir
     {
-        for (int i = 0; i < 10; i++)
+        get
         {
-            m_bCanJoy[i] = false;
+            return vrundir;
         }
+    }
+    private float _maxDistanceMoved;
+    private Vector2 _OffSet = Vector2.zero;
+
+    private readonly Dictionary<int, Vector2> _initialTouchPositions = new Dictionary<int, Vector2>();
+    private readonly Dictionary<int, Vector2> _maximumOffSetPosition = new Dictionary<int, Vector2>();
+
+    void HandleTouchBegin(Touch touch) {
+
+        Debug.Log("HandleTouchBegin");
+        //在最大距离偏移字典中，清楚touch.id
+        _maximumOffSetPosition.Remove(touch.fingerId);
+        _initialTouchPositions.Add(touch.fingerId, touch.position);
+    }
+
+    void HandleTouchMoved(Touch touch) {
+
+        if (_initialTouchPositions.ContainsKey(touch.fingerId)) //判定当前这个手指ID已经在字典中
+        {
+            Vector2 v1 = _initialTouchPositions[touch.fingerId];    //拿到起点位置
+             Vector2 v2;
+            if (!_maximumOffSetPosition.TryGetValue (touch.fingerId, out v2))       //判断当前最大偏移里面是否存在这个手指，如果有，那么返回v2，如果没有，直接将v1赋值给v2
+            {
+                 v2 = v1;
+            }
+
+            float distance = Vector2.Distance(v2, v1);      //上一次滑动的距离
+
+            if (Vector2.Distance(touch.position, v1) > distance)//本次滑动距离和上一次相比
+            {
+                _maximumOffSetPosition[touch.fingerId] = touch.position;
+            }
+        }
+    
+    }
+
+    void HandleTouchEnd(Touch touch) {
+
+        if (_initialTouchPositions.ContainsKey(touch.fingerId))
+        {
+            Debug.Log("HandleTouchEnd, finger id = " + touch.fingerId);
+            Vector2 v2;
+            Vector2 v1 = _initialTouchPositions[touch.fingerId];     //拿到初始位置
+
+            //拿到最大偏移距离
+            if (!_maximumOffSetPosition.TryGetValue(touch.fingerId, out v2))       //判断当前最大偏移里面是否存在这个手指，如果有，那么返回v2，如果没有，直接将v1赋值给v2
+            {
+                v2 = v1;
+            }
+            _maxDistanceMoved = Vector2.Distance(v1, v2);
+
+            //拿到起点到终点的向量
+            _OffSet = v2 - v1;
+            DetectSwipeLeft(_maxDistanceMoved, _OffSet);
+            DetectSwipeRight(_maxDistanceMoved, _OffSet);
+            //移除手指id
+            ResetData(touch);
+        }
+    
+    }
+
+    void ResetData(Touch touch) {
+
+        _initialTouchPositions.Remove(touch.fingerId);
+
+        _maximumOffSetPosition.Remove(touch.fingerId);
+    }
+
+    void DetectSwipeLeft(float maxDistanceMoved, Vector2 offSet)
+    {
+        if (
+              maxDistanceMoved > Drag_DISTANCE_REQUIRED &&
+              Vector2.Dot(offSet, Vector2.left) > 0.85 &&
+              Input.touchCount == 1
+              )
+        {
+            vrundir.x = -1f;
+        }
+
+    }
+
+    void DetectSwipeRight(float maxDistanceMoved, Vector2 offSet)
+    {
+        if (
+            maxDistanceMoved > Drag_DISTANCE_REQUIRED &&
+            Vector2.Dot(offSet, Vector2.right) > 0.85 &&
+            Input.touchCount == 1
+            )
+        {
+            vrundir.x = 1f;
+        }
+    }
+
+
+    void VRunForwardTouchHandler()
+    {
+
+        vrundir = Vector2.zero;
+
+        for (int i = 0; i < Input.touches.Length; i++)
+        {
+            Touch touch = Input.touches[i];
+            switch (touch.phase)
+            {
+                case TouchPhase.Began:
+                    {
+                        HandleTouchBegin(touch);
+                        break;
+                    }
+                case TouchPhase.Moved:
+                    {
+                        HandleTouchMoved(touch);
+                        break;
+                    }
+                //A finger is touching the screen but hasn't moved since the last frame.
+                case TouchPhase.Stationary:
+                    {
+                        break;
+                    }
+                //The system cancelled tracking for the touch, as when (for example) the user puts the device to her face 
+                //or more than five touches happened simultaneously. This is the final phase of a touch.
+                case TouchPhase.Canceled:
+                    {
+                        ResetData(touch);
+                        break;
+                    }
+                case TouchPhase.Ended:
+                    {
+                        HandleTouchEnd(touch);
+                        break;
+                    }
+            }//----end switch
+
+        }//----end for cycle
+
+
+        //左滑 -> 
+
+        //右滑 ->
+
+        //上滑 ->
+
+        //下滑 ->
+
     }
     #endregion
 
@@ -238,7 +389,7 @@ public class UIScene_Fight : UIScene
 
         
         //m_LifeNum = m_uiLife.Length;
-        m_LifeNum = ba.BaseAtt[eAttInfo.AttInfo_HP];
+        m_LifeNum = Owner.BaseAtt[eAttInfo.AttInfo_HP];
 
 
 
@@ -247,15 +398,23 @@ public class UIScene_Fight : UIScene
     void Update()
     {
         if (m_bPressedJumpUp)
-            ba.PlayerMgr.CalJumpSmallUp();       //上跳
+            Owner.PlayerMgr.CalJumpSmallUp();       //上跳
         else if (m_bPressedJumpDown)
-            ba.PlayerMgr.CalJumpDown();  // 下跳
+            Owner.PlayerMgr.CalJumpDown();  // 下跳
 
+        if (Owner.RoleBehaInfos.RunMode == eRunMode.eRun_Horizontal)
+        {
 #if UNITY_EDITOR
         MouseController();
 #else
         TouchController ();
 #endif
+        }
+        else if (Owner.RoleBehaInfos.RunMode == eRunMode.eRun_Vertical)
+        {
+              VRunForwardTouchHandler();
+        }
+
         if (m_oJoyFront.transform.localPosition.y > 0f)
         {
             m_oJoyFront.transform.localPosition = new Vector3(m_oJoyFront.transform.localPosition.x, 0f, m_oJoyFront.transform.localPosition.z);
@@ -279,16 +438,6 @@ public class UIScene_Fight : UIScene
         GlobalHelper.LoadLevel("SelecteV1");
     }
     #endregion
-
-    //private void OnGUI()
-    //{
-    //    if (GUI.Button(new Rect(0, 0, 100, 100), "Press"))
-    //    {
-    //        //GetScore(10);
-    //        BeInjured();
-    //        Debug.Log(m_LifeNum);
-    //    }
-    //}
 
     #region 生命值
     public UISprite[] m_uiLife;
@@ -363,4 +512,26 @@ public class UIScene_Fight : UIScene
         GlobalHelper.LoadLevel("SelecteV1");
     }
 #endregion
+
+    #region 回收数据
+    void OnDisable()
+    {
+        for (int i = 0; i < 10; i++)
+        {
+            m_bCanJoy[i] = false;
+        }
+        m_bCanJoy = null;
+    }
+    #endregion
 }
+
+
+//private void OnGUI()
+//{
+//    if (GUI.Button(new Rect(0, 0, 100, 100), "Press"))
+//    {
+//        //GetScore(10);
+//        BeInjured();
+//        Debug.Log(m_LifeNum);
+//    }
+//}

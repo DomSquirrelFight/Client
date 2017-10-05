@@ -16,15 +16,15 @@ namespace Assets.Scripts.Action
             //找到sourceowner
             if (SocketName == "")
             {
-
-                if (DataStore.SourceOwner)
-                {
-                    socket = DataStore.SourceOwner;
-                }
-                else
-                {
-                    socket = transform.gameObject;
-                }
+                socket = transform.gameObject;
+                //if (DataStore.SourceOwner)
+                //{
+                //    socket = DataStore.SourceOwner;
+                //}
+                //else
+                //{
+                //    socket = transform.gameObject;
+                //}
             }
             else
             {
