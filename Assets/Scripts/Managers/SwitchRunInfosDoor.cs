@@ -4,14 +4,47 @@ using UnityEngine;
 using AttTypeDefine;
 public class SwitchRunInfosDoor : MonoBehaviour {
 
+
+    public int ModeNumber;
+
+    public eSwitchRunInfosDoor[] switchmode;
+
     public eRunMode Mode = eRunMode.eRun_Horizontal;
+
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.layer == LayerMask.NameToLayer("NPC"))     //如果撞到们的是npc
+
+        if (switchmode.Length <= 0)
+            return;
+
+        for (int i = 0; i < switchmode.Length; i++)
         {
-            BaseActor ba = other.transform.parent.GetComponent<BaseActor>();
-            ba.SetCurRoleBehavInfos(Mode);
-            Destroy(gameObject);
+            switch (switchmode[i])
+            {
+                case eSwitchRunInfosDoor.eSwitch_DoorMode:
+                    {
+                        if (other.gameObject.layer == LayerMask.NameToLayer("NPC"))     //如果撞到们的是npc
+                        {
+                            BaseActor ba = other.transform.parent.GetComponent<BaseActor>();
+                            ba.SetCurRoleBehavInfos(Mode);
+                            switchmode[i] = eSwitchRunInfosDoor.eSwitch_NULL;
+                        }
+                        break;
+                    }
+                case eSwitchRunInfosDoor.eSwitch_OpenHorizontalMove:
+                    {
+                        break;
+                    }
+                case eSwitchRunInfosDoor.eSwitch_RunSpeed:
+                    {
+                        break;
+                    }
+            }
+          
         }
+           
+
+
+     
     }
 }

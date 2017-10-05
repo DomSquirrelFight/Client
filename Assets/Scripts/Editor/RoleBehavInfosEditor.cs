@@ -265,6 +265,7 @@ namespace Assets.Scripts.AssetInfoEditor
             if (nValue != (int)_data.RunMode)
             {
                 _data.RunMode = (eRunMode)nValue;
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
 
