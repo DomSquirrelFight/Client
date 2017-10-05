@@ -13,6 +13,7 @@ public class SwitchRunInfosDoor : MonoBehaviour {
 
     public bool CanRoleMoveHorizontal = false;
 
+    public float RoleMoveSpeed = 0f;
 
     void OnTriggerEnter(Collider other)
     {
@@ -45,6 +46,11 @@ public class SwitchRunInfosDoor : MonoBehaviour {
                     }
                 case eSwitchRunInfosDoor.eSwitch_RunSpeed:
                     {
+                        BaseActor ba = other.transform.parent.GetComponent<BaseActor>();
+                        if (ba.RoleBehaInfos.RunMode == eRunMode.eRun_Vertical)
+                        {
+                            ba.RoleBehaInfos.RoleMoveSpeed = RoleMoveSpeed;
+                        }
                         break;
                     }
             }

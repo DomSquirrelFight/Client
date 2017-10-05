@@ -16,7 +16,7 @@ public class SwitchRunInfosDoorEditor : Editor {
     int[] arrNSwitchmode = new int[] { 0,1,2,3,4,5};
     int nValue;
     bool bValue;
-
+    float fValue;
     string[] arrRunMode = new string[] { "横向运动", "纵向运动" };
     int[] arrNRunMode = new int[] { 0, 1 };
 
@@ -97,6 +97,17 @@ public class SwitchRunInfosDoorEditor : Editor {
                     }
                 case eSwitchRunInfosDoor.eSwitch_RunSpeed:          //跑步速度
                     {
+                        #region 角色前进速度
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField("角色前进速度");
+                        fValue = EditorGUILayout.FloatField(_data.RoleMoveSpeed);
+                        if (fValue != _data.RoleMoveSpeed)
+                        {
+                            _data.RoleMoveSpeed = fValue;
+                            EditorUtility.SetDirty(_data);
+                        }
+                        EditorGUILayout.EndHorizontal();
+                        #endregion
                         break;
                     }
             }
