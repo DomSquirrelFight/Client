@@ -53,6 +53,7 @@ namespace Assets.Scripts.AssetInfoEditor
             if (bValue != _data.CanSmallJump)
             {
                 _data.CanSmallJump = bValue;
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #endregion
@@ -66,6 +67,7 @@ namespace Assets.Scripts.AssetInfoEditor
                 _data.SmallJumpAccel = fValue;
                 _data.SmallJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.SmallJumpAccel, _data.SmallJumpUpDuration);
                 _data.SmallJumpHeight = GlobalHelper.CalculateJumpHeight(_data.SmallJumpInitSpeed, _data.SmallJumpAccel, _data.SmallJumpUpDuration);
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #endregion
@@ -79,6 +81,7 @@ namespace Assets.Scripts.AssetInfoEditor
                 _data.SmallJumpUpDuration = fValue;
                 _data.SmallJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.SmallJumpAccel, _data.SmallJumpUpDuration);
                 _data.SmallJumpHeight = GlobalHelper.CalculateJumpHeight(_data.SmallJumpInitSpeed, _data.SmallJumpAccel, _data.SmallJumpUpDuration);
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #endregion
@@ -104,6 +107,7 @@ namespace Assets.Scripts.AssetInfoEditor
             if (fValue != _data.RoleMoveSpeed)
             {
                 _data.RoleMoveSpeed = fValue;
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #endregion
@@ -120,6 +124,7 @@ namespace Assets.Scripts.AssetInfoEditor
             if (bValue != _data.CanFire)
             {
                 _data.CanFire = bValue;
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #endregion
@@ -130,6 +135,7 @@ namespace Assets.Scripts.AssetInfoEditor
             if (bValue != _data.CanPickUpBox)
             {
                 _data.CanPickUpBox = bValue;
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #region 角色后退速度
@@ -139,6 +145,7 @@ namespace Assets.Scripts.AssetInfoEditor
             if (fValue != _data.RoleInjureBackSpeed)
             {
                 _data.RoleInjureBackSpeed = fValue;
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #endregion
@@ -148,88 +155,110 @@ namespace Assets.Scripts.AssetInfoEditor
         void VerticalMove()
         {
             CommonMove();
+
             #region 是否可以大跳跃
             EditorGUILayout.BeginHorizontal();
             bValue = EditorGUILayout.Toggle("是否可以大跳跃", _data.CanBigJump);
             if (bValue != _data.CanBigJump)
             {
                 _data.CanBigJump = bValue;
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #endregion
 
-            #region 大跳跃加速度
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("大跳跃加速度");
-            fValue = EditorGUILayout.FloatField(_data.BigJumpAccel);
-            if (fValue != _data.BigJumpAccel)
+            if (_data.CanBigJump)
             {
-                _data.BigJumpAccel = fValue;
-                _data.BigJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.BigJumpAccel, _data.BigJumpUpDuration);
-                _data.BigJumpHeight = GlobalHelper.CalculateJumpHeight(_data.BigJumpInitSpeed, _data.BigJumpAccel, _data.BigJumpUpDuration);
+                #region 大跳跃加速度
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("大跳跃加速度");
+                fValue = EditorGUILayout.FloatField(_data.BigJumpAccel);
+                if (fValue != _data.BigJumpAccel)
+                {
+                    _data.BigJumpAccel = fValue;
+                    _data.BigJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.BigJumpAccel, _data.BigJumpUpDuration);
+                    _data.BigJumpHeight = GlobalHelper.CalculateJumpHeight(_data.BigJumpInitSpeed, _data.BigJumpAccel, _data.BigJumpUpDuration);
+                    EditorUtility.SetDirty(_data);
+                }
+                EditorGUILayout.EndHorizontal();
+                #endregion
+
+                #region 大跳跃上升时间
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("大跳跃上升时间");
+                fValue = EditorGUILayout.FloatField(_data.BigJumpUpDuration);
+                if (fValue != _data.BigJumpUpDuration)
+                {
+                    _data.BigJumpUpDuration = fValue;
+                    _data.BigJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.BigJumpAccel, _data.BigJumpUpDuration);
+                    _data.BigJumpHeight = GlobalHelper.CalculateJumpHeight(_data.BigJumpInitSpeed, _data.BigJumpAccel, _data.BigJumpUpDuration);
+                    EditorUtility.SetDirty(_data);
+                }
+                EditorGUILayout.EndHorizontal();
+                #endregion
+           
+            }
+
+            #region 是否可以横向运动
+            EditorGUILayout.BeginHorizontal();
+            bValue = EditorGUILayout.Toggle("是否可以横向运动", _data.CanRoleMoveHorizontal);
+            if (bValue != _data.CanRoleMoveHorizontal)
+            {
+                _data.CanRoleMoveHorizontal = bValue;
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #endregion
 
-            #region 大跳跃上升时间
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("大跳跃上升时间");
-            fValue = EditorGUILayout.FloatField(_data.BigJumpUpDuration);
-            if (fValue != _data.BigJumpUpDuration)
+            if (_data.CanRoleMoveHorizontal)
             {
-                _data.BigJumpUpDuration = fValue;
-                _data.BigJumpInitSpeed = GlobalHelper.CalculateInitSpeed(_data.BigJumpAccel, _data.BigJumpUpDuration);
-                _data.BigJumpHeight = GlobalHelper.CalculateJumpHeight(_data.BigJumpInitSpeed, _data.BigJumpAccel, _data.BigJumpUpDuration);
-            }
-            EditorGUILayout.EndHorizontal();
-            #endregion
+                #region 横向运动速度
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("横向运动速度");
+                fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalSpeed);
+                if (fValue != _data.RoleMoveHorizontalSpeed)
+                {
+                    _data.RoleMoveHorizontalSpeed = fValue;
+                    _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+                    EditorUtility.SetDirty(_data);
+                }
+                EditorGUILayout.EndHorizontal();
+                #endregion
 
-            #region 横向运动速度
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("横向运动速度");
-            fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalSpeed);
-            if (fValue != _data.RoleMoveHorizontalSpeed)
-            {
-                _data.RoleMoveHorizontalSpeed = fValue;
+                #region 角色横向运动持续时间
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("角色横向运动持续时间");
+                fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalDuration);
+                if (fValue != _data.RoleMoveHorizontalDuration)
+                {
+                    _data.RoleMoveHorizontalDuration = fValue;
+                    _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
+                    EditorUtility.SetDirty(_data);
+                }
+                EditorGUILayout.EndHorizontal();
+                #endregion
+
+                #region 角色横向运动距离
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("角色横向运动距离");
                 _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
-                EditorUtility.SetDirty(_data);
+                EditorGUILayout.LabelField(_data.RoleMoveHorizontalDistance.ToString());
+                EditorGUILayout.EndHorizontal();
+                #endregion
+
+                #region 横向运动位置
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField("横向运动位置");
+                nValue = EditorGUILayout.IntPopup((int)_data.RunState, arrVRunState, arrNvRunState);
+
+                if (nValue != (int)_data.RunState)
+                {
+                    _data.RunState = (eVRunState)nValue;
+                    EditorUtility.SetDirty(_data);
+                }
+                EditorGUILayout.EndHorizontal();
+                #endregion
             }
-            EditorGUILayout.EndHorizontal();
-            #endregion
-
-            #region 角色横向运动持续时间
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("角色横向运动持续时间");
-            fValue = EditorGUILayout.FloatField(_data.RoleMoveHorizontalDuration);
-            if (fValue != _data.RoleMoveHorizontalDuration)
-            {
-                _data.RoleMoveHorizontalDuration = fValue;
-                _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
-                EditorUtility.SetDirty(_data);
-            }
-            EditorGUILayout.EndHorizontal();
-            #endregion
-
-            #region 角色横向运动距离
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("角色横向运动距离");
-            _data.RoleMoveHorizontalDistance = _data.RoleMoveHorizontalSpeed * _data.RoleMoveHorizontalDuration;
-            EditorGUILayout.LabelField(_data.RoleMoveHorizontalDistance.ToString());
-            EditorGUILayout.EndHorizontal();
-            #endregion
-
-            #region 横向运动位置
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("横向运动位置");
-            nValue = EditorGUILayout.IntPopup((int)_data.RunState, arrVRunState, arrNvRunState);
-
-            if (nValue != (int)_data.RunState)
-            {
-                _data.RunState = (eVRunState)nValue;
-                EditorUtility.SetDirty(_data);
-            }
-            EditorGUILayout.EndHorizontal();
-            #endregion
         }
 
         void OnGUI()
@@ -319,14 +348,3 @@ namespace Assets.Scripts.AssetInfoEditor
         }
     }
 }
-
-//#region 角色旋转速度
-//EditorGUILayout.BeginHorizontal();
-//EditorGUILayout.LabelField("角色旋转速度");
-//fValue = EditorGUILayout.FloatField(_data.RoleRotSpeed);
-//if (fValue != _data.RoleRotSpeed)
-//{
-//    _data.RoleRotSpeed = fValue;
-//}
-//EditorGUILayout.EndHorizontal();
-//#endregion

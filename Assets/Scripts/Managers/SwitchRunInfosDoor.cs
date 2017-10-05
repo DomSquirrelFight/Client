@@ -11,12 +11,15 @@ public class SwitchRunInfosDoor : MonoBehaviour {
 
     public eRunMode Mode = eRunMode.eRun_Horizontal;
 
+    public bool CanRoleMoveHorizontal = false;
+
+
     void OnTriggerEnter(Collider other)
     {
 
         if (switchmode.Length <= 0)
             return;
-
+       
         for (int i = 0; i < switchmode.Length; i++)
         {
             switch (switchmode[i])
@@ -33,6 +36,11 @@ public class SwitchRunInfosDoor : MonoBehaviour {
                     }
                 case eSwitchRunInfosDoor.eSwitch_OpenHorizontalMove:
                     {
+                        BaseActor ba = other.transform.parent.GetComponent<BaseActor>();
+                        if (ba.RoleBehaInfos.RunMode == eRunMode.eRun_Vertical)
+                        {
+                            ba.RoleBehaInfos.CanRoleMoveHorizontal = CanRoleMoveHorizontal;
+                        }
                         break;
                     }
                 case eSwitchRunInfosDoor.eSwitch_RunSpeed:

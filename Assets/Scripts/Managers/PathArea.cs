@@ -1,13 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Assets.Scripts.WayFinding;
 public class PathArea : MonoBehaviour {
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
 
         Gizmos.DrawWireCube(transform.position + Vector3.up,  Vector3.one);
+
+        Vector3[] vecs = PathArea.GetVectorArray(this);
+        if (vecs.Length == 0)
+            return;
+        PathFinding.GizmoDraw(vecs, 0f);
+
 #if UNITY_EDITOR
         //Handles.color = Color.white;
         //Handles.Label(transform.position + Vector3.up, index.ToString());
@@ -27,5 +33,7 @@ public class PathArea : MonoBehaviour {
         return m_vCurPoints;
 
     }
+
+
 
 }

@@ -272,19 +272,26 @@ public class PlayerManager : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if(null == Owner)
-            return;
-        switch (Owner.RoleBehaInfos.RunMode)
-        {
-            case eRunMode.eRun_Horizontal:
-                {
-                    HDrawGizmos();
-                    break;
-                }
-            case eRunMode.eRun_Vertical:{
-                    break;
-                }
-        }
+        //if(null == Owner)
+        //    return;
+
+        //if (null != m_vCurPoints && m_vCurPoints.Length > 1)
+        //{
+        //    PathFinding.GizmoDraw(m_vCurPoints, m_fPer);
+        //}
+       
+
+        //switch (Owner.RoleBehaInfos.RunMode)
+        //{
+        //    case eRunMode.eRun_Horizontal:
+        //        {
+        //            //HDrawGizmos();
+        //            break;
+        //        }
+        //    case eRunMode.eRun_Vertical:{
+        //            break;
+        //        }
+        //}
        
     }
 
@@ -767,12 +774,12 @@ public class PlayerManager : MonoBehaviour
             //}
             //#endregion
 
-            if (m_bIsFirst)
-            {
-                m_bIsFirst = false;
-                if (m_fCurPercent < min)
-                    return;
-            }
+            //if (m_bIsFirst)
+            //{
+            //    m_bIsFirst = false;
+            //    if (m_fCurPercent < min)
+            //        return;
+            //}
 
             #region 计算位置
             //if (PathFinding.CheckRecalculatePath(m_vCurPoints, m_fPer))
@@ -787,11 +794,17 @@ public class PlayerManager : MonoBehaviour
 
             Vector3 pos = PathFinding.Interp(m_vCurPoints, m_fPer);
 
-            transform.position = Vector3.Lerp(transform.position, new Vector3(
+            transform.position = new Vector3(
                 pos.x,
                 transform.position.y,
                 pos.z
-                ), 10 * Time.deltaTime);
+                );
+
+            //transform.position = Vector3.Lerp(transform.position, new Vector3(
+            //    pos.x,
+            //    transform.position.y,
+            //    pos.z
+            //    ), 10 * Time.deltaTime);
             #endregion
         }
 
@@ -846,7 +859,7 @@ public class PlayerManager : MonoBehaviour
 
         CalCurvePercent();      //计算曲线进度
 
-        Owner.CRunFor.VerticalMove((int)m_vInputMove.x, m_vCurPoints, m_fPer);
+        Owner.CRunFor.VerticalMove((int)m_vInputMove.x, m_vCurPoints, m_fPer, Owner.RoleBehaInfos.CanRoleMoveHorizontal);
     }                                                         //根据外界输入，转换输入数据格式
 
     void CalCurvePercent()

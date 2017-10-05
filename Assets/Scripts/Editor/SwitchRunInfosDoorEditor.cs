@@ -15,6 +15,7 @@ public class SwitchRunInfosDoorEditor : Editor {
     string[] arrSwitchmode = new string[] { "空模式", "改变门模式", "改变运动速度", "权限，是否开启酷跑横向运动", "是否开启相机zoom功能"};
     int[] arrNSwitchmode = new int[] { 0,1,2,3,4,5};
     int nValue;
+    bool bValue;
 
     string[] arrRunMode = new string[] { "横向运动", "纵向运动" };
     int[] arrNRunMode = new int[] { 0, 1 };
@@ -82,6 +83,16 @@ public class SwitchRunInfosDoorEditor : Editor {
                     }
                 case eSwitchRunInfosDoor.eSwitch_OpenHorizontalMove:    //是否开启横向酷跑
                     {
+                        #region 是否可以横向运动
+                        EditorGUILayout.BeginHorizontal();
+                        bValue = EditorGUILayout.Toggle("是否可以横向运动", _data.CanRoleMoveHorizontal);
+                        if (bValue != _data.CanRoleMoveHorizontal)
+                        {
+                            _data.CanRoleMoveHorizontal = bValue;
+                            EditorUtility.SetDirty(_data);
+                        }
+                        EditorGUILayout.EndHorizontal();
+                        #endregion
                         break;
                     }
                 case eSwitchRunInfosDoor.eSwitch_RunSpeed:          //跑步速度

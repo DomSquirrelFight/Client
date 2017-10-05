@@ -101,7 +101,10 @@ namespace Assets.Scripts.WayFinding
             int currPt = Mathf.Min(Mathf.FloorToInt(per * (float)numSections), numSections - 1);
 
             float u = per * (float)numSections - (float)currPt;
-
+            if (currPt < 0 || currPt > source.Length)
+            {
+                return Vector3.zero;
+            }
             Vector3 a = source[currPt];
             Vector3 b = source[currPt + 1];
             Vector3 c = source[currPt + 2];
@@ -120,9 +123,9 @@ namespace Assets.Scripts.WayFinding
             Gizmos.color = Color.white;
             Vector3 prevPt = Interp(source, 0);
 
-            for (int i = 1; i <= 20; i++)
+            for (int i = 1; i <= 40; i++)
             {
-                float pm = (float)i / 20f;
+                float pm = (float)i / 40f;
                 Vector3 currPt = Interp(source, pm);
                 Gizmos.DrawLine(currPt, prevPt);
                 prevPt = currPt;
@@ -165,36 +168,47 @@ namespace Assets.Scripts.WayFinding
             bIsMoving = false;
         }
 
-        public void VerticalMove(int _dir/*-1 : left, 1:right, 0, stay still*/, Vector3[] curposints/*steller catmull points*/, float percent/*stelleer catmull percent*/)
+        public void VerticalMove(int _dir/*-1 : left, 1:right, 0, stay still*/, Vector3[] curposints/*steller catmull points*/, float percent/*stelleer catmull percent*/, bool CanRoleMoveHorizontal/*是否开启横向酷跑*/)
         {
-            movedir = _dir;
-
-            if (!IsInTransition())      //判断是否在转换状态
+            if (CanRoleMoveHorizontal)
             {
-                if (movedir != 0f)
+                movedir = _dir;
+
+                if (!IsInTransition())      //判断是否在转换状态
                 {
-                    SetTransition();            //设置转换
+                    if (movedir != 0f)
+                    {
+                        SetTransition();            //设置转换
+                    }
                 }
+
+                //获取曲线当前点的速度方向.
+                Vector3 dir = GetCurCurveDir(curposints, percent);
+
+                tplayer.forward = dir;
+
+                //获取角色当前的位置.
+                Vector3 curpos = GetCurPos(curposints, percent);
+
+                //偏移数值 如果是在切换状态下，那么偏移的数值会和非偏移情况下有所不同
+                float dis = GetCurShiftDis();
+
+                //计算偏移后的角色位置
+                Vector3 finalpos = GetFinalPos(curpos, dis);
+
+                tplayer.position = new Vector3(finalpos.x, tplayer.position.y, finalpos.z);
+
+                if (IsTransitionOver())
+                    CloseTransition();
             }
-
-            //获取曲线当前点的速度方向.
-            Vector3 dir = GetCurCurveDir(curposints, percent);
-
-            tplayer.forward = dir;
-
-            //获取角色当前的位置.
-            Vector3 curpos = GetCurPos(curposints, percent);
-
-            //偏移数值 如果是在切换状态下，那么偏移的数值会和非偏移情况下有所不同
-            float dis = GetCurShiftDis();
-
-            //计算偏移后的角色位置
-            Vector3 finalpos = GetFinalPos(curpos, dis);
-
-            tplayer.position = new Vector3(finalpos.x, tplayer.position.y, finalpos.z);
-
-            if (IsTransitionOver())
-                CloseTransition();
+            else
+            {
+                 Vector3 dir = GetCurCurveDir(curposints, percent);
+                 tplayer.forward = dir;
+                 Vector3 pos = GetCurCurvePos(curposints, percent);
+                 tplayer.position = new Vector3(pos.x, tplayer.position.y, pos.z);
+            }
+         
 
         }
 

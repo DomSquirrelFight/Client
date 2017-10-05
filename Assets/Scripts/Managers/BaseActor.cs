@@ -529,7 +529,11 @@ public class BaseActor : MonoBehaviour
     void OnDisable()
     {
         ArrRoleBehaInfos = null;
-        rf.ClearData(); rf = null;
+        if (null != rf)
+        {
+            rf.ClearData(); rf = null;
+        }
+      
     }
     #endregion
 
