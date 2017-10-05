@@ -123,15 +123,14 @@ public class PassBehavior : UIScene {
     void LoadLevel()
     {
         //dragstate = DragState.State_Drag;
-        //if (m_CurIndex==1)
-        //{
-        //    GlobalHelper.LoadLevel("Map_Test_Fight");
-        //}
-        //else if(m_CurIndex==0)
-        //{
-        //    GlobalHelper.LoadLevel("Map_TestFightV1");
-        //}
-        GlobalHelper.LoadLevel("Loading");
+        if (m_CurIndex==1)
+        {
+            GlobalHelper.LoadLevel("Map_Test_Fight");
+        }
+        else if(m_CurIndex==0)
+        {
+            GlobalHelper.LoadLevel("Map_TestFightV1");
+        }
     }
 #endregion
 

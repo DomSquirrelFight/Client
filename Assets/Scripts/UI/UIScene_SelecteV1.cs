@@ -70,13 +70,12 @@ public class UIScene_SelecteV1 : UIScene {
         if (e_State == StateUI.State_Move)
         {
             MoveOutDrag(Grid_CurrentIndex);
-            CurBtn.transform.localPosition = UI[Grid_CurrentIndex].transform.localPosition;
         }
         if ((Mathf.Abs(Grid.transform.localPosition.x + (Grid_CurrentIndex * Grid_PerSize))) < 10f)
         {
             e_State = StateUI.State_Stay;
         }
-       
+        CurBtn.transform.localPosition = UI[Grid_CurrentIndex].transform.localPosition;
     }
 
     #region 初始化button
