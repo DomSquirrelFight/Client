@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PathArea : MonoBehaviour {
-    public Transform[] RoutePoints;
-    public PathArea[] NextAreas;
-    //public Transform[] LinkAreaPoints;
-    
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
@@ -20,11 +16,12 @@ public class PathArea : MonoBehaviour {
 
     public static Vector3[] GetVectorArray(PathArea pa)
     {
-        Vector3[]  m_vCurPoints = new Vector3[pa.RoutePoints.Length];
 
-        for (int i = 0; i < m_vCurPoints.Length; i++)
+        Vector3[] m_vCurPoints = new Vector3[pa.transform.childCount];
+
+        for (int i = 0; i < pa.transform.childCount; i++)
         {
-            m_vCurPoints[i] = pa.RoutePoints[i].transform.position;
+            m_vCurPoints[i] = pa.transform.GetChild(i).position;
         }
 
         return m_vCurPoints;

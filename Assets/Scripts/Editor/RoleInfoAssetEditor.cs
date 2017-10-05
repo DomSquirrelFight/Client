@@ -44,7 +44,7 @@ namespace Assets.Scripts.AssetInfoEditor
         string[] arrMonsterType = new string[] {"陨石", "飞鸟", "地面NPC", "假盒子" };
         int[] arrNMonsterType = new int[] { 0, 1, 2, 3};
 
-        string[] arrMonsterMoveType = new string[] { "直线行走", "追击"};
+        string[] arrMonsterMoveType = new string[] { "横向运动", "纵向运动"};
         int[] arrNMonsterMoveType = new int[] { 0, 1};
 
         #endregion
@@ -140,23 +140,16 @@ namespace Assets.Scripts.AssetInfoEditor
             }
             #endregion
 
-            #region 地面怪兽行为方式
-            if (_data.CharacType == eCharacType.Type_Major)
-            {
-                _data.MoveType = eMoveType.eMove_NULL;
-            }
-            else
-            {
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("地面怪兽移动行为方式");
-                nValue = EditorGUILayout.IntPopup((int)_data.MoveType, arrMonsterMoveType, arrNMonsterMoveType);
+            #region 运动类型
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("运动类型");
+            nValue = EditorGUILayout.IntPopup((int)_data.RunMode, arrMonsterMoveType, arrNMonsterMoveType);
 
-                if (nValue != (int)_data.MoveType)
-                {
-                    _data.MoveType = (eMoveType)nValue;
-                }
-                EditorGUILayout.EndHorizontal();
+            if (nValue != (int)_data.RunMode)
+            {
+                _data.RunMode = (eRunMode)nValue;
             }
+            EditorGUILayout.EndHorizontal();
             #endregion
 
          
