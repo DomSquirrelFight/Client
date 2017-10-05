@@ -298,7 +298,7 @@ public class PlayerManager : MonoBehaviour
     #endregion
 
     #region 横向运动接口
-        void HorizontalMove()
+   void HorizontalMove()
     {
         if (!CanMajorMove())
             return;
@@ -859,7 +859,7 @@ public class PlayerManager : MonoBehaviour
 
         CalCurvePercent();      //计算曲线进度
 
-        Owner.CRunFor.VerticalMove((int)m_vInputMove.x, m_vCurPoints, m_fPer, Owner.RoleBehaInfos.CanRoleMoveHorizontal);
+        Owner.CRunFor.VerticalMove((int)(m_vInputMove.x), m_vCurPoints, m_fPer, Owner.RoleBehaInfos.CanRoleMoveHorizontal);
     }                                                         //根据外界输入，转换输入数据格式
 
     void CalCurvePercent()
@@ -876,7 +876,7 @@ public class PlayerManager : MonoBehaviour
 
         if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
         {
-            m_vInputMove = m_UISceneFight.DirPos; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
+            m_vInputMove = m_UISceneFight.VRunDir; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
         }
         else
         {

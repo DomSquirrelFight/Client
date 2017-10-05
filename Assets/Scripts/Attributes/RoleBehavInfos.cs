@@ -18,6 +18,7 @@ namespace Assets.Scripts.AssetInfoEditor
 
         public float RoleInjureBackSpeed;   //角色受伤后退速度
 
+        
         public bool CanRoleMoveHorizontal;      //角色在酷跑模式下是否可以横向运动
 
         public float RoleMoveHorizontalSpeed;       //角色横向运动速度
