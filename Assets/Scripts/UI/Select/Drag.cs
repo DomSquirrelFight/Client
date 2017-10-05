@@ -64,6 +64,8 @@ public class Drag : UIScene {
     #region 拖拽中的判定
     void OnDrag(Vector2 delta)
     {
+        e_State = StateUI.State_Stay;
+        
         drag = delta;
         if (!IsTouch)
         {
@@ -92,6 +94,7 @@ public class Drag : UIScene {
     #region 拖拽结束之后的判定
     void OnPress()
     {
+        e_State = StateUI.State_Move;
         if (IsClick)
         {
             Pos =  Grid.transform.localPosition;
