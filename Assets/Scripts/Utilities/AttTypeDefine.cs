@@ -27,14 +27,6 @@ namespace AttTypeDefine
         e_Null,
     }
 
-    ////通过不同的场景，预加载不同的资源
-    //public enum SceneType
-    //{
-    //    SelecteLoading,
-    //    Null,
-    //    FightLoading,
-    //}
-
     //任务选择界面的，拖动，滑动
     public  enum StateUI
     {
@@ -45,31 +37,16 @@ namespace AttTypeDefine
     public enum AnimState
     {
         State_null,
-        State_BgAnim,
-        State_PicAnim,
         State_ProgressBar,
     }
-//<<<<<<< HEAD
-//<<<<<<< HEAD
-//    //用于在关卡选择界面 判断是不是可以移动pass
-//    public enum DragState
-//=======
- // 关卡选择中判断是不是可以拖动
-// public enum DragState
-////>>>>>>> master
-//    {
-//        State_Drag,
-//        State_Stop,
-//    }
-//=======
-//    //用于判断双击
-//    //public enum ClickState
-//    //{
-//    //    Click_First,
-//    //    Click_Scecond,
-//    //    Click_Null,
-//    //}
-//>>>>>>> master
+
+    //用于控制loading界面要之后要加载的场景
+    public enum SceneGo
+    {
+        Fight,
+        Select,
+        Go_null,
+    }
     #endregion
 
     #region Character Behaviour

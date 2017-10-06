@@ -1,12 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Assets.Scripts.Helper;
+﻿using Assets.Scripts.Helper;
+using AttTypeDefine;
 
-public class Begin : MonoBehaviour {
+public class Begin : UIScene {
 
     void Start()
     {
-        Helpers.UIScene<UIScene_Start>();
+
+        if (e_SceneGo == SceneGo.Select)
+            Helpers.UIScene<UIScene_SelecteV1>();
+        else
+            Helpers.UIScene<UIScene_Start>();
+
     }
 }

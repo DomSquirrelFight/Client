@@ -10,7 +10,6 @@ public class UIScene_Loading : UIScene {
     public float m_fSpeed;
     //背景图片
     public UISprite m_uBg;
-    AnimState animState;
     //Bar的实例
     public GameObject m_oBar;
     //tipslist,共有型，可以在inspector中进行添加
@@ -21,50 +20,26 @@ public class UIScene_Loading : UIScene {
     bool m_bIsChange = false;
     //label用来存储要显示的tip
     public UILabel m_Tip;
+    AnimState animState;
     #endregion
 
     #region 系统接口
     void Start()
     {
-        //if (eState == LoadingState.e_LoadLevel)
-        //{
-        //    eScene = SceneType.FightLoading;
-        //}
-        //else if (eState == LoadingState.e_LoadSelect)
-        //{
-        //    eScene = SceneType.SelecteLoading;
-        //}
+       
         StartCoroutine(SceneChange());
         DontDestroy();
-        animState = AnimState.State_BgAnim;
+        //DataReset();
+        animState = AnimState.State_ProgressBar;
     }
 
-    // Update is called once per frame
     void Update()
     {
         #region 场景加载
-        //背景图的加载
-        if (animState == AnimState.State_BgAnim)
-        {
-            if (m_uBg.fillAmount >= 1f)
-            {
-                animState = AnimState.State_ProgressBar;
-            }
-            else
-            {
-                m_uBg.fillAmount += 2f * Time.deltaTime;
-            }
-        }
-        //pic的加载
-        //if (animState == AnimState.Start_PicAnim)
-        //{
-        //    //TweenPosition.Begin(m_oPic, 2f, new Vector3(0, 0, 0)).method = UITweener.Method.BounceIn;
-        //    animState = AnimState.Start_ProgressBar;
-        //}
         //进度条的加载
         if (animState == AnimState.State_ProgressBar)
         {
-            TweenPosition.Begin(m_oBar, 1f, new Vector3(-450, -280, 0)).method = UITweener.Method.BounceIn;
+            TweenPosition.Begin(m_oBar, 1f, new Vector3(0, -280, 0)).method = UITweener.Method.BounceIn;
             //StartCoroutine(LaterDo());
             animState = AnimState.State_null;
 
@@ -75,18 +50,17 @@ public class UIScene_Loading : UIScene {
             LoadRes();
             //进度条推进
             Invoke("ProcessBar", 2f);
-            
+
 
         }
         #endregion
 
         #region tips加载
-        if(!m_bIsChange)
+        if (!m_bIsChange)
         {
             Invoke("RandomIndex", 3f);
             m_Tip.text = m_lTips[m_CurIndex];
             m_bIsChange = true;
-
         }
 #endregion
     }
@@ -111,52 +85,46 @@ public class UIScene_Loading : UIScene {
 
     #region 进度条推进
     //进度条推进
+    UISlider us;
     void ProcessBar()
     {
-        UISlider us = gameObject.GetComponent<UISlider>();
+        us = gameObject.GetComponent<UISlider>();
         if (us.value < 1)
         {
             us.value += m_fSpeed * Time.deltaTime;
         }
         else
         {
-            //进度条走到百分之百，资源销毁
-            // StartCoroutine(LaterDo());
-            //DestroyLoading();s
+
             Invoke("DestroyLoading", 2f);
-            //场景切换
             //DestroyLoading();
         }
     }
     #endregion
 
-    //延迟销毁
-    //IEnumerator LaterDo()
-    //{
-    //    while(true)
-    //    {
-    //        yield return new WaitForSeconds(5);
-    //    }
-
-    //}
-    //场景切换，异步加载
+    #region 数据复位
+    void DataReset()
+    {
+        us.value = 0;
+        m_bIsChange = false;
+        animState = AnimState.State_ProgressBar;
+    }
+#endregion
 
     #region 场景异步加载
     AsyncOperation asyn;
     IEnumerator SceneChange()
     {
-        //异步加载新的场景
-        //if (type == SceneType.FightLoading)
-        //{
-            asyn = GlobalHelper.LoadLevelAsync("Map_Test_Fight");
-            // type = SceneType.Null;
-        //}
-        //if (type == SceneType.SelecteLoading)
-        //{
-        //    // asyn = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync("SelecteV1");
-        //    asyn = GlobalHelper.LoadLevelAsync("SelecteV1");
-        //    // type = SceneType.Null;
-        //}
+        if(e_SceneGo==SceneGo.Fight)
+        {
+            asyn = GlobalHelper.LoadLevelAsync("ReduceDrawCall");
+           // e_SceneGo = SceneGo.Go_null;
+        }
+        else if(e_SceneGo==SceneGo.Select)
+        {
+            asyn = GlobalHelper.LoadLevelAsync("Begin");
+           // e_SceneGo = SceneGo.Go_null;
+        }
         yield return asyn;
     }
     #endregion

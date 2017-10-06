@@ -391,7 +391,8 @@ public class UIScene_Fight : UIScene
         //m_LifeNum = m_uiLife.Length;
         m_LifeNum = Owner.BaseAtt[eAttInfo.AttInfo_HP];
 
-
+        //设置状态，下一个转化场景
+        e_SceneGo = SceneGo.Select;
 
     }
 
@@ -435,7 +436,8 @@ public class UIScene_Fight : UIScene
     void LeaveScene(GameObject obj)
     {
         //退出离开游戏，跳转到login界面
-        GlobalHelper.LoadLevel("SelecteV1");
+        GlobalHelper.LoadLevel("Loading");
+        
     }
     #endregion
 
@@ -502,6 +504,7 @@ public class UIScene_Fight : UIScene
     void Gameover()
     {
         Destroy(Owner.gameObject);
+        CloseJoyAndButton();
         this.InvokeNextFrame(UIGameOver);
      
     }
@@ -514,10 +517,21 @@ public class UIScene_Fight : UIScene
         //显示最终得分
         m_uiTotalScore.text = "Total Score=" + m_labelScore.text;
     }
+    void CloseJoyAndButton()
+    {
+        m_oJoyBack.SetActive(false);
+        m_oJoyFront.SetActive(false);
+        m_oJumpUp.SetActive(false);
+        m_oJumpDown.SetActive(false);
+        m_oPickUpBox.SetActive(false);
+
+
+    }
 
     void EndTheGame(GameObject obj)
     {
-        GlobalHelper.LoadLevel("SelecteV1");
+        GlobalHelper.LoadLevel("Loading");
+        
     }
 #endregion
 
@@ -532,14 +546,3 @@ public class UIScene_Fight : UIScene
     }
     #endregion
 }
-
-
-//private void OnGUI()
-//{
-//    if (GUI.Button(new Rect(0, 0, 100, 100), "Press"))
-//    {
-//        //GetScore(10);
-//        BeInjured();
-//        Debug.Log(m_LifeNum);
-//    }
-//}

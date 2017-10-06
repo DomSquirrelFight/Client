@@ -16,6 +16,7 @@ public class UIScene_Custompass : UIScene {
     {
         UIEventListener.Get(m_oBack).onClick = ClickBtn;
         InitePass();
+        e_SceneGo = SceneGo.Fight;
     }
     #endregion
 
