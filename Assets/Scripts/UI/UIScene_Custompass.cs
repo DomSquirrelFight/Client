@@ -30,6 +30,7 @@ public class UIScene_Custompass : UIScene {
         }
     }
     #endregion
+
     protected override void ClickBtn(GameObject obj)
     {
         base.ClickBtn(obj);
