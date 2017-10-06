@@ -398,6 +398,8 @@ public class UIScene_Fight : UIScene
 
     void Update()
     {
+        if (null == Owner)
+            return;
         if (m_bPressedJumpUp)
             Owner.PlayerMgr.CalJumpSmallUp();       //上跳
         else if (m_bPressedJumpDown)
@@ -504,22 +506,27 @@ public class UIScene_Fight : UIScene
     void Gameover()
     {
         Destroy(Owner.gameObject);
-        CloseJoyAndButton();
-        this.InvokeNextFrame(UIGameOver);
-     
+       
+        // this.InvokeNextFrame(UIGameOver);
+       Invoke("UIGameOver", 0.3f);
+      
+        // UIGameOver();
     }
 
     void UIGameOver()
     {
-        Time.timeScale = 0f;
-        //Gameover界面的活性打开
+        CloseJoyAndButton();
+       
+        ////Gameover界面的活性打开
         m_oGameOver.SetActive(true);
-        //显示最终得分
+        ////显示最终得分
         m_uiTotalScore.text = "Total Score=" + m_labelScore.text;
+        Time.timeScale = 0f;
     }
     void CloseJoyAndButton()
     {
         m_oJoyBack.SetActive(false);
+        //Destroy(m_oJoyFront);
         m_oJoyFront.SetActive(false);
         m_oJumpUp.SetActive(false);
         m_oJumpDown.SetActive(false);
