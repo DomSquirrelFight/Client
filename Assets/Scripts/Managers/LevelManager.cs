@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class LevelManager : MonoBehaviour {
 
-
     string[] routes = new string[] { "IGSoft_Projects", "Prefabs/Character"};
     List<GameObject> list = new List<GameObject>();
     void PreLoadRes()
@@ -28,9 +27,6 @@ public class LevelManager : MonoBehaviour {
         }
       
     }
-
-
-
 
     public void LoadSceneRes()
     {
@@ -68,7 +64,6 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
-
     #region 数据回收
     void OnDisable()
     {
@@ -80,5 +75,4 @@ public class LevelManager : MonoBehaviour {
     }
     #endregion
 
-	
 }

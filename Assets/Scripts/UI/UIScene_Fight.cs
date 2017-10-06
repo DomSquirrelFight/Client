@@ -502,12 +502,19 @@ public class UIScene_Fight : UIScene
     void Gameover()
     {
         Destroy(Owner.gameObject);
+        this.InvokeNextFrame(UIGameOver);
+     
+    }
+
+    void UIGameOver()
+    {
         Time.timeScale = 0f;
         //Gameover界面的活性打开
         m_oGameOver.SetActive(true);
         //显示最终得分
         m_uiTotalScore.text = "Total Score=" + m_labelScore.text;
     }
+
     void EndTheGame(GameObject obj)
     {
         GlobalHelper.LoadLevel("SelecteV1");
