@@ -93,11 +93,11 @@ public class BoxController : MonoBehaviour {
         {
             if ((Owner = other.transform.parent.GetComponent<BaseActor>()) != null)
             {
-                //if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
-                //{
-                //    TrigBuff(Owner, 5010101);
-                //}
-                //else 
+                if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
+                {
+                    TrigBuff(Owner, 5010101);
+                }
+                else 
                 if (Owner.BaseAtt.RoleInfo.CharacType != eCharacType.Type_Major && Owner.BaseAtt.RoleInfo.CharacSide == eCharacSide.Side_Enemy)
                 {
                     TrigBuff(Owner, 1010101);

@@ -445,7 +445,7 @@ public class UIScene_Fight : UIScene
     public void BeInjured()
     {
         m_LifeNum--;
-        if(m_LifeNum<0)
+        if(m_LifeNum<=0)
         {
             Gameover();
         }
@@ -501,12 +501,20 @@ public class UIScene_Fight : UIScene
     public GameObject m_oOverBtn;
     void Gameover()
     {
+        Destroy(Owner.gameObject);
+        this.InvokeNextFrame(UIGameOver);
+     
+    }
+
+    void UIGameOver()
+    {
         Time.timeScale = 0f;
         //Gameover界面的活性打开
         m_oGameOver.SetActive(true);
         //显示最终得分
         m_uiTotalScore.text = "Total Score=" + m_labelScore.text;
     }
+
     void EndTheGame(GameObject obj)
     {
         GlobalHelper.LoadLevel("SelecteV1");
