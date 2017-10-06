@@ -30,6 +30,10 @@ public class SwitchRunInfosDoor : MonoBehaviour {
                         if (other.gameObject.layer == LayerMask.NameToLayer("NPC"))     //如果撞到们的是npc
                         {
                             BaseActor ba = other.transform.parent.GetComponent<BaseActor>();
+                            if (Mode == eRunMode.eRun_Vertical)
+                            {
+                                ba.SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
+                            }
                             ba.SetCurRoleBehavInfos(Mode);
                             switchmode[i] = eSwitchRunInfosDoor.eSwitch_NULL;
                         }

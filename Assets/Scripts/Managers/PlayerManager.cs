@@ -467,8 +467,9 @@ public class PlayerManager : MonoBehaviour
                     }
                     else if (other.contacts[0].otherCollider.gameObject.layer == NpcMaskGlossy)                             //如果碰到了npc
                     {
-                        if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
+                        if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major && null != other.contacts[0].otherCollider.transform.parent)
                         {
+                            //BaseActor tmp1 = other.contacts[0].otherCollider.transform.parent.GetComponent<BaseActor>();
                             UnityEngine.Object obj = Resources.Load("IGSoft_Projects/Buffs/5010101");
                             GameObject tmp = Instantiate(obj) as GameObject;
                             ActionInfos acInfos = tmp.GetComponent<ActionInfos>();
