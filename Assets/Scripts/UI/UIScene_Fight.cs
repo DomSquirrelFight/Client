@@ -444,16 +444,16 @@ public class UIScene_Fight : UIScene
     int m_LifeNum;
     public void BeInjured()
     {
-        m_LifeNum--;
-        if(m_LifeNum<=1)
+        if (m_LifeNum > 0)
         {
-            Gameover();
-        }
-        else
-        {
+            m_LifeNum--;
             m_uiLife[m_LifeNum].enabled = false;
+            if (m_LifeNum <= 0)
+            {
+                Gameover();
+            }
         }
-        
+   
     }
     #endregion
 
