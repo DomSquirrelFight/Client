@@ -35,6 +35,8 @@ public class RpgFollowCameraAction : CameraBaseAction {
 
     void RpgFollow()
     {
+        if (null == Owner)
+            return;
         Vector3 pos = Owner.ActorTrans.position + OffSet;
 
         tCamera.position = Vector3.Lerp(tCamera.position, pos, fMoveSpeed*Time.deltaTime);

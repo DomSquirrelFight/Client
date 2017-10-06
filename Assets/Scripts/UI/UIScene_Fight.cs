@@ -445,7 +445,7 @@ public class UIScene_Fight : UIScene
     public void BeInjured()
     {
         m_LifeNum--;
-        if(m_LifeNum<0)
+        if(m_LifeNum<=0)
         {
             Gameover();
         }
@@ -501,6 +501,7 @@ public class UIScene_Fight : UIScene
     public GameObject m_oOverBtn;
     void Gameover()
     {
+        Destroy(Owner.gameObject);
         Time.timeScale = 0f;
         //Gameover界面的活性打开
         m_oGameOver.SetActive(true);
