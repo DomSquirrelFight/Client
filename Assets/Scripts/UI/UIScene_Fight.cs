@@ -445,7 +445,7 @@ public class UIScene_Fight : UIScene
     public void BeInjured()
     {
         m_LifeNum--;
-        if(m_LifeNum<=0)
+        if(m_LifeNum<=1)
         {
             Gameover();
         }
