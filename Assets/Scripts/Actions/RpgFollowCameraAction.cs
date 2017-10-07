@@ -9,6 +9,9 @@ public class RpgFollowCameraAction : CameraBaseAction {
 
     public Vector3 Direction;
 
+    //相机高度不变
+
+   
 
     protected override void Reset()
     {
@@ -32,14 +35,23 @@ public class RpgFollowCameraAction : CameraBaseAction {
         }
         base.Update();
     }
-
+    float x, y, z;
     void RpgFollow()
     {
         if (null == Owner)
             return;
+
         Vector3 pos = Owner.ActorTrans.position + OffSet;
 
-        tCamera.position = Vector3.Lerp(tCamera.position, pos, fMoveSpeed*Time.deltaTime);
+        x = Mathf.Lerp(tCamera.position.x, pos.x, fMoveSpeed * Time.deltaTime);
+
+        y = Mathf.Lerp(tCamera.position.y, pos.y, fMoveSpeed * Time.deltaTime * 0.5f);
+
+        z = Mathf.Lerp(tCamera.position.z, pos.z, fMoveSpeed * Time.deltaTime);
+
+
+        tCamera.position = new Vector3(x, y, z);
+       
 
         tCamera.rotation = Quaternion.Lerp(tCamera.rotation, Quaternion.Euler(Direction), fRotSpeed*Time.deltaTime);
     }
