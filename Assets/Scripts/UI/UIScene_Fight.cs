@@ -73,11 +73,7 @@ public class UIScene_Fight : UIScene
         Owner.SkillMgr.UseSkill(eSkillType.SkillType_ThrowBox);
     }
 
-    //认为最多不会超过10个
-    bool[] m_bCanJoy = new bool[10];
-    // Use this for initialization
-
-
+    private readonly List<int> HTouchFingerID = new List<int>();
     Vector3 TouchPos;
     void TouchController()
     {
@@ -91,10 +87,9 @@ public class UIScene_Fight : UIScene
                     {
                         if (touch.position.x > Screen.width / 2f)
                         {
-                            m_bCanJoy[i] = false;
                             return;
                         }
-                        m_bCanJoy[i] = true;
+                        HTouchFingerID.Add(touch.fingerId);
                         TouchPos = cam.ScreenToWorldPoint(touch.position);//获取点击起点位置
                         m_oJoyFront.transform.localPosition = Vector3.zero;
                         m_oJoyBack.transform.position = m_vJoyBackOrigPos = TouchPos;//赋值给起点游戏对象
@@ -103,42 +98,38 @@ public class UIScene_Fight : UIScene
                     }
                 case TouchPhase.Moved:
                     {
-                        if (!m_bCanJoy[i]) return;
-                        Debug.Log("TouchController :: TouchPhase.Moved");
-                        TouchPos = cam.ScreenToWorldPoint(touch.position);
-                        CalculateDir();
-                        if (Vector3.Distance(TouchPos, m_oJoyBack.transform.position) >= m_fRadius)
+                        if (HTouchFingerID.Contains(touch.fingerId))
                         {
-                            m_oJoyFront.transform.localPosition = m_oJoyBack.transform.InverseTransformPoint(m_vJoyBackOrigPos + (TouchPos - m_vJoyBackOrigPos).normalized * m_fRadius);
-                        }
-                        else
-                        {
-                            m_oJoyFront.transform.localPosition = m_oJoyBack.transform.InverseTransformPoint(TouchPos);
+                            TouchPos = cam.ScreenToWorldPoint(touch.position);
+                            CalculateDir();
+                            if (Vector3.Distance(TouchPos, m_oJoyBack.transform.position) >= m_fRadius)
+                            {
+                                m_oJoyFront.transform.localPosition = m_oJoyBack.transform.InverseTransformPoint(m_vJoyBackOrigPos + (TouchPos - m_vJoyBackOrigPos).normalized * m_fRadius);
+                            }
+                            else
+                            {
+                                m_oJoyFront.transform.localPosition = m_oJoyBack.transform.InverseTransformPoint(TouchPos);
+                            }
                         }
                         break;
                     }
                 case TouchPhase.Ended:
                     {
-                        dirpos = Vector2.zero;
-                        SetJoyStick(false);
-                        //if (!m_bCanJoy[i]) return;
-                        
-                        Debug.Log("TouchController :: TouchPhase.Ended");
-                        //bpressed = false;
+                        if (HTouchFingerID.Contains(touch.fingerId))
+                        {
+                            dirpos = Vector2.zero;
+                            SetJoyStick(false);
+                            HTouchFingerID.Remove(touch.fingerId);
+                        }
                         break;
                     }
                 case TouchPhase.Canceled:
                     {
                         dirpos = Vector2.zero;
-                        if (!m_bCanJoy[i]) return;
-                        Debug.Log("TouchController :: TouchPhase.Canceled");
-                       
                         break;
                     }
                 case TouchPhase.Stationary:
                     {
-                        if (!m_bCanJoy[i]) return;
-                        Debug.Log("TouchController :: TouchPhase.Stationary");
                         //dirpos = Vector2.zero;
                         break;
                     }
@@ -158,7 +149,6 @@ public class UIScene_Fight : UIScene
                 return;
             }
             bCanJoy = true;
-            //bpressed = true;
             pos = cam.ScreenToWorldPoint(Input.mousePosition);
             m_oJoyFront.transform.localPosition = Vector3.zero;
             m_oJoyBack.transform.position = m_vJoyBackOrigPos = pos;
@@ -230,7 +220,7 @@ public class UIScene_Fight : UIScene
 
     void HandleTouchBegin(Touch touch) {
 
-        Debug.Log("HandleTouchBegin");
+      
         //在最大距离偏移字典中，清楚touch.id
         _maximumOffSetPosition.Remove(touch.fingerId);
         _initialTouchPositions.Add(touch.fingerId, touch.position);
@@ -261,7 +251,7 @@ public class UIScene_Fight : UIScene
 
         if (_initialTouchPositions.ContainsKey(touch.fingerId))
         {
-            Debug.Log("HandleTouchEnd, finger id = " + touch.fingerId);
+            //Debug.Log("HandleTouchEnd, finger id = " + touch.fingerId);
             Vector2 v2;
             Vector2 v1 = _initialTouchPositions[touch.fingerId];     //拿到初始位置
 
@@ -356,14 +346,6 @@ public class UIScene_Fight : UIScene
 
         }//----end for cycle
 
-
-        //左滑 -> 
-
-        //右滑 ->
-
-        //上滑 ->
-
-        //下滑 ->
 
     }
     #endregion
@@ -551,9 +533,9 @@ public class UIScene_Fight : UIScene
     #region 回收数据
     void OnDisable()
     {
-        if (null != m_bCanJoy)
+        if (null != HTouchFingerID)
         {
-            m_bCanJoy = null;
+            HTouchFingerID.Clear();
         }     
     }
     #endregion
