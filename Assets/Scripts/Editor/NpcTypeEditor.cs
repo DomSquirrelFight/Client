@@ -102,13 +102,27 @@ public class NpcTypeEditor : Editor {
                     #endregion
 
                     #region 设置出生的scale
+                    EditorGUILayout.BeginHorizontal();
                     Vector3 v = EditorGUILayout.Vector3Field("设置角色出生Scale", _data.vBirthScale);
                     if (v != _data.vBirthScale)
                     {
                         _data.vBirthScale = v;
                         EditorUtility.SetDirty(_data);
                     }
+                    EditorGUILayout.EndHorizontal();
                     #endregion
+
+                    #region 设置模型层级
+                    EditorGUILayout.BeginHorizontal();
+                    string str = EditorGUILayout.TextField("设置模型层级", _data.layername);
+                    if (str != _data.layername)
+                    {
+                        _data.layername = str;
+                        EditorUtility.SetDirty(_data);
+                    }
+                    EditorGUILayout.EndHorizontal();
+                    #endregion
+
                     break;
                 }
         }

@@ -23,6 +23,9 @@ namespace Assets.Scripts.AssetInfoEditor
 
         public int nTotalHP;
 
+        public Vector3 vScale = Vector3.one;
+
+
 
         public void OnValidate()
         {

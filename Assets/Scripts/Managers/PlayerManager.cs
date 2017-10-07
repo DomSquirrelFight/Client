@@ -193,6 +193,12 @@ public class PlayerManager : MonoBehaviour
 
     public void OnStart(BaseActor owner, PathArea birthArea)
     {
+
+        Owner = owner;
+        if (Owner.RoleBehaInfos.movetype == eCharacMoveType.eMove_StayStill)
+        {
+            return;
+        }
         NpcMaskGlossy = LayerMask.NameToLayer("NPC");
         NpcMask = 1 << NpcMaskGlossy;
 
@@ -214,7 +220,7 @@ public class PlayerManager : MonoBehaviour
         HoldBoxMask = 1 << HoldBoxMaskGlossy;
 
 
-        Owner = owner;
+     
 
         SkillMgr = Owner.SkillMgr;
 
@@ -911,8 +917,12 @@ public class PlayerManager : MonoBehaviour
         int n;
         void GoundMonsterStraight()
         {
-            //判定是否走出了视野范围
+            
 
+            if (Owner.RoleBehaInfos.movetype == eCharacMoveType.eMove_StayStill)
+                return;
+
+            //判定是否走出了视野范围
             if (m_fPer > 0.95f)
             {
                 Destroy(transform.parent.gameObject);

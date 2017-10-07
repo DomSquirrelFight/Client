@@ -139,13 +139,13 @@ public class BaseActor : MonoBehaviour
     /// 创建角色，并将角色实例返回
     /// </summary>
     /// <returns></returns>
-    static public BaseActor CreatePlayer(int roldid/*角色ID*/, Vector3 pos, Quaternion rot , Vector3 scale )
+    static public BaseActor CreatePlayer(int roldid/*角色ID*/, Vector3 pos, Quaternion rot, Vector3 scale, bool scaleUsingDefault = true/*true : 用RoleInfo, false, 用外面传进来的参数*/ , eCharacMoveType movetype = eCharacMoveType.eMove_FollowRoute, bool moveUsingDefault = true/*true : 用RoleBehavInfo, false, 用外面传进来的参数*/, string layername = "NPC")
     {
 
         #region 加载Asset文件
 
         //角色信息
-        RoleInfos roleInfos = DataRecordManager.GetDataInstance<RoleInfos>(roldid);
+        RoleInfos roleInfos = Instantiate(DataRecordManager.GetDataInstance<RoleInfos>(roldid));
         if (null == roleInfos)
         {
             Debug.LogErrorFormat("Fail to find asset in route ({0})", roleInfos.strRolePath);
@@ -179,7 +179,11 @@ public class BaseActor : MonoBehaviour
         #region 创建模型
         BaseActor ba = Player.AddComponent<BaseActor>();//加载BaseActor脚本
 
-        CreateActor(roldid, roleInfos.strRolePath, ba, pos, rot, scale);//加载模型
+        Vector3 _scale = roleInfos.vScale;
+        if (!scaleUsingDefault)
+            _scale = scale;
+
+        CreateActor(roldid, roleInfos.strRolePath, ba, pos, rot, _scale);//加载模型
         #endregion
 
         #region 角色属性
@@ -191,12 +195,12 @@ public class BaseActor : MonoBehaviour
         {
             case eRunMode.eRun_Horizontal:
                 {
-                    ba.rolebehainfo = rolebehainfos;//初始化角色行为信息
+                    ba.rolebehainfo = ba.ArrRoleBehaInfos[0];//初始化角色行为信息
                     
                     break;
                 }
             case eRunMode.eRun_Vertical:{
-                    ba.rolebehainfo = rolebehainfos1;//初始化角色行为信息
+                    ba.rolebehainfo = ba.ArrRoleBehaInfos[1];//初始化角色行为信息
                     break;
                 }
         }
@@ -250,6 +254,17 @@ public class BaseActor : MonoBehaviour
         }
     
     
+        #endregion
+
+        #region 设置角色运动类型
+        if (!moveUsingDefault)
+        {
+            ba.rolebehainfo.movetype = movetype;//修改运动模式
+        }
+        #endregion
+
+        #region 设置层级
+        GlobalHelper.SetLayerToObject(ba.gameObject, layername);
         #endregion
 
         return ba;

@@ -24,6 +24,9 @@ public class RoleBehavInfosInpectorEditor : Editor {
     string[] arrVRunState = new string[] { "横向-左", "横向-中", "横向-右"};
     int[] arrNvRunState = new int[] { 0, 1, 2 };
 
+    string[] arrCharacMoveType = new string[] { "静止不动", "跟随路线运动" };
+    int[] arrNCharacMoveType = new int[] { 0, 1 };
+
     void OnEnable()
     {
         _data = target as RoleBehavInfos;
@@ -97,6 +100,19 @@ public class RoleBehavInfosInpectorEditor : Editor {
         EditorGUILayout.EndHorizontal();
         #endregion
 
+        #region 角色运动模式<静止不动，跟随路线>
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("角色运动模式<静止不动，跟随路线>");
+        nValue = EditorGUILayout.IntPopup((int)_data.movetype, arrCharacMoveType, arrNCharacMoveType);
+
+        if (nValue != (int)_data.movetype)
+        {
+            _data.movetype = (eCharacMoveType)nValue;
+            EditorUtility.SetDirty(_data);
+        }
+        EditorGUILayout.EndHorizontal();
+
+        #endregion
     }
 
     void HorizontalMove()

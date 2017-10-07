@@ -97,6 +97,8 @@ namespace Assets.Scripts.WayFinding
         public static Vector3 Interp(Vector3[] source, float per)    //插值获取路线点坐标
         {
 
+            if (null == source)
+                Debug.LogError(1);
             int numSections = source.Length - 3;
             int currPt = Mathf.Min(Mathf.FloorToInt(per * (float)numSections), numSections - 1);
 

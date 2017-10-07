@@ -40,5 +40,10 @@ public class BaseAttr : MonoBehaviour
         }
     }
 
+    void OnDisable()
+    {
+        m_arrInfos = null;
+        roleinfos = null;
+    }
 
 }

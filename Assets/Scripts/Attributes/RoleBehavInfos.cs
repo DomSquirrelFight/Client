@@ -31,6 +31,8 @@ namespace Assets.Scripts.AssetInfoEditor
 
         public eRunMode RunMode = eRunMode.eRun_Horizontal;
 
+        public eCharacMoveType movetype = eCharacMoveType.eMove_FollowRoute;            //角色是静止不动，还是跟随路线前进
+
         public bool CanSmallJump;        //是否可以跳跃
         public float SmallJumpHeight;    //跳跃高度
         public float SmallJumpInitSpeed; //跳跃初速度

@@ -35,6 +35,8 @@ namespace Assets.Scripts.AssetInfoEditor
 
         bool bValue = false;
 
+        Vector3 vValue;
+
         string[] arrCharacterSide = new string[] { "玩家", "敌军", "中立"};
         int[] arrNCharacterSide = new int[] { 0, 1, 2 };
 
@@ -85,6 +87,7 @@ namespace Assets.Scripts.AssetInfoEditor
             if (nValue != _data.nRoleID)
             {
                 _data.nRoleID = nValue;
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #endregion
@@ -148,11 +151,22 @@ namespace Assets.Scripts.AssetInfoEditor
             if (nValue != (int)_data.RunMode)
             {
                 _data.RunMode = (eRunMode)nValue;
+                EditorUtility.SetDirty(_data);
             }
             EditorGUILayout.EndHorizontal();
             #endregion
 
-         
+            #region 角色缩放比例
+            EditorGUILayout.BeginHorizontal();
+            vValue = EditorGUILayout.Vector3Field("角色缩放比例", _data.vScale);
+            if (vValue != _data.vScale)
+            {
+                _data.vScale = vValue;
+                EditorUtility.SetDirty(_data);
+            }
+            EditorGUILayout.EndHorizontal();
+
+            #endregion
 
             #region 总血量
             EditorGUILayout.BeginHorizontal();

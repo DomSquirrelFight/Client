@@ -93,7 +93,7 @@ public class BoxController : MonoBehaviour {
         {
             if ((Owner = other.transform.parent.GetComponent<BaseActor>()) != null)
             {
-                if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
+                if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major && Vector3.Dot(Owner.Actor.transform.forward, transform.forward) * Mathf.Rad2Deg > 100f)
                 {
                     TrigBuff(Owner, 5010101);
                 }
@@ -104,6 +104,7 @@ public class BoxController : MonoBehaviour {
                     Owner.HoldBoxDir =transform.forward;                               //确定飞过来的盒子的方向
                 }
             }
+            Destroy(gameObject);
         }
     }
 

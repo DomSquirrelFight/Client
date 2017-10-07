@@ -8,6 +8,8 @@ namespace Assets.Scripts.AssetInfoEditor
     public class RoleBehavInfosEditor : EditorWindow
     {
 
+
+
         #region 变量
         public RoleBehavInfos _data;
 
@@ -41,6 +43,10 @@ namespace Assets.Scripts.AssetInfoEditor
 
         string[] arrVRunState = new string[] { "横向-左", "横向-中", "横向-右" };
         int[] arrNvRunState = new int[] { 0, 1, 2 };
+
+
+        string[] arrCharacMoveType = new string[] { "静止不动", "跟随路线运动" };
+        int[] arrNCharacMoveType = new int[] { 0, 1 };
 
         #endregion
 
@@ -111,6 +117,21 @@ namespace Assets.Scripts.AssetInfoEditor
             }
             EditorGUILayout.EndHorizontal();
             #endregion
+
+            #region 角色运动模式<静止不动，跟随路线>
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("角色运动模式<静止不动，跟随路线>");
+            nValue = EditorGUILayout.IntPopup((int)_data.movetype, arrCharacMoveType, arrNCharacMoveType);
+
+            if (nValue != (int)_data.movetype)
+            {
+                _data.movetype = (eCharacMoveType)nValue;
+                EditorUtility.SetDirty(_data);
+            }
+            EditorGUILayout.EndHorizontal();
+
+            #endregion
+
 
         }
 

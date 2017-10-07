@@ -68,6 +68,19 @@ public class GlobalHelper
     }
 
 
+    public static void SetLayerToObject(GameObject obj, string name)
+    {
+        if (null == obj)
+            return;
+        obj.layer = LayerMask.NameToLayer(name);
+        for (int i = 0; i < obj.transform.childCount; i++)
+        {
+            obj.transform.GetChild(i).gameObject.layer = LayerMask.NameToLayer(name);
+            SetLayerToObject(obj.transform.GetChild(i).gameObject, name);
+        }
+    }
+
+
     public static GameObject FindGameObjectWithName(GameObject obj, string name)
     {
 
