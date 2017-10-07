@@ -97,6 +97,8 @@ public class PlayerManager : MonoBehaviour
 
     int HoldBoxMaskGlossy;
 
+    int RunMonsterGlossy;
+
     public int NHoldBoxMaskGlossy
     {
         get
@@ -220,7 +222,7 @@ public class PlayerManager : MonoBehaviour
         HoldBoxMask = 1 << HoldBoxMaskGlossy;
 
 
-     
+        RunMonsterGlossy = LayerMask.NameToLayer("RunMonster");
 
         SkillMgr = Owner.SkillMgr;
 
@@ -464,15 +466,27 @@ public class PlayerManager : MonoBehaviour
                     {
                         OperateGround(other, BoxMask);
                     }
-                    else if (other.contacts[0].otherCollider.gameObject.layer == NpcMaskGlossy)                             //如果碰到了npc
+                    else if (other.contacts[0].otherCollider.gameObject.layer == NpcMaskGlossy || other.contacts[0].otherCollider.gameObject.layer == RunMonsterGlossy)                             //如果碰到了npc or run monster
                     {
                         if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major && null != other.contacts[0].otherCollider.transform.parent)
                         {
-                            //BaseActor tmp1 = other.contacts[0].otherCollider.transform.parent.GetComponent<BaseActor>();
+                            BaseActor tmp1 = other.contacts[0].otherCollider.transform.parent.GetComponent<BaseActor>();
+
+                            if (other.contacts[0].otherCollider.gameObject.layer == RunMonsterGlossy && tmp1.BaseAtt.RoleInfo.CharacSide == eCharacSide.Side_Neutral && tmp1.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Boss)
+                            {
+                                Owner.UISceneFight.Gameover();
+                                return;
+                            }
+
                             UnityEngine.Object obj = Resources.Load("IGSoft_Projects/Buffs/5010101");
                             GameObject tmp = Instantiate(obj) as GameObject;
                             ActionInfos acInfos = tmp.GetComponent<ActionInfos>();
                             acInfos.SetOwner(Owner.gameObject, Owner, null);
+                            if (other.contacts[0].otherCollider.gameObject.layer == RunMonsterGlossy && tmp1.BaseAtt.RoleInfo.CharacType == eCharacType.Type_NormalNpc && tmp1.BaseAtt.RoleInfo.CharacType == eCharacType.Type_NormalNpc)
+                            {
+                                Destroy(other.contacts[0].otherCollider.transform.parent.gameObject);
+                            }
+                        
                         }
                     }
 

@@ -22,7 +22,7 @@ public class NpcType :  BaseAction{
     public Vector3 vBirthScale = Vector3.one;
 
     [HideInInspector]
-    public string layername = "NPC";
+    public string layername = "RunMonster";
 
     void OnDrawGizmos()
     {
@@ -71,7 +71,7 @@ public class NpcType :  BaseAction{
                 }
             case eMonsterType.MonType_GroundNpc:
                 {
-                    BaseActor ba = BaseActor.CreatePlayer(RoleId, transform.position, transform.rotation, vBirthScale, false, movetype, false);
+                    BaseActor ba = BaseActor.CreatePlayer(RoleId, transform.position, transform.rotation, vBirthScale, false, movetype, false, layername);
                     ba.PlayerMgr.OnStart(ba, area);
                     //if (TriggerOnce)
                     //Destroy(gameObject);
