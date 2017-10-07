@@ -222,11 +222,11 @@ namespace AttTypeDefine
     }
 
 
-    public enum eWallEvent
+    public enum eCharacMoveType
     {
-        eWallEvent_ChoosePath,
+        eMove_StayStill,
+        eMove_FollowRoute,
     }
-
 
     #endregion
 

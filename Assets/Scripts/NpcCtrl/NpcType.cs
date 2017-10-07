@@ -5,16 +5,21 @@ using AttTypeDefine;
 using Assets.Scripts.Action;
 public class NpcType :  BaseAction{
 
+    [HideInInspector]
     public eMonsterType MonsterType = eMonsterType.MonType_Null;
-
-    public string PrefabName;
-
-    public int RoleId;
-    
+    [HideInInspector]
+    public string PrefabName;    
+    [HideInInspector]
     public bool TriggerOnce = false;
-
+    [HideInInspector]
+    public eCharacMoveType movetype = eCharacMoveType.eMove_FollowRoute;
+    [HideInInspector]
+    public int RoleId;
+    [HideInInspector]
     public PathArea area;
 
+    [HideInInspector]
+    public Vector3 vBirthScale = Vector3.one;
 
     void OnDrawGizmos()
     {
@@ -65,8 +70,8 @@ public class NpcType :  BaseAction{
                 {
                     BaseActor ba = BaseActor.CreatePlayer(RoleId, transform.position, transform.rotation, Vector3.one);
                     ba.PlayerMgr.OnStart(ba, area);
-                    if (TriggerOnce)
-                    Destroy(gameObject);
+                    //if (TriggerOnce)
+                    //Destroy(gameObject);
                     break;
                 }
         }

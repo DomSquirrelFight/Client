@@ -121,7 +121,7 @@ public class SkillManager : MonoBehaviour
     void PlayerPickUpBoxAnim()
     {
 
-        if (m_bBeginPickupBox)
+        if (m_bBeginPickupBox && null != m_bcCurBox)
         {
             if (m_bcCurBox.transform.localPosition.y < m_BoxRotateRadius - 0.1f)
             {
@@ -131,6 +131,10 @@ public class SkillManager : MonoBehaviour
             {
                 m_delNotifyEvent(gameObject);
             }
+        }
+        else if (m_bBeginPickupBox && null == m_bcCurBox)
+        {
+            Debug.LogError("CurBox is null");
         }
     }
 
