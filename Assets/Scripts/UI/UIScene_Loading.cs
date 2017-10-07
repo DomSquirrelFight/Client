@@ -30,27 +30,28 @@ public class UIScene_Loading : UIScene {
         StartCoroutine(SceneChange());
         DontDestroy();
         //DataReset();
-        animState = AnimState.State_ProgressBar;
+        animState = AnimState.State_Loadbg;
     }
 
     void Update()
     {
         #region 场景加载
         //进度条的加载
-        if (animState == AnimState.State_ProgressBar)
+        if (animState == AnimState.State_Loadbg)
         {
             TweenPosition.Begin(m_oBar, 1f, new Vector3(0, -280, 0)).method = UITweener.Method.BounceIn;
             //StartCoroutine(LaterDo());
-            animState = AnimState.State_null;
+            animState = AnimState.State_ProgressBar;
 
         }
-        if (animState == AnimState.State_null)
+        if (animState == AnimState.State_ProgressBar)
         {
-            //资源预加载
-            LoadRes();
             //进度条推进
-            Invoke("ProcessBar", 2f);
-
+             Invoke("ProcessBar", 1f);
+            //this.InvokeNextFrame(ProcessBar);
+            // animState = AnimState.State_null;
+            //Debug.Log(Time.deltaTime);
+            //ProcessBar();
 
         }
         #endregion
@@ -66,22 +67,6 @@ public class UIScene_Loading : UIScene {
     }
     #endregion
 
-    #region 资源预加载
-    //场景资源预加载
-    void LoadRes()
-    {
-        GC.Collect();
-        Resources.UnloadUnusedAssets();
-        //复位所有全局引用
-        //清理策划表实例缓存
-        //if (type == SceneType.SelecteLoading)
-        //{
-        //}
-        //if (type == SceneType.FightLoading)
-        //{
-        //}
-    }
-    #endregion
 
     #region 进度条推进
     //进度条推进
@@ -96,7 +81,7 @@ public class UIScene_Loading : UIScene {
         else
         {
 
-            Invoke("DestroyLoading", 2f);
+            Invoke("DestroyLoading", 1f);
             //DestroyLoading();
         }
     }

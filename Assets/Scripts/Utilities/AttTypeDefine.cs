@@ -36,6 +36,7 @@ namespace AttTypeDefine
     //动画的状态，用于loading界面
     public enum AnimState
     {
+        State_Loadbg,
         State_null,
         State_ProgressBar,
     }

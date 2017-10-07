@@ -357,7 +357,7 @@ public class UIScene_Fight : UIScene
         UIEventListener.Get(m_oPickUpBox).onClick = PressPickUpBox;
         UIEventListener.Get(m_oJumpDown).onPress = PressJumpDown;
         UIEventListener.Get(m_oLeaveBtn).onClick = LeaveScene;
-        UIEventListener.Get(m_oOverBtn).onClick = EndTheGame;
+        UIEventListener.Get(m_oOverBtn).onClick = LeaveScene;
     }
 
     void Start()
@@ -418,6 +418,7 @@ public class UIScene_Fight : UIScene
     public GameObject m_oLeaveBtn;
     void LeaveScene(GameObject obj)
     {
+        GlobalHelper.ResumeGame();
         //退出离开游戏，跳转到login界面
         GlobalHelper.LoadLevel("Loading");
         
@@ -523,11 +524,6 @@ public class UIScene_Fight : UIScene
         m_oJoyFront.SetActive(isopen);
     }
 
-    void EndTheGame(GameObject obj)
-    {
-        GlobalHelper.LoadLevel("Loading");
-        
-    }
 #endregion
 
     #region 回收数据
