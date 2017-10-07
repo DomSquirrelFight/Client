@@ -46,6 +46,8 @@ public class UIScene_Loading : UIScene {
         }
         if (animState == AnimState.State_null)
         {
+            //资源预加载
+            LoadRes();
             //进度条推进
             Invoke("ProcessBar", 2f);
 
@@ -66,7 +68,19 @@ public class UIScene_Loading : UIScene {
 
     #region 资源预加载
     //场景资源预加载
-
+    void LoadRes()
+    {
+        GC.Collect();
+        Resources.UnloadUnusedAssets();
+        //复位所有全局引用
+        //清理策划表实例缓存
+        //if (type == SceneType.SelecteLoading)
+        //{
+        //}
+        //if (type == SceneType.FightLoading)
+        //{
+        //}
+    }
     #endregion
 
     #region 进度条推进
