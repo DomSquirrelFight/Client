@@ -143,11 +143,11 @@ public class PlayerManager : MonoBehaviour
                 {
                     if (value == ePlayerJumpDownState.CanJumpDown_YES)                     //ui fight 下跳按钮点亮
                     {
-                        m_UISceneFight.BDisableJumpDown = false;
+                        Owner.UISceneFight.BDisableJumpDown = false;
                     }
                     else if (value == ePlayerJumpDownState.CanJumpDown_NO)               // ui fight 下跳按钮变灰
                     {
-                        m_UISceneFight.BDisableJumpDown = true;
+                        Owner.UISceneFight.BDisableJumpDown = true;
                     }
                 }
                 bCanJumpDown = value;
@@ -176,14 +176,7 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    UIScene_Fight m_UISceneFight;
-    public UIScene_Fight UISceneFight
-    {
-        get
-        {
-            return m_UISceneFight;
-        }
-    }
+
 
     public  float SBoxSize = 0.6f;
 
@@ -227,8 +220,8 @@ public class PlayerManager : MonoBehaviour
 
         if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major)
         {
-            m_UISceneFight = Helpers.UIScene<UIScene_Fight>();
-            m_UISceneFight.OnStart(Owner);
+            Owner.UISceneFight = Helpers.UIScene<UIScene_Fight>();
+            Owner.UISceneFight.OnStart(Owner);
         }
         cc = Owner.CameraContrl;
         //m_curJumpData = Owner.SmallJumpDataStore;
@@ -382,14 +375,14 @@ public class PlayerManager : MonoBehaviour
 
             if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                m_vInputMove = m_UISceneFight.DirPos; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
+                m_vInputMove = Owner.UISceneFight.DirPos; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
             }
             else
             {
                 he = Input.GetAxis("Horizontal");
-                if (0f == he && (m_UISceneFight))
+                if (0f == he && (Owner.UISceneFight))
                 {
-                    m_vInputMove = m_UISceneFight.DirPos; //否则 用摇杆数据
+                    m_vInputMove = Owner.UISceneFight.DirPos; //否则 用摇杆数据
                 }
                 else if (0f != he)
                 {
@@ -860,14 +853,14 @@ public class PlayerManager : MonoBehaviour
 
         if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
         {
-            m_vInputMove = m_UISceneFight.VRunDir; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
+            m_vInputMove = Owner.UISceneFight.VRunDir; //m_vInputMove 需要时时获取UIScene_JoyStick的摇杆数据
         }
         else
         {
             he = Input.GetAxis("Horizontal");
-            if (0f == he && (m_UISceneFight))
+            if (0f == he && (Owner.UISceneFight))
             {
-                m_vInputMove = m_UISceneFight.DirPos; //否则 用摇杆数据
+                m_vInputMove = Owner.UISceneFight.DirPos; //否则 用摇杆数据
             }
             else if (0f != he)
             {

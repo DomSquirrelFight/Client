@@ -113,4 +113,19 @@ public class GlobalHelper
     #endregion
 
 
+    public static void ResumeGame()
+    {
+
+        Time.timeScale = 1f;
+    }
+
+
+
+    public static void PauseGame()
+    {
+        Time.timeScale = 0f;
+    }
+
+
+
 }

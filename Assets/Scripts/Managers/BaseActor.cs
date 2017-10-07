@@ -554,4 +554,42 @@ public class BaseActor : MonoBehaviour
     }
     #endregion
 
+    #region 清空所有输入数据<在弹出结束游戏界面的时候，需要调用>
+    public void ResetAllInputs()
+    {
+        if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+          
+        }
+        else
+        {
+            Input.ResetInputAxes();
+        }
+
+       
+        //关闭摇杆和技能按钮
+        UISceneFight.SetJoyAndButton(false);
+
+    }
+
+    #endregion
+
+
+    #region UI
+    UIScene_Fight m_UISceneFight;
+    public UIScene_Fight UISceneFight
+    {
+        get
+        {
+            return m_UISceneFight;
+        }
+        set
+        {
+            if (value != m_UISceneFight)
+                m_UISceneFight = value;
+        }
+    }
+
+    #endregion
+
 }

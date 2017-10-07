@@ -18,7 +18,7 @@ namespace Assets.Scripts.Action
                 //同步UI显示.
                 AudioManager.PlayAudio(Defenser.gameObject, eAudioType.Audio_Skill, "Hurt");
                 //m_delBeinjured();
-                Defenser.PlayerMgr.UISceneFight.BeInjured();
+                Defenser.UISceneFight.BeInjured();
             }
             //计算主角得分
             else
@@ -26,11 +26,11 @@ namespace Assets.Scripts.Action
                 AudioManager.PlayAudio(Defenser.gameObject, eAudioType.Audio_Skill, "HitEnemy");
                 if (null != Attacker)
                 {
-                    if (null == Attacker.PlayerMgr.UISceneFight)
+                    if (null == Attacker.UISceneFight)
                     {
                         return;
                     }
-                    Attacker.PlayerMgr.UISceneFight.GetScore(10);
+                    Attacker.UISceneFight.GetScore(10);
                     // m_delGetscore(10);
                 }
             }

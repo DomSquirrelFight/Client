@@ -19,7 +19,7 @@ public class SelfRotation : MonoBehaviour {
             if (ba.BaseAtt.RoleInfo.CharacType == AttTypeDefine.eCharacType.Type_Major)
             {
                 //加分
-                ba.PlayerMgr.UISceneFight.GetScore(10);
+                ba.UISceneFight.GetScore(10);
                 //播放特效
                 GameObject obj = Instantiate(Resources.Load("IGSoft_Projects/Projects/Projects_1/PT_Baodian010"), (transform.position + Vector3.up*3.5f), transform.rotation) as GameObject;
                 //播放音乐

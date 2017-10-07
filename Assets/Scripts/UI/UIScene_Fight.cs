@@ -98,7 +98,7 @@ public class UIScene_Fight : UIScene
                         TouchPos = cam.ScreenToWorldPoint(touch.position);//获取点击起点位置
                         m_oJoyFront.transform.localPosition = Vector3.zero;
                         m_oJoyBack.transform.position = m_vJoyBackOrigPos = TouchPos;//赋值给起点游戏对象
-                        m_oJoyBack.SetActive(true);
+                        SetJoyStick(true);
                         break;
                     }
                 case TouchPhase.Moved:
@@ -120,7 +120,7 @@ public class UIScene_Fight : UIScene
                 case TouchPhase.Ended:
                     {
                         dirpos = Vector2.zero;
-                        m_oJoyBack.SetActive(false);//关闭活性
+                        SetJoyStick(false);
                         //if (!m_bCanJoy[i]) return;
                         
                         Debug.Log("TouchController :: TouchPhase.Ended");
@@ -162,7 +162,7 @@ public class UIScene_Fight : UIScene
             pos = cam.ScreenToWorldPoint(Input.mousePosition);
             m_oJoyFront.transform.localPosition = Vector3.zero;
             m_oJoyBack.transform.position = m_vJoyBackOrigPos = pos;
-            m_oJoyBack.SetActive(true);
+            SetJoyStick(true);
         }
         else if (Input.GetMouseButton(0))
         {
@@ -181,7 +181,7 @@ public class UIScene_Fight : UIScene
         else if (Input.GetMouseButtonUp(0))
         {
             if (!bCanJoy) return;
-            m_oJoyBack.SetActive(false);
+            SetJoyStick(false);
             //bpressed = false;
             dirpos = Vector2.zero;
         }
@@ -380,8 +380,7 @@ public class UIScene_Fight : UIScene
 
     void Start()
     {
-       
-        m_oJoyBack.SetActive(false);
+        SetJoyStick(false);       
 
         m_vJoyBackOrigPos = m_oJoyBack.transform.position;
 
@@ -505,34 +504,41 @@ public class UIScene_Fight : UIScene
     public GameObject m_oOverBtn;
     void Gameover()
     {
+        //关闭所有场景输入
+        Owner.ResetAllInputs();
+        //销毁主角
         Destroy(Owner.gameObject);
-       
-        // this.InvokeNextFrame(UIGameOver);
-       Invoke("UIGameOver", 0.3f);
-      
-        // UIGameOver();
+        //下一帧启动游戏结束UI
+        this.InvokeNextFrame(UIGameOver);
     }
 
     void UIGameOver()
     {
-        CloseJoyAndButton();
-       
-        ////Gameover界面的活性打开
+        //Gameover界面的活性打开
         m_oGameOver.SetActive(true);
-        ////显示最终得分
+        //显示最终得分
         m_uiTotalScore.text = "Total Score=" + m_labelScore.text;
-        Time.timeScale = 0f;
+
+        GlobalHelper.PauseGame();
     }
-    void CloseJoyAndButton()
+    public void SetJoyAndButton(bool isopen)
     {
-        m_oJoyBack.SetActive(false);
-        //Destroy(m_oJoyFront);
-        m_oJoyFront.SetActive(false);
-        m_oJumpUp.SetActive(false);
-        m_oJumpDown.SetActive(false);
-        m_oPickUpBox.SetActive(false);
+        SetSkillBtn(isopen);
+        SetJoyStick(isopen);
+    }
+
+    void SetSkillBtn(bool isopen)
+    {
+        m_oJumpUp.SetActive(isopen);
+        m_oJumpDown.SetActive(isopen);
+        m_oPickUpBox.SetActive(isopen);
+    }
 
 
+    void SetJoyStick(bool isopen)
+    {
+        m_oJoyBack.SetActive(isopen);
+        m_oJoyFront.SetActive(isopen);
     }
 
     void EndTheGame(GameObject obj)
@@ -545,11 +551,10 @@ public class UIScene_Fight : UIScene
     #region 回收数据
     void OnDisable()
     {
-        for (int i = 0; i < 10; i++)
+        if (null != m_bCanJoy)
         {
-            m_bCanJoy[i] = false;
-        }
-        m_bCanJoy = null;
+            m_bCanJoy = null;
+        }     
     }
     #endregion
 }
