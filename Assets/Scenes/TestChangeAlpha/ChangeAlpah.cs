@@ -6,14 +6,16 @@ using Assets.Scripts.Action;
 public class ChangeAlpah : BaseAction {
      SpriteRenderer m_sRender;
     public float m_fSpeed;
+    float speed;
     Color tmp;
-    public  float m_fMax;
-    public float m_fMin;
+    public  float m_fMax = 1f;
+    public float m_fMin = 0f;
     public override void TrigAction()
     {
         m_sRender = gameObject.GetComponent<SpriteRenderer>();
          tmp = m_sRender.color;
         base.TrigAction();
+        speed = m_fSpeed;
     }
     protected override void Update()
     {
@@ -26,10 +28,16 @@ public class ChangeAlpah : BaseAction {
 
     void ChangeAlpha()
     {
-        if (tmp.a >= m_fMax)
+        if (tmp.a >= m_fMax) {
             tmp.a = m_fMax;
+            speed = 0 - m_fSpeed;
+        }
         else if (tmp.a <= m_fMin)
+        {
             tmp.a = m_fMin;
-        tmp.a -= m_fSpeed * Time.deltaTime;
+            speed = m_fSpeed;
+        }
+
+        tmp.a += (speed * Time.deltaTime / 100f);
     }
 }

@@ -97,6 +97,8 @@ public class PlayerManager : MonoBehaviour
 
     int HoldBoxMaskGlossy;
 
+    int RunMonsterGlossy;
+
     public int NHoldBoxMaskGlossy
     {
         get
@@ -220,7 +222,7 @@ public class PlayerManager : MonoBehaviour
         HoldBoxMask = 1 << HoldBoxMaskGlossy;
 
 
-     
+        RunMonsterGlossy = LayerMask.NameToLayer("RunMonster");
 
         SkillMgr = Owner.SkillMgr;
 
@@ -464,7 +466,7 @@ public class PlayerManager : MonoBehaviour
                     {
                         OperateGround(other, BoxMask);
                     }
-                    else if (other.contacts[0].otherCollider.gameObject.layer == NpcMaskGlossy)                             //如果碰到了npc
+                    else if (other.contacts[0].otherCollider.gameObject.layer == NpcMaskGlossy || other.contacts[0].otherCollider.gameObject.layer == RunMonsterGlossy)                             //如果碰到了npc or run monster
                     {
                         if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major && null != other.contacts[0].otherCollider.transform.parent)
                         {
@@ -473,6 +475,10 @@ public class PlayerManager : MonoBehaviour
                             GameObject tmp = Instantiate(obj) as GameObject;
                             ActionInfos acInfos = tmp.GetComponent<ActionInfos>();
                             acInfos.SetOwner(Owner.gameObject, Owner, null);
+                            if (other.contacts[0].otherCollider.gameObject.layer == RunMonsterGlossy)
+                            {
+                                Destroy(other.contacts[0].otherCollider.transform.parent.gameObject);
+                            }
                         }
                     }
 
