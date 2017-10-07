@@ -56,7 +56,6 @@ public class UIScene_Fight : UIScene
        
     }
 
-
     void PressJumpUp(GameObject obj, bool pressed)
     {
         m_bPressedJumpUp = pressed;
