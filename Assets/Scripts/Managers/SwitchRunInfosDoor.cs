@@ -45,6 +45,7 @@ public class SwitchRunInfosDoor : MonoBehaviour {
                         if (ba.RoleBehaInfos.RunMode == eRunMode.eRun_Vertical)
                         {
                             ba.RoleBehaInfos.CanRoleMoveHorizontal = CanRoleMoveHorizontal;
+                            ba.UISceneFight.SetJoyAndButton(false);
                         }
                         break;
                     }

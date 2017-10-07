@@ -103,8 +103,9 @@ public class BoxController : MonoBehaviour {
                     TrigBuff(Owner, 1010101);
                     Owner.HoldBoxDir =transform.forward;                               //确定飞过来的盒子的方向
                 }
+                Destroy(gameObject);
             }
-            Destroy(gameObject);
+         
         }
     }
 
