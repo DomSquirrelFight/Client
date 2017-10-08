@@ -484,7 +484,7 @@ public class UIScene_Fight : UIScene
     public GameObject m_oGameOver;
     public UILabel m_uiTotalScore;
     public GameObject m_oOverBtn;
-    public void Gameover()
+    void Gameover()
     {
         //关闭所有场景输入
         Owner.ResetAllInputs();
