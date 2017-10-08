@@ -470,14 +470,22 @@ public class PlayerManager : MonoBehaviour
                     {
                         if (Owner.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Major && null != other.contacts[0].otherCollider.transform.parent)
                         {
-                            //BaseActor tmp1 = other.contacts[0].otherCollider.transform.parent.GetComponent<BaseActor>();
-                            UnityEngine.Object obj = Resources.Load("IGSoft_Projects/Buffs/5010101");
-                            GameObject tmp = Instantiate(obj) as GameObject;
-                            ActionInfos acInfos = tmp.GetComponent<ActionInfos>();
-                            acInfos.SetOwner(Owner.gameObject, Owner, null);
-                            if (other.contacts[0].otherCollider.gameObject.layer == RunMonsterGlossy)
+                            BaseActor tmp1 = other.contacts[0].otherCollider.transform.parent.GetComponent<BaseActor>();
+
+                            if (tmp1.BaseAtt.RoleInfo.CharacSide == eCharacSide.Side_Neutral && tmp1.BaseAtt.RoleInfo.CharacType == eCharacType.Type_Boss)
                             {
-                                Destroy(other.contacts[0].otherCollider.transform.parent.gameObject);
+                                Owner.UISceneFight.Gameover();
+                            }
+                            else
+                            {
+                                UnityEngine.Object obj = Resources.Load("IGSoft_Projects/Buffs/5010101");
+                                GameObject tmp = Instantiate(obj) as GameObject;
+                                ActionInfos acInfos = tmp.GetComponent<ActionInfos>();
+                                acInfos.SetOwner(Owner.gameObject, Owner, null);
+                                if (other.contacts[0].otherCollider.gameObject.layer == RunMonsterGlossy)
+                                {
+                                    Destroy(other.contacts[0].otherCollider.transform.parent.gameObject);
+                                }
                             }
                         }
                     }
