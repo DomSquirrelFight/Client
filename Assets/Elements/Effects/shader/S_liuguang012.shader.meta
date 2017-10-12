@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: 3e9e47a38d9d4b74d8fadd9290610526
+timeCreated: 1488535885
+licenseType: Pro
+ShaderImporter:
+  defaultTextures:
+  - _Xiaosang: {fileID: 2800000, guid: aef2d72c5a7c0374ab5d4e3e7dfea779, type: 3}
+  - _niuqu: {fileID: 2800000, guid: 26cca6af0bec8a94eaefe7a317622d3c, type: 3}
+  - _wenli02: {fileID: 2800000, guid: ddeb6b06c9b916c4fb6a9a35680cccb3, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

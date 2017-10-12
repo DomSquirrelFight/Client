@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 1b115fe5ba4915146a13b9f431489de8
+timeCreated: 1489215146
+licenseType: Pro
+ShaderImporter:
+  defaultTextures:
+  - _Xiaosang: {fileID: 2800000, guid: 5598d59be0a8ed74693e5b3a3f77453e, type: 3}
+  - _niuqu: {fileID: 2800000, guid: 26cca6af0bec8a94eaefe7a317622d3c, type: 3}
+  - _wenli02: {fileID: 2800000, guid: 1acace4de3be7c54fbcb8a03d71d7473, type: 3}
+  - _node_5122_copy: {fileID: 2800000, guid: 970a620b895468a458d879fb1b047a63, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

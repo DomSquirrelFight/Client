@@ -1,0 +1,269 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: M_Tex50272
+  m_Shader: {fileID: 4800000, guid: adea3ef1f9acb794caa4a21e388047f9, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+      data:
+        first:
+          name: _MainTex
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _BumpMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _DetailNormalMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _ParallaxMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _OcclusionMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _EmissionMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _DetailMask
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _DetailAlbedoMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _MetallicGlossMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Rongjie
+        second:
+          m_Texture: {fileID: 2800000, guid: f19f6d181688a5f449a804eb1aa551bd, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _wenli02
+        second:
+          m_Texture: {fileID: 2800000, guid: 4a3c3617b7546364883543f803b6ecaf, type: 3}
+          m_Scale: {x: 0.2, y: 0.2}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _node_413
+        second:
+          m_Texture: {fileID: 2800000, guid: f19f6d181688a5f449a804eb1aa551bd, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _node_8575
+        second:
+          m_Texture: {fileID: 2800000, guid: b0f3b82434a2b8747af09455c4aab9dc, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _wenli01
+        second:
+          m_Texture: {fileID: 2800000, guid: 1acace4de3be7c54fbcb8a03d71d7473, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Wenli
+        second:
+          m_Texture: {fileID: 2800000, guid: 87f74ae56b4a34d43a32095056226cee, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _wenli03
+        second:
+          m_Texture: {fileID: 2800000, guid: 0b14d31ac788fb94380eba7525628d33, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _Niuqu
+        second:
+          m_Texture: {fileID: 2800000, guid: c87b1f9cd67cc874c97483c110978c9e, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _node_6844
+        second:
+          m_Texture: {fileID: 2800000, guid: 0b14d31ac788fb94380eba7525628d33, type: 3}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: -0.25, y: 0}
+    m_Floats:
+      data:
+        first:
+          name: _SrcBlend
+        second: 1
+      data:
+        first:
+          name: _DstBlend
+        second: 0
+      data:
+        first:
+          name: _Cutoff
+        second: 0.5
+      data:
+        first:
+          name: _Parallax
+        second: 0.02
+      data:
+        first:
+          name: _ZWrite
+        second: 1
+      data:
+        first:
+          name: _Glossiness
+        second: 0.5
+      data:
+        first:
+          name: _BumpScale
+        second: 1
+      data:
+        first:
+          name: _OcclusionStrength
+        second: 1
+      data:
+        first:
+          name: _DetailNormalMapScale
+        second: 1
+      data:
+        first:
+          name: _UVSec
+        second: 0
+      data:
+        first:
+          name: _Mode
+        second: 0
+      data:
+        first:
+          name: _Metallic
+        second: 0
+      data:
+        first:
+          name: _Amount
+        second: 1.435897
+      data:
+        first:
+          name: _qiangdu
+        second: 1.2
+      data:
+        first:
+          name: _uuuuuuuuu
+        second: 2
+      data:
+        first:
+          name: _P
+        second: 1
+      data:
+        first:
+          name: _B
+        second: 0.02
+      data:
+        first:
+          name: _W2R
+        second: 0
+      data:
+        first:
+          name: _san
+        second: 0.0512821
+      data:
+        first:
+          name: _qiang
+        second: 1
+      data:
+        first:
+          name: _bian
+        second: 0.05
+      data:
+        first:
+          name: _san001
+        second: -0.5
+      data:
+        first:
+          name: _Bqiangdu
+        second: 1.5
+      data:
+        first:
+          name: _node_3347
+        second: 1
+      data:
+        first:
+          name: _node_1949
+        second: 1
+      data:
+        first:
+          name: _B_copy
+        second: 0.1
+    m_Colors:
+      data:
+        first:
+          name: _EmissionColor
+        second: {r: 0, g: 0, b: 0, a: 1}
+      data:
+        first:
+          name: _Color
+        second: {r: 1, g: 1, b: 1, a: 1}
+      data:
+        first:
+          name: _color
+        second: {r: 0.14819978, g: 0.875, b: 0.12224266, a: 1}
+      data:
+        first:
+          name: _Bcolor
+        second: {r: 0.38969997, g: 0.9117647, b: 0.13408312, a: 1}
+      data:
+        first:
+          name: _node_2405
+        second: {r: 0.19882472, g: 0.9264706, b: 0.10218424, a: 1}

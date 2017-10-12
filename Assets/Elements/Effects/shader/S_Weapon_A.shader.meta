@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: 4f44f2d82f429794db0dcc6501fa52fa
+timeCreated: 1487215395
+licenseType: Pro
+ShaderImporter:
+  defaultTextures:
+  - _wenli: {fileID: 2800000, guid: 28873d4d5bcdaab458c8aef76928c04e, type: 3}
+  - _Opacity: {fileID: 2800000, guid: aae3275ae79f3634a89e242bf1e3b1e1, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
